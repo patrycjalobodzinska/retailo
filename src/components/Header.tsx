@@ -59,18 +59,13 @@ export default function Header() {
   return (
     <>
       <header
-        className="sticky top-0 left-0 right-0 z-[100] flex items-center justify-between"
+        className="fixed top-0 left-0 right-0 z-[100] flex items-center justify-between"
         style={{
           paddingLeft: "5vw",
           paddingRight: "5vw",
           paddingTop: 16,
           paddingBottom: 16,
           background: "transparent",
-          // Pull the rest of the page up underneath the header so it
-          // overlays content (like the hero image) rather than pushing
-          // it down. Header's actual visual height (the pills) is
-          // ~64px; this negative margin matches that.
-          marginBottom: -72,
         }}>
         <a
           href="/"
