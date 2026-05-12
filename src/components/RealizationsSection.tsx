@@ -186,11 +186,13 @@ export default function RealizationsSection({
       });
       document.body.appendChild(panel);
 
-      // Expand the gradient panel to fill the whole viewport, then push
-      // the route. The destination page shares the same gradient as its
-      // fixed background, so we can simply snap-remove the panel after a
-      // brief hold (no fade — that revealed the body's #000 during the
-      // crossfade and read as a dark flash).
+      // Pre-warm the destination route so router.push has the JS chunk
+      // ready by the time the expand animation completes. Without this,
+      // a first-visit navigation can take 300-800ms after push before
+      // the new page paints — and during that gap a fixed-duration hold
+      // pulls the panel off too early, briefly revealing the homepage.
+      router.prefetch(`/realizacje/${slug}`);
+
       const tl = gsap.timeline();
       tl.to(panel, {
         top: 0,
@@ -204,12 +206,18 @@ export default function RealizationsSection({
       tl.add(() => {
         router.push(`/realizacje/${slug}`);
       });
-      // Hold opaque long enough for the destination to mount + paint.
-      tl.to({}, { duration: 0.45 });
-      tl.add(() => {
-        panel.remove();
-        isFlyingRef.current = false;
-      });
+      // DO NOT auto-remove the panel after a fixed delay — on first
+      // navigation that fires before the destination has rendered and
+      // the homepage flashes through. The pathname-change useEffect
+      // above removes any stale panels once Next has actually swapped
+      // the route. A safety timeout below clears the panel if pathname
+      // change somehow doesn't fire within 4s (aborted nav, etc.).
+      window.setTimeout(() => {
+        if (document.body.contains(panel)) {
+          panel.remove();
+          isFlyingRef.current = false;
+        }
+      }, 4000);
     },
     [router],
   );
