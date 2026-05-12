@@ -24,10 +24,14 @@ const raleway = Raleway({
 });
 
 export async function generateMetadata(): Promise<Metadata> {
-  const settings = await getSiteSettings();
-  return {
-    title: settings?.metaTitle ?? "Retailo",
-  };
+  try {
+    const settings = await getSiteSettings();
+    return {
+      title: settings?.metaTitle ?? "Retailo",
+    };
+  } catch {
+    return { title: "Retailo" };
+  }
 }
 
 export default async function RootLayout({
@@ -35,10 +39,19 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const [languages, defaultLang] = await Promise.all([
-    getLanguages(),
-    getDefaultLanguage(),
-  ]);
+  // Sanity fetches must never throw at build time — if they do, Next
+  // can drop the route from the prerender manifest and Vercel serves
+  // its infrastructure 404. Fall back to the safe defaults instead.
+  let languages: Awaited<ReturnType<typeof getLanguages>> = [];
+  let defaultLang = "pl";
+  try {
+    [languages, defaultLang] = await Promise.all([
+      getLanguages(),
+      getDefaultLanguage(),
+    ]);
+  } catch (e) {
+    console.error("[RootLayout] Sanity fetch failed, using fallback:", e);
+  }
 
   return (
     <html
