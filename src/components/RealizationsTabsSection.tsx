@@ -50,27 +50,15 @@ export default function RealizationsTabsSection() {
         typeof window !== "undefined" &&
         window.matchMedia("(max-width: 1023px)").matches;
 
-      // Mobile / landscape phone / very short laptop: the pinned
-      // 200%-scrub timeline stutters with Lenis smooth scroll AND cuts
-      // off the bottom half of the section behind the viewport edge.
-      // Skip the pin entirely. Replace with a lightweight per-item
-      // fade-up that fires once when the card scrolls into view — no
-      // pin, no scrub, no flicker.
+      // Mobile / landscape phone / very short laptop: skip the pinned
+      // scrub timeline entirely. No entrance animation either — the
+      // gsap.set/gsap.fromTo approach kept the items stuck at opacity:0
+      // when ScrollTrigger didn't refresh in time after hydration, so
+      // descriptions disappeared. Static render is the most reliable.
       if (shortViewport || isMobile) {
-        items.forEach((el) => {
-          gsap.set(el, { y: 28, opacity: 0 });
-          gsap.to(el, {
-            y: 0,
-            opacity: 1,
-            duration: 0.7,
-            ease: "power3.out",
-            scrollTrigger: {
-              trigger: el,
-              start: "top 88%",
-              toggleActions: "play none none none",
-            },
-          });
-        });
+        items.forEach((el) =>
+          gsap.set(el, { clearProps: "all" }),
+        );
         return;
       }
 
