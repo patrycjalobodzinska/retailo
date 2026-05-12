@@ -46,13 +46,17 @@ export default function RealizationsTabsSection() {
       const shortViewport =
         typeof window !== "undefined" &&
         window.matchMedia("(max-height: 600px)").matches;
+      const isMobile =
+        typeof window !== "undefined" &&
+        window.matchMedia("(max-width: 1023px)").matches;
 
-      // Landscape phone / very short laptop: the pinned 200%-scrub timeline
-      // hides the bottom half of the section behind a viewport edge. Skip
-      // the pin entirely, render every item at its resting state, and let
-      // the page scroll naturally (CSS resets the absolute positioning at
-      // the same breakpoint).
-      if (shortViewport) {
+      // Mobile / landscape phone / very short laptop: the pinned
+      // 200%-scrub timeline stutters with Lenis smooth scroll AND cuts
+      // off the bottom half of the section behind the viewport edge.
+      // Skip the pin entirely, render every item at its resting state,
+      // and let the page scroll naturally (CSS resets the absolute
+      // positioning at the same breakpoint).
+      if (shortViewport || isMobile) {
         items.forEach((el) => gsap.set(el, { y: 0, opacity: 1 }));
         return;
       }
@@ -116,7 +120,7 @@ export default function RealizationsTabsSection() {
       style={{ background: BG_COLOR }}>
       <div
         ref={pinRef}
-        className="h-screen min-h-[640px] w-full overflow-hidden flex items-center px-[6vw] gap-12 max-lg:flex-col max-lg:gap-6 max-lg:items-stretch max-lg:py-[6vh] max-lg:justify-start [@media(max-height:600px)]:!h-auto [@media(max-height:600px)]:!min-h-0 [@media(max-height:600px)]:!overflow-visible [@media(max-height:600px)]:!py-[8vh]">
+        className="h-screen min-h-[640px] w-full overflow-hidden flex items-center px-[6vw] gap-12 max-lg:!h-auto max-lg:!min-h-0 max-lg:!overflow-visible max-lg:flex-col max-lg:gap-6 max-lg:items-stretch max-lg:py-[8vh] max-lg:justify-start [@media(max-height:600px)]:!h-auto [@media(max-height:600px)]:!min-h-0 [@media(max-height:600px)]:!overflow-visible [@media(max-height:600px)]:!py-[8vh]">
         {/* Left: image (smaller than viewport, gentle parallax drift) */}
         <div className="w-1/2 flex items-center justify-center max-lg:w-full max-lg:flex-none">
           <div className="w-full max-w-[500px] aspect-[5/7] overflow-hidden rounded-md max-lg:max-w-[220px] max-lg:aspect-[1800/2732] [@media(max-height:600px)]:!max-w-[180px] [@media(max-height:600px)]:!aspect-[16/9]">
@@ -131,9 +135,9 @@ export default function RealizationsTabsSection() {
         </div>
 
         {/* Right: header + stacked items */}
-        <div className="w-1/2 h-full relative max-lg:w-full max-lg:flex-1 max-lg:min-h-[55vh] max-lg:[--rl-stack-top:14vh] [@media(max-height:600px)]:!flex [@media(max-height:600px)]:!flex-col [@media(max-height:600px)]:!gap-4 [@media(max-height:600px)]:!h-auto [@media(max-height:600px)]:!min-h-0">
+        <div className="w-1/2 h-full relative max-lg:!flex max-lg:!flex-col max-lg:!gap-5 max-lg:w-full max-lg:!h-auto max-lg:!min-h-0 [@media(max-height:600px)]:!flex [@media(max-height:600px)]:!flex-col [@media(max-height:600px)]:!gap-4 [@media(max-height:600px)]:!h-auto [@media(max-height:600px)]:!min-h-0">
           {/* Header — static, sits above the stacked items */}
-          <div className="absolute top-[8vh] left-0 right-0 z-0 max-lg:top-0 max-lg:mb-4 [@media(max-height:600px)]:!static">
+          <div className="absolute top-[8vh] left-0 right-0 z-0 max-lg:!static max-lg:!mb-2 [@media(max-height:600px)]:!static">
             <p
               className="m-0 mb-3 uppercase tracking-[0.2em] font-semibold text-[#0086b0]"
               style={{ fontSize: "clamp(0.72rem, 0.8vw, 0.85rem)" }}>
@@ -159,14 +163,16 @@ export default function RealizationsTabsSection() {
             </p>
           </div>
 
-          {/* Stacked items — same QASection pattern */}
+          {/* Stacked items — same QASection pattern. On mobile / short
+              viewports the absolute positioning is reset so items flow
+              as a normal vertical list (no pin + no clipping). */}
           {ITEMS.map((item, i) => (
             <div
               key={item.title}
               ref={(el) => {
                 itemRefs.current[i] = el;
               }}
-              className="absolute left-0 right-0 will-change-transform [@media(max-height:600px)]:!static [@media(max-height:600px)]:!opacity-100 [@media(max-height:600px)]:!translate-y-0"
+              className="absolute left-0 right-0 will-change-transform max-lg:!static max-lg:!opacity-100 max-lg:!translate-y-0 [@media(max-height:600px)]:!static [@media(max-height:600px)]:!opacity-100 [@media(max-height:600px)]:!translate-y-0"
               style={{
                 top: `calc(var(--rl-stack-top, ${TOP_OFFSET_VH}vh) + ${i * STACK_OFFSET_PX}px)`,
                 zIndex: i + 1,

@@ -69,19 +69,23 @@ export default function Header() {
       }
 
       if (!hero) {
+        // Larger thresholds avoid micro-scroll flicker — particularly on
+        // mobile inside pinned/scrub sections (ProductShowcase, GlobalSection)
+        // where Lenis dispatches tiny negative deltas as animations reverse.
+        // Showing the header on every <1px upscroll caused it to pop in
+        // and out repeatedly.
+        const showThreshold = -14;
+        const hideThreshold = 10;
         if (justExitedHero) {
           setVisible(delta < 0);
-          // Going from absolute (in hero) to fixed at top:16 while the
-          // transform tweens 0 → -130% would leave the pill briefly visible
-          // at top:16 with its black background. Suppress the transform
-          // transition for one frame so the pill snaps off-screen instead
-          // of sliding in and back out.
           if (delta > 0) {
             setSuppressTransition(true);
             window.setTimeout(() => setSuppressTransition(false), 80);
           }
-        } else if (Math.abs(delta) > 6) {
-          setVisible(delta < 0);
+        } else if (delta < showThreshold) {
+          setVisible(true);
+        } else if (delta > hideThreshold) {
+          setVisible(false);
         }
       }
       lastYRef.current = y;
