@@ -1,0 +1,545 @@
+@import "tailwindcss";
+
+html, body {
+  background: #000;
+  overscroll-behavior: none;
+  overflow-x: clip;
+}
+
+.no-scrollbar {
+  scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+
+.rl-fade-with-reveal {
+  opacity: calc(1 - var(--reveal-progress, 0) * 2);
+}
+
+.rl-reveal-text {
+  position: absolute;
+  left: 6vw;
+  bottom: 14vh;
+  z-index: 60;
+  max-width: 820px;
+  pointer-events: none;
+}
+@media (max-width: 767px) {
+  .rl-reveal-text {
+    left: 6vw;
+    right: 6vw;
+    bottom: 6vh;
+    max-width: none;
+  }
+}
+.rl-reveal-text-line {
+  --line-raw: clamp(
+    0,
+    calc((var(--reveal-progress, 0) - var(--line-start, 0.5)) / var(--line-duration, 0.5)),
+    1
+  );
+  --line-progress: calc(var(--line-raw) * (2 - var(--line-raw)));
+  /* Two terms compose the Y position:
+       1) per-line slide-in: (1 - line-progress) * 30vh — pulls line up from
+          its 30vh-below-rest starting offset to its rest position.
+       2) global upward drift: reveal-progress * 30vh — keeps every line,
+          even ones already at "rest", moving up as scroll progresses, so
+          nothing visually stops mid-section.
+     Net Y range across the full exit: +30vh (below) → 0 (rest) → -30vh
+     (above rest). */
+  transform: translate(
+    calc((1 - var(--line-progress)) * var(--line-x-offset, -6vw)),
+    calc(((1 - var(--line-progress)) * 30vh) - (var(--reveal-progress, 0) * 30vh))
+  );
+  opacity: var(--line-progress);
+  margin: 0;
+  padding: 14px 0 14px 44px;
+  font-size: clamp(1.2rem, 1.7vw, 1.65rem);
+  line-height: 1.35;
+  color: #fff;
+  font-weight: 600;
+  font-family: "Montserrat", system-ui, sans-serif;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  position: relative;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.14);
+  will-change: transform, opacity;
+}
+.rl-reveal-text-line::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: 28px;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.7);
+  transform: translateY(-50%);
+}
+.rl-reveal-text-line:last-child {
+  border-bottom: none;
+}
+.rl-reveal-line-title {
+  display: block;
+  font-weight: 800;
+  font-size: 1.05em;
+  letter-spacing: 0.1em;
+  color: #ffffff;
+}
+.rl-reveal-line-desc {
+  display: block;
+  margin-top: 8px;
+  font-size: 0.62em;
+  font-weight: 400;
+  letter-spacing: 0.03em;
+  text-transform: none;
+  color: rgba(255, 255, 255, 0.72);
+  line-height: 1.5;
+}
+
+.rl-section-bg-frame {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 100vh;
+  z-index: 1;
+  pointer-events: none;
+  box-sizing: border-box;
+  border-style: solid;
+  border-color: #0a1014;
+  border-top-width: max(0px, calc(18vh * (1 - var(--reveal-progress, 0) * 2.5)));
+  border-bottom-width: 0;
+  border-left-width: max(0px, calc(14vw * (1 - var(--reveal-progress, 0) * 2)));
+  border-right-width: max(0px, calc(14vw * (1 - var(--reveal-progress, 0) * 2)));
+}
+
+/* exit translate is applied imperatively by JS rAF (see RealizationsSection.tsx) */
+
+/* Per-slide title + location + CTA caption block, positioned below the
+   image (see buildSlideHTML in RealizationsSection.tsx). Only the active
+   slide shows it. The container must allow overflow so the caption can
+   extend past the image bounds. */
+.slide-container {
+  overflow: visible;
+}
+.slide-container .slide-info {
+  opacity: 0;
+  transition: opacity 500ms ease;
+}
+.slide-container.active .slide-info {
+  opacity: 1;
+}
+.slide-container .slide-info-cta:hover {
+  border-bottom-color: rgba(255, 255, 255, 0.9) !important;
+}
+
+/* Mobile: GSAP sets slide widths/heights with vw + vh which on a portrait
+   phone produces a very tall, thin shape. Override to a wider, shorter
+   aspect for the active slide, and hide the prev/next side slides
+   altogether (they'd render as tiny ugly strips). */
+@media (max-width: 767px) {
+  .slide-container.active {
+    left: 50% !important;
+    width: 86vw !important;
+    height: 50vh !important;
+  }
+  .slide-container.prev,
+  .slide-container.next {
+    opacity: 0 !important;
+    pointer-events: none !important;
+    width: 0 !important;
+    height: 0 !important;
+  }
+}
+
+/* === Realizations 3D carousel === */
+.rl-carousel {
+  --card-width: 200px;
+  --card-height: 300px;
+  --card-transition-easing: cubic-bezier(0.55, 0.05, 0.4, 1);
+
+  --scale-duration: 1400ms;
+  --scale-easing: cubic-bezier(0.5, 0.08, 0.5, 0.95);
+  --scale-delay: 0ms;
+
+  --move-duration: 1400ms;
+  --move-easing: cubic-bezier(0.55, 0.05, 0.4, 1);
+  --move-delay: 150ms;
+
+  --rotation-duration: 650ms;
+  --rotation-easing: cubic-bezier(0.45, 0.05, 0.4, 1);
+  --rotation-delay: 0ms;
+
+  --card-transition-duration: 1500ms;
+
+  position: relative;
+  width: 100%;
+  flex: 1 1 0;
+  min-height: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+@media (min-width: 800px) {
+  .rl-carousel {
+    --card-width: 280px;
+    --card-height: 340px;
+  }
+}
+@media (min-width: 1280px) {
+  .rl-carousel {
+    --card-width: 320px;
+    --card-height: 380px;
+  }
+}
+@media (min-width: 1600px) {
+  .rl-carousel {
+    --card-width: 360px;
+    --card-height: 420px;
+  }
+}
+
+.rl-carousel__bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  user-select: none;
+  overflow: hidden;
+}
+.rl-carousel__bg::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: #000;
+  z-index: 1;
+  /* Overlay starts at 0.45 during the hold (slide visible) and deepens to
+     0.75 by the end of the exit, when the reveal-text lines are on screen
+     and need solid contrast against the bg. */
+  opacity: calc(0.45 + var(--reveal-progress, 0) * 0.3);
+}
+/* Full-screen variant when bg sits at pinChild level (extends 40vh below the
+   pin, so the image continues into the next section as user scrolls past). */
+.rl-carousel__bg--full {
+  position: absolute;
+  inset: auto;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 140vh;
+  /* JS sets --bg-scroll-y so the bg visually scrolls up as the user
+     scrolls past the section. Height gives ~1.4x object-cover zoom (mild)
+     and enough overhang to keep the viewport fully covered at -40vh of
+     translate. */
+  transform: translateY(var(--bg-scroll-y, 0));
+}
+.rl-carousel__bg-image {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  transform: translateX(-50%) translateX(var(--bg-translate-offset, 0));
+  width: 100%;
+  height: 100%;
+  transition: transform 1000ms ease, opacity 1000ms ease;
+  opacity: 0;
+}
+.rl-carousel__bg-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center top;
+}
+.rl-carousel__bg-image[data-role="current"] {
+  opacity: 1;
+  --bg-translate-offset: 0;
+}
+.rl-carousel__bg-image[data-role="previous"] {
+  --bg-translate-offset: -25%;
+}
+.rl-carousel__bg-image[data-role="next"] {
+  --bg-translate-offset: 25%;
+}
+.rl-carousel__bg-image[data-role="hidden-left"] {
+  --bg-translate-offset: -50%;
+  opacity: 0;
+}
+.rl-carousel__bg-image[data-role="hidden-right"] {
+  --bg-translate-offset: 50%;
+  opacity: 0;
+}
+
+.rl-carousel__list {
+  position: relative;
+  width: calc(5 * var(--card-width));
+  height: var(--card-height);
+  z-index: 2;
+}
+
+.rl-carousel__btn {
+  --btn-size: 35px;
+  width: var(--btn-size);
+  height: var(--btn-size);
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 100;
+  border: none;
+  background: none;
+  cursor: pointer;
+  padding: 0;
+  opacity: calc(1 - var(--reveal-progress, 0) * 2) !important;
+}
+.rl-carousel__btn:focus { outline: none; }
+.rl-carousel__btn--left { left: 2vw; }
+.rl-carousel__btn--right { right: 2vw; }
+.rl-carousel__btn svg { width: 100%; height: 100%; }
+
+.rl-carousel__cards {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  perspective: 1000px;
+}
+
+.rl-card {
+  --card-translateY-offset: 0;
+  --card-translateX-offset: 0;
+  --card-scale-offset: 1;
+  --frame-rotation: 0deg;
+  --opacity: 0;
+  /* same portrait dimensions for all roles — orientation comes from frame rotation */
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform:
+    translate(-50%, -50%)
+    translateX(var(--card-translateX-offset))
+    translateY(var(--card-translateY-offset))
+    scale(var(--card-scale-offset));
+  width: var(--card-width);
+  height: var(--card-height);
+  opacity: 1;
+  transition:
+    transform var(--scale-duration) var(--scale-easing),
+    opacity var(--card-transition-duration) var(--card-transition-easing);
+  user-select: none;
+  pointer-events: none;
+}
+.rl-card__exit {
+  position: absolute;
+  inset: 0;
+  transform-origin: center center;
+}
+.rl-card[data-role="previous"] .rl-card__exit {
+  --exit-p: clamp(0, calc(var(--reveal-progress, 0) * 1.8), 1);
+  transform:
+    translateX(calc(-90vw * var(--exit-p)))
+    translateY(calc(-110vh * var(--exit-p)));
+}
+.rl-card[data-role="next"] .rl-card__exit {
+  --exit-p: clamp(0, calc(var(--reveal-progress, 0) * 1.8), 1);
+  transform:
+    translateX(calc(90vw * var(--exit-p)))
+    translateY(calc(-110vh * var(--exit-p)));
+}
+.rl-card[data-role="current"] .rl-card__exit {
+  --exit-p: clamp(0, calc(var(--reveal-progress, 0) * 1.8), 1);
+  transform: translateY(calc(-130vh * var(--exit-p)));
+  clip-path: inset(0 0 calc(100% * var(--exit-p)) 0);
+}
+.rl-card__frame {
+  position: absolute;
+  inset: 0;
+  transform: rotate(var(--frame-rotation));
+  transform-origin: center center;
+  overflow: hidden;
+  transition: transform var(--rotation-duration) var(--rotation-easing) var(--rotation-delay);
+}
+.rl-card__frame::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: #000;
+  z-index: 2;
+  opacity: calc(1 - var(--opacity));
+  transition: opacity var(--card-transition-duration) var(--card-transition-easing);
+  pointer-events: none;
+}
+.rl-card__image {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+.rl-card__image img {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  /* square that covers the box at any rotation; counter-rotation keeps it upright */
+  width: max(var(--card-width), var(--card-height));
+  height: max(var(--card-width), var(--card-height));
+  transform: translate(-50%, -50%) rotate(calc(-1 * var(--frame-rotation, 0deg)));
+  transition: transform var(--rotation-duration) var(--rotation-easing) var(--rotation-delay);
+  object-fit: cover;
+  display: block;
+}
+
+.rl-card[data-role="current"] {
+  --frame-rotation: 0deg;
+  --card-scale-offset: 1.35;
+  --opacity: 0.92;
+  /* incoming: rotation starts immediately */
+  --rotation-delay: 0ms;
+  z-index: 50;
+  pointer-events: auto;
+}
+.rl-card[data-role="previous"] {
+  --card-translateX-offset: calc(-1 * var(--card-width) * 1.45);
+  --frame-rotation: -90deg;
+  --card-scale-offset: 0.8;
+  --opacity: 0.6;
+  /* outgoing: rotation delayed until the end of the move/scale animation */
+  --rotation-delay: 750ms;
+  z-index: 30;
+}
+.rl-card[data-role="next"] {
+  --card-translateX-offset: calc(var(--card-width) * 1.45);
+  --frame-rotation: 90deg;
+  --card-scale-offset: 0.8;
+  --opacity: 0.6;
+  --rotation-delay: 750ms;
+  z-index: 30;
+}
+.rl-card[data-role="hidden-left"],
+.rl-card[data-role="hidden-right"] {
+  --card-scale-offset: 0.8;
+  --opacity: 0;
+  --rotation-delay: 750ms;
+  opacity: 0;
+  z-index: 0;
+}
+.rl-card[data-role="hidden-left"] {
+  --card-translateX-offset: calc(-2.4 * var(--card-width));
+  --frame-rotation: -90deg;
+}
+.rl-card[data-role="hidden-right"] {
+  --card-translateX-offset: calc(2.4 * var(--card-width));
+  --frame-rotation: 90deg;
+}
+
+.rl-info-list {
+  position: absolute;
+  width: calc(3 * var(--card-width));
+  height: var(--card-height);
+  pointer-events: none;
+  z-index: 3;
+  transform: translateY(calc(-60vh * var(--reveal-progress, 0)));
+}
+.rl-info-wrapper {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: flex-start;
+  align-items: flex-end;
+  perspective: 1000px;
+  transform-style: preserve-3d;
+}
+.rl-info {
+  margin-bottom: calc(var(--card-height) / 8);
+  margin-left: calc(var(--card-width) / 1.5);
+  transform: translateZ(2rem);
+  transition: transform var(--card-transition-duration) var(--card-transition-easing);
+}
+.rl-info .rl-text {
+  position: relative;
+  font-family: "Montserrat", system-ui, sans-serif;
+  font-size: calc(var(--card-width) * var(--text-size-offset, 0.2));
+  white-space: nowrap;
+  color: #fff;
+  width: fit-content;
+  margin: 0;
+}
+.rl-info .rl-name,
+.rl-info .rl-location {
+  text-transform: uppercase;
+}
+.rl-info .rl-name { font-weight: 800; }
+.rl-info .rl-location {
+  --mg-left: 40px;
+  --text-size-offset: 0.12;
+  font-weight: 600;
+  margin-left: var(--mg-left);
+  margin-bottom: calc(var(--mg-left) / 2);
+  padding-bottom: 0.8rem;
+}
+.rl-info .rl-location::before,
+.rl-info .rl-location::after {
+  content: "";
+  position: absolute;
+  background: #fff;
+  left: 0;
+  transform: translate(calc(-1 * var(--mg-left)), -50%);
+}
+.rl-info .rl-location::before { top: 50%; width: 20px; height: 5px; }
+.rl-info .rl-location::after { bottom: 0; width: 60px; height: 2px; }
+.rl-info .rl-description {
+  --text-size-offset: 0.065;
+  font-weight: 500;
+  white-space: normal;
+  max-width: calc(var(--card-width) * 1.6);
+  opacity: calc(1 - var(--reveal-progress, 0) * 2) !important;
+}
+
+
+/* Detail-page entrance — runs on first paint of /realizacje/[slug].
+   The destination's fixed gradient backdrop matches the carousel→detail
+   navigation panel, so the panel can fade without any color shift. The
+   content (main) then eases in on top. */
+@keyframes realization-detail-in {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.realization-detail-in {
+  animation: realization-detail-in 0.7s ease-out 0.25s backwards;
+}
+
+/* Header slide-down on the realization detail page. Plays once on mount
+   after the carousel→detail gradient panel settles, so the header drops
+   in from above onto the gradient. */
+@keyframes realization-header-down {
+  from { transform: translateY(-110%); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+.realization-header-in {
+  animation: realization-header-down 0.6s cubic-bezier(0.22, 0.61, 0.36, 1) 0.15s backwards;
+}
+
+/* Realization detail image fade-in — soft entry over the gradient. */
+@keyframes realization-image-in {
+  from { opacity: 0; transform: scale(1.04); }
+  to { opacity: 1; transform: scale(1); }
+}
+.realization-image-in {
+  animation: realization-image-in 0.9s cubic-bezier(0.22, 0.61, 0.36, 1) 0.5s backwards;
+}
+
+/* Realization detail — staggered fade-in for each block. Header & hero
+   image already use their own keyframes; these are for downstream blocks
+   so the page reveals top-to-bottom rather than all-at-once. */
+@keyframes realization-block-in {
+  from { opacity: 0; transform: translateY(18px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.realization-block-in {
+  animation: realization-block-in 0.7s cubic-bezier(0.22, 0.61, 0.36, 1) backwards;
+}
+.realization-block-in-1 { animation-delay: 0.7s; }
+.realization-block-in-2 { animation-delay: 0.85s; }
+.realization-block-in-3 { animation-delay: 1.0s; }
+.realization-block-in-4 { animation-delay: 1.15s; }
+.realization-block-in-5 { animation-delay: 1.30s; }

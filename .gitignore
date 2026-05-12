@@ -1,11 +1,14 @@
-# build output
-dist/
-
-# generated types
-.astro/
-
 # dependencies
 node_modules/
+
+# Next.js
+.next/
+out/
+build/
+
+# Sanity / Astro leftovers
+dist/
+.astro/
 
 # logs
 npm-debug.log*
@@ -13,12 +16,17 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 
-# environment variables
+# typescript
+*.tsbuildinfo
+next-env.d.ts
+
+# environment
 .env
+.env.local
 .env.production
+.env*.local
 
-# macOS-specific files
+# OS / editor
 .DS_Store
-
-# jetbrains setting folder
 .idea/
+.vercel
