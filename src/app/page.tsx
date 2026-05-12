@@ -1,4 +1,4 @@
-import dynamic from "next/dynamic";
+import nextDynamic from "next/dynamic";
 import Header from "@/components/Header";
 import Hero from "@/components/Hero";
 import QASection from "@/components/QASection";
@@ -8,15 +8,23 @@ import { getHomePage, type HomePage } from "@/lib/sanity/fetch";
 // blocks initial hydration if eager-imported alongside the hero. Lazy
 // loading them lets the hero animation kick off as soon as React hydrates
 // the small set of above-the-fold components.
-const ProductShowcase = dynamic(() => import("@/components/ProductShowcase"));
-const RealizationsSection = dynamic(
+const ProductShowcase = nextDynamic(() => import("@/components/ProductShowcase"));
+const RealizationsSection = nextDynamic(
   () => import("@/components/RealizationsSection"),
 );
-const RealizationsTabsSection = dynamic(
+const RealizationsTabsSection = nextDynamic(
   () => import("@/components/RealizationsTabsSection"),
 );
-const GlobalSection = dynamic(() => import("@/components/GlobalSection"));
-const Footer = dynamic(() => import("@/components/Footer"));
+const GlobalSection = nextDynamic(() => import("@/components/GlobalSection"));
+const Footer = nextDynamic(() => import("@/components/Footer"));
+
+// Force / to be prerendered as static at build time. Without this, the
+// async nature of the page + the wrapped Sanity fetch could make Next
+// emit / as a dynamic function — and if Vercel doesn't wire that
+// function up under the deployment's URL, every request to / returns
+// the platform's 404: NOT_FOUND.
+export const dynamic = "force-static";
+export const revalidate = 3600;
 
 // Wrap the Sanity fetch — if Sanity is unreachable / misconfigured at
 // build time we still want the home page in the route manifest, just
