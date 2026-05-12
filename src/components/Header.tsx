@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import LanguageSwitcher from "./LanguageSwitcher";
 
@@ -13,103 +13,22 @@ type NavItem = {
 };
 
 const NAV_ITEMS: NavItem[] = [
-  // "Rozwiazanie" → ~1.4 viewports into the pinned ProductShowcase so the
-  // image has fully arrived and lifted into its resting position, with the
-  // heading + features visible alongside.
   { label: "Rozwiazanie", target: "rozwiazanie", vhOffset: 1.4 },
   { label: "Realizacje", target: "realizacje", vhOffset: 0.15 },
   { label: "Kontakt", target: "kontakt" },
 ];
 
-const HERO_THRESHOLD = 0.85; // header is "in hero" while scrollY < 85vh
-
 export default function Header() {
   const pathname = usePathname();
-  // Homepage has the hero image behind the header (light text variant);
-  // every other route lives on a light page background and needs the
-  // dark-text variant pinned in glass-pill form.
+  // Homepage uses the light-text variant (sits over the dark hero image
+  // at the top); every other route uses the dark-text variant.
   const isSubpage = pathname !== "/";
 
-  const headerRef = useRef<HTMLElement>(null);
   const [open, setOpen] = useState(false);
-  const [visible, setVisible] = useState(true);
-  const [inHero, setInHero] = useState(!isSubpage);
-  const [suppressTransition, setSuppressTransition] = useState(false);
-  const lastYRef = useRef(0);
-  const lastInHeroRef = useRef(!isSubpage);
-  // After clicking a nav item we trigger a programmatic smooth scroll; the
-  // scroll-direction handler would otherwise hide the header mid-jump.
-  const navLockUntilRef = useRef(0);
-
-  // No intro animation — the header is hidden while the hero is visible
-  // and only slides down once the user scrolls past it.
-
-  useEffect(() => {
-    lastYRef.current = window.scrollY;
-    const onScroll = () => {
-      const y = window.scrollY;
-      const heroHeight = window.innerHeight * HERO_THRESHOLD;
-      // Subpages don't have a hero behind the header — keep it permanently
-      // in the fixed-pill form so the scroll-direction reveal/hide still
-      // works but the "in hero" branch never engages.
-      const hero = isSubpage ? false : y < heroHeight;
-      const delta = y - lastYRef.current;
-      const justExitedHero = lastInHeroRef.current && !hero;
-
-      setInHero(hero);
-
-      // While a nav-click smooth-scroll is animating, keep the header
-      // pinned visible — otherwise it slides off mid-jump and the user
-      // sees the closing X get cut.
-      if (performance.now() < navLockUntilRef.current) {
-        setVisible(true);
-        lastYRef.current = y;
-        lastInHeroRef.current = hero;
-        return;
-      }
-
-      if (!hero) {
-        // Header now stays pinned visible the whole time outside hero —
-        // the scroll-direction show/hide pattern was firing inside
-        // pinned/scrub sections every time an animation reversed, which
-        // read as jitter on mobile. Always-visible removes the noise.
-        setVisible(true);
-      }
-      lastYRef.current = y;
-      lastInHeroRef.current = hero;
-    };
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-
-    let lenisOff: (() => void) | undefined;
-    const tryAttachLenis = () => {
-      const lenis = window.__lenis;
-      if (lenis) {
-        lenis.on("scroll", onScroll);
-        lenisOff = () => lenis.off("scroll", onScroll);
-        return true;
-      }
-      return false;
-    };
-    let intervalId: number | undefined;
-    if (!tryAttachLenis()) {
-      intervalId = window.setInterval(() => {
-        if (tryAttachLenis()) {
-          if (intervalId) window.clearInterval(intervalId);
-        }
-      }, 100);
-    }
-    return () => {
-      if (intervalId) window.clearInterval(intervalId);
-      window.removeEventListener("scroll", onScroll);
-      if (lenisOff) lenisOff();
-    };
-  }, []);
 
   useEffect(() => {
     if (open) {
       document.body.style.overflow = "hidden";
-      setVisible(true);
     } else {
       document.body.style.overflow = "";
     }
@@ -129,10 +48,6 @@ export default function Header() {
     const elTop = el.getBoundingClientRect().top + window.scrollY;
     const extra = (item.vhOffset ?? 0) * window.innerHeight;
     const top = elTop + extra - 80;
-    // Lenis takes ~1.2s with our duration; lock the visibility through
-    // the whole tween plus a small grace period.
-    navLockUntilRef.current = performance.now() + 1500;
-    setVisible(true);
     const lenis = window.__lenis;
     if (lenis) {
       lenis.scrollTo(top, { duration: 1.2 });
@@ -141,31 +56,21 @@ export default function Header() {
     }
   };
 
-  // While in hero we keep the header transparent over the dark image; once
-  // the user has scrolled past the hero we render a compact pill that can
-  // hide on scroll-down and re-appear on scroll-up.
   return (
     <>
       <header
-        ref={headerRef}
-        className="left-0 right-0 z-[100] flex items-center justify-between"
+        className="sticky top-0 left-0 right-0 z-[100] flex items-center justify-between"
         style={{
-          // In hero: absolute at the top of the page — header is part of
-          // the hero, scrolls away with the page on scroll-down, and is
-          // re-encountered when scrolling back up to the top.
-          // After hero: fixed glass pill that reveals on scroll-up and
-          // hides on scroll-down.
-          position: inHero ? "absolute" : "fixed",
-          top: inHero ? 0 : 16,
           paddingLeft: "5vw",
           paddingRight: "5vw",
-          paddingTop: inHero ? 18 : 0,
-          paddingBottom: inHero ? 18 : 0,
-          transform: inHero || visible ? "translateY(0)" : "translateY(-130%)",
-          transition:
-            inHero || suppressTransition ? "none" : "transform 450ms ease",
+          paddingTop: 16,
+          paddingBottom: 16,
           background: "transparent",
-          pointerEvents: inHero || visible ? "auto" : "none",
+          // Pull the rest of the page up underneath the header so it
+          // overlays content (like the hero image) rather than pushing
+          // it down. Header's actual visual height (the pills) is
+          // ~64px; this negative margin matches that.
+          marginBottom: -72,
         }}>
         <a
           href="/"
@@ -179,12 +84,9 @@ export default function Header() {
           className="inline-flex backdrop-blur-sm items-center no-underline"
           aria-label="retailo. — strona glowna"
           style={{
-            // Always-on glass pill: dark variant on homepage (over the hero
-            // image and post-hero dark sections), light variant on subpages.
             background: isSubpage
               ? "rgba(255,255,255,0.4)"
               : "rgba(15,21,24,0.2)",
-
             WebkitBackdropFilter: "blur(14px) saturate(140%)",
             border: isSubpage
               ? "1px solid rgba(10,42,46,0.08)"
@@ -192,8 +94,6 @@ export default function Header() {
             padding: "8px 16px",
             borderRadius: 999,
           }}>
-          {/* Two logo files: regular (dark) for light backgrounds, light
-              (white) for dark backgrounds. */}
           <img
             src={isSubpage ? "/retailologo.webp" : "/retailologo_light.webp"}
             alt="retailo."
