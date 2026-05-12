@@ -53,11 +53,24 @@ export default function RealizationsTabsSection() {
       // Mobile / landscape phone / very short laptop: the pinned
       // 200%-scrub timeline stutters with Lenis smooth scroll AND cuts
       // off the bottom half of the section behind the viewport edge.
-      // Skip the pin entirely, render every item at its resting state,
-      // and let the page scroll naturally (CSS resets the absolute
-      // positioning at the same breakpoint).
+      // Skip the pin entirely. Replace with a lightweight per-item
+      // fade-up that fires once when the card scrolls into view — no
+      // pin, no scrub, no flicker.
       if (shortViewport || isMobile) {
-        items.forEach((el) => gsap.set(el, { y: 0, opacity: 1 }));
+        items.forEach((el) => {
+          gsap.set(el, { y: 28, opacity: 0 });
+          gsap.to(el, {
+            y: 0,
+            opacity: 1,
+            duration: 0.7,
+            ease: "power3.out",
+            scrollTrigger: {
+              trigger: el,
+              start: "top 88%",
+              toggleActions: "play none none none",
+            },
+          });
+        });
         return;
       }
 
