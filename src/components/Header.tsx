@@ -69,24 +69,11 @@ export default function Header() {
       }
 
       if (!hero) {
-        // Larger thresholds avoid micro-scroll flicker — particularly on
-        // mobile inside pinned/scrub sections (ProductShowcase, GlobalSection)
-        // where Lenis dispatches tiny negative deltas as animations reverse.
-        // Showing the header on every <1px upscroll caused it to pop in
-        // and out repeatedly.
-        const showThreshold = -14;
-        const hideThreshold = 10;
-        if (justExitedHero) {
-          setVisible(delta < 0);
-          if (delta > 0) {
-            setSuppressTransition(true);
-            window.setTimeout(() => setSuppressTransition(false), 80);
-          }
-        } else if (delta < showThreshold) {
-          setVisible(true);
-        } else if (delta > hideThreshold) {
-          setVisible(false);
-        }
+        // Header now stays pinned visible the whole time outside hero —
+        // the scroll-direction show/hide pattern was firing inside
+        // pinned/scrub sections every time an animation reversed, which
+        // read as jitter on mobile. Always-visible removes the noise.
+        setVisible(true);
       }
       lastYRef.current = y;
       lastInHeroRef.current = hero;

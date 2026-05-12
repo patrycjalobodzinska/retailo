@@ -190,10 +190,12 @@ export default function GlobalSection() {
         start: `${Math.round(COUNTRY_SCROLL_PROGRESS * 100)}% top`,
         end: "bottom bottom",
         invalidateOnRefresh: true,
+        // Once the badges have appeared they stay — no reverse on leave.
+        // Earlier the timeline reversed when scrolling past the trigger
+        // end (or back above start), and the flags blinked out as the
+        // user kept scrolling.
         onEnter: () => countryTl.timeScale(1).play(),
         onEnterBack: () => countryTl.timeScale(1).play(),
-        onLeave: () => countryTl.timeScale(2).reverse(),
-        onLeaveBack: () => countryTl.timeScale(2).reverse(),
       });
 
       // Stopka + CTA nad stopką: koniec scrolla
