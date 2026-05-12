@@ -229,7 +229,7 @@ export default function ProductShowcase() {
       </div>
       <section
         ref={sectionRef}
-        className="relative w-full h-screen min-h-[640px] overflow-hidden">
+        className="relative w-full h-screen min-h-[640px] overflow-hidden max-lg:h-[100dvh]">
         {/* Phase 1 bg - gradient scrolls */}
         <div
           ref={bg1Ref}
@@ -254,7 +254,7 @@ export default function ProductShowcase() {
           </p>
           <ul
             ref={featuresRef}
-            className="absolute top-[15vh] right-[5vw] m-0 p-0 list-none flex flex-col gap-6 max-w-[360px] pointer-events-auto will-change-[transform,opacity] max-lg:!top-auto max-lg:!bottom-[4vh] max-lg:right-auto max-lg:left-[6vw] max-lg:max-w-[88vw] max-lg:gap-1.5">
+            className="absolute top-[15vh] right-[5vw] m-0 p-0 list-none flex flex-col gap-6 max-w-[360px] pointer-events-auto will-change-[transform,opacity] max-lg:!top-auto max-lg:!bottom-[calc(4dvh+env(safe-area-inset-bottom,0px))] max-lg:right-auto max-lg:left-[6vw] max-lg:max-w-[88vw] max-lg:gap-1.5">
             {[
               [
                 "Modularnosc",
@@ -457,7 +457,7 @@ export default function ProductShowcase() {
             cards arrive. */}
         <div
           ref={mobileVersionCardRef}
-          className="lg:hidden absolute left-[6vw] right-[6vw] bottom-[6vh] z-[9] pointer-events-auto opacity-0">
+          className="lg:hidden absolute left-[6vw] right-[6vw] bottom-[calc(6dvh+env(safe-area-inset-bottom,0px))] z-[9] pointer-events-auto opacity-0">
           <div
             className="rounded-2xl p-6"
             style={{
@@ -529,10 +529,13 @@ export default function ProductShowcase() {
               style={{
                 // Bottom-anchored stack. minHeight set tight against
                 // the longest card's content (~132px for the Eliminacja
-                // description) so coverage holds without reserving extra
-                // empty space. Base lowered from 16vh → 8vh so the top
-                // of the stack (Card 0) clears the image at ~46vh.
-                bottom: `calc(8vh + ${(3 - i) * 48}px)`,
+                // description). dvh (dynamic viewport height) instead of
+                // vh so the cards reposition when iOS Safari's URL bar
+                // expands on scroll-up — vh refers to the large viewport
+                // (no toolbar) and would otherwise push the cards under
+                // the bar. env(safe-area-inset-bottom) adds the
+                // home-indicator height on devices that have one.
+                bottom: `calc(8dvh + ${(3 - i) * 48}px + env(safe-area-inset-bottom, 0px))`,
                 minHeight: 134,
                 zIndex: 10 + i,
                 background: "#e9e2d8",

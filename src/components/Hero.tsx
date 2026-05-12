@@ -63,7 +63,7 @@ export default function Hero({ data }: { data?: HeroData } = {}) {
   return (
     <section
       ref={heroRef}
-      className="relative w-full h-screen min-h-[640px] overflow-hidden bg-[#f0f4f5] flex items-center justify-center">
+      className="relative w-full h-screen min-h-[640px] overflow-hidden bg-[#f0f4f5] flex items-center justify-center max-lg:h-[100dvh]">
       <img
         ref={imageRef}
         src="/hero3.jpeg"
