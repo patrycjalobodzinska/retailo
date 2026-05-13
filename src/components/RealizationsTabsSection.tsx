@@ -50,12 +50,17 @@ export default function RealizationsTabsSection() {
         typeof window !== "undefined" &&
         window.matchMedia("(max-width: 1023px)").matches;
 
-      // Mobile / landscape phone / very short laptop: no animation at
-      // all. Items render as a plain vertical list (CSS overrides
-      // max-lg:!static + !opacity-100 + !translate-y-0 reset the
-      // absolute desktop layout). Skip GSAP entirely so there's
-      // nothing to fail or flicker.
-      if (shortViewport || isMobile) return;
+      // Mobile / landscape phone / very short laptop: skip the pinned
+      // scrub timeline entirely. No entrance animation either — the
+      // gsap.set/gsap.fromTo approach kept the items stuck at opacity:0
+      // when ScrollTrigger didn't refresh in time after hydration, so
+      // descriptions disappeared. Static render is the most reliable.
+      if (shortViewport || isMobile) {
+        items.forEach((el) =>
+          gsap.set(el, { clearProps: "all" }),
+        );
+        return;
+      }
 
       const initialOffset = window.innerHeight * INITIAL_GAP_VH_FRACTION;
 
