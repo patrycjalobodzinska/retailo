@@ -300,7 +300,7 @@ export default function ProductShowcase() {
             image's CENTER. */}
         <div
           ref={imageWrapRef}
-          className="absolute z-[5] overflow-hidden will-change-transform left-1/2 top-1/2 w-[500px] h-[590px] max-2xl:!left-[40%] max-2xl:!w-[400px] max-2xl:!h-[470px] max-xl:!left-[38%] max-xl:!w-[340px] max-xl:!h-[400px] max-lg:!left-1/2 max-lg:!top-[31vh] max-lg:!w-[min(clamp(150px,30vh,340px),66vw)] max-lg:!h-[min(clamp(150px,30vh,340px),66vw)]">
+          className="absolute z-[5] overflow-hidden will-change-transform left-1/2 top-1/2 w-[500px] h-[590px] max-2xl:!left-[44%] max-2xl:!w-[440px] max-2xl:!h-[520px] max-xl:!left-[40%] max-xl:!w-[360px] max-xl:!h-[430px] max-lg:!left-1/2 max-lg:!top-[31vh] max-lg:!w-[min(clamp(150px,30vh,340px),66vw)] max-lg:!h-[min(clamp(150px,30vh,340px),66vw)]">
           <img
             ref={photoRef}
             src="/model1.png"
@@ -373,7 +373,7 @@ export default function ProductShowcase() {
             {/* Right — kompaktowa lista korzysci wdrozenia + prominent
                 card "Wersja pod klienta". Pokazywane rowniez na mobile,
                 gdzie ukladaja sie w stosie pod spec gridem. */}
-            <div className="flex flex-col justify-center max-w-[460px] pt-[4vh] gap-6 pointer-events-auto max-lg:max-w-full max-lg:pt-0">
+            <div className="flex flex-col justify-center max-w-[460px] pt-[4vh] gap-6 pointer-events-auto max-2xl:max-w-[360px] max-xl:max-w-[320px] max-lg:max-w-full max-lg:pt-0">
               {/* Korzysci wdrozenia — desktop only. Mobile already shows
                   the same benefits in the stacking cards further down. */}
               <div className="max-lg:hidden">
