@@ -50,15 +50,26 @@ export default function RealizationsTabsSection() {
         typeof window !== "undefined" &&
         window.matchMedia("(max-width: 1023px)").matches;
 
-      // Mobile / landscape phone / very short laptop: skip the pinned
-      // scrub timeline entirely. No entrance animation either — the
-      // gsap.set/gsap.fromTo approach kept the items stuck at opacity:0
-      // when ScrollTrigger didn't refresh in time after hydration, so
-      // descriptions disappeared. Static render is the most reliable.
+      // Mobile / landscape phone / very short laptop: no pin, no scrub,
+      // no entrance — just static flow. Kill any ScrollTriggers that
+      // may have been created against this section on a previous render
+      // (HMR or window-resize from desktop into mobile), and clear any
+      // leftover inline GSAP styles on the items.
       if (shortViewport || isMobile) {
-        items.forEach((el) =>
-          gsap.set(el, { clearProps: "all" }),
-        );
+        ScrollTrigger.getAll().forEach((st) => {
+          const tr = st.trigger;
+          if (
+            tr === sectionRef.current ||
+            tr === pinRef.current ||
+            (tr instanceof Element &&
+              sectionRef.current?.contains(tr))
+          ) {
+            st.kill();
+          }
+        });
+        items.forEach((el) => gsap.set(el, { clearProps: "all" }));
+        if (pinRef.current) gsap.set(pinRef.current, { clearProps: "all" });
+        if (imageRef.current) gsap.set(imageRef.current, { clearProps: "all" });
         return;
       }
 
