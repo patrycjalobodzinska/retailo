@@ -300,7 +300,7 @@ export default function ProductShowcase() {
             image's CENTER. */}
         <div
           ref={imageWrapRef}
-          className="absolute z-[5] overflow-hidden will-change-transform left-1/2 top-1/2 w-[500px] h-[590px] max-2xl:!left-[44%] max-2xl:!w-[440px] max-2xl:!h-[520px] max-xl:!left-[40%] max-xl:!w-[360px] max-xl:!h-[430px] max-lg:!left-1/2 max-lg:!top-[31vh] max-lg:!w-[min(clamp(150px,30vh,340px),66vw)] max-lg:!h-[min(clamp(150px,30vh,340px),66vw)]">
+          className="absolute z-[5] overflow-hidden will-change-transform left-1/2 top-1/2 w-[500px] h-[590px] max-2xl:!left-[40%] max-2xl:!w-[400px] max-2xl:!h-[470px] max-xl:!left-[38%] max-xl:!w-[340px] max-xl:!h-[400px] max-lg:!left-1/2 max-lg:!top-[31vh] max-lg:!w-[min(clamp(150px,30vh,340px),66vw)] max-lg:!h-[min(clamp(150px,30vh,340px),66vw)]">
           <img
             ref={photoRef}
             src="/model1.png"
