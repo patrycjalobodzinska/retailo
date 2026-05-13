@@ -257,9 +257,9 @@ export default function GlobalSection() {
         {/* Intro text */}
         <div
           ref={introRef}
-          className="absolute top-[10vh] left-0 right-0 z-10 flex justify-center">
+          className="absolute top-[10vh] left-0 right-0 z-10 flex justify-center px-[6vw]">
           <p
-            className="flex items-center gap-4 text-white/80 tracking-wide m-0"
+            className="flex items-center gap-4 text-white/80 tracking-wide m-0 max-md:gap-2 max-md:flex-wrap max-md:justify-center"
             style={{ fontSize: "clamp(1.1rem, 1.8vw, 1.5rem)" }}>
             Wdrozenia w calej Europie
             <span
