@@ -135,10 +135,13 @@ export default function RealizationsTabsSection() {
           </div>
         </div>
 
-        {/* Right: header + stacked items */}
-        <div className="w-1/2 h-full relative max-lg:!flex max-lg:!flex-col max-lg:!gap-2 max-lg:w-full max-lg:!h-auto max-lg:!min-h-0 [@media(max-height:600px)]:!flex [@media(max-height:600px)]:!flex-col [@media(max-height:600px)]:!gap-2 [@media(max-height:600px)]:!h-auto [@media(max-height:600px)]:!min-h-0">
-          {/* Header — static, sits above the stacked items */}
-          <div className="absolute top-[8vh] left-0 right-0 z-0 max-lg:!static max-lg:!mb-2 [@media(max-height:600px)]:!static">
+        {/* Right: header + stacked items. Mobile renders this as a plain
+            flex column; on lg+ it becomes the relative anchor for the
+            absolutely-positioned stacked items. */}
+        <div className="flex flex-col gap-2 w-full lg:w-1/2 lg:h-full lg:relative lg:block lg:gap-0">
+          {/* Header — sits above the stacked items. Absolute only on
+              desktop; on mobile it's a plain block in the flex flow. */}
+          <div className="lg:absolute lg:top-[8vh] lg:left-0 lg:right-0 z-0 mb-2 lg:mb-0">
             <p
               className="m-0 mb-3 uppercase tracking-[0.2em] font-semibold text-[#0086b0]"
               style={{ fontSize: "clamp(0.72rem, 0.8vw, 0.85rem)" }}>
@@ -173,8 +176,12 @@ export default function RealizationsTabsSection() {
               ref={(el) => {
                 itemRefs.current[i] = el;
               }}
-              className="absolute left-0 right-0 will-change-transform max-lg:!static max-lg:!opacity-100 max-lg:!translate-y-0 [@media(max-height:600px)]:!static [@media(max-height:600px)]:!opacity-100 [@media(max-height:600px)]:!translate-y-0"
+              className="lg:absolute lg:left-0 lg:right-0 will-change-transform"
               style={{
+                // Inline `top` is fine even on mobile — position:static
+                // (the default at small breakpoints, since we only add
+                // `lg:absolute`) ignores top. No !important gymnastics
+                // needed, no hydration mismatch.
                 top: `calc(var(--rl-stack-top, ${TOP_OFFSET_VH}vh) + ${i * STACK_OFFSET_PX}px)`,
                 zIndex: i + 1,
                 background: BG_COLOR,
