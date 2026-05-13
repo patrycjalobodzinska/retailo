@@ -121,7 +121,7 @@ export default function RealizationsTabsSection() {
       style={{ background: BG_COLOR }}>
       <div
         ref={pinRef}
-        className="h-screen min-h-[640px] w-full overflow-hidden flex items-center px-[6vw] gap-12 max-lg:!h-auto max-lg:!min-h-0 max-lg:!overflow-visible max-lg:flex-col max-lg:gap-6 max-lg:items-stretch max-lg:py-[8vh] max-lg:justify-start [@media(max-height:600px)]:!h-auto [@media(max-height:600px)]:!min-h-0 [@media(max-height:600px)]:!overflow-visible [@media(max-height:600px)]:!py-[8vh]">
+        className="h-screen min-h-[640px] w-full overflow-hidden flex items-center px-[6vw] gap-12 max-lg:!h-auto max-lg:!min-h-0 max-lg:!overflow-visible max-lg:flex-col max-lg:gap-4 max-lg:items-stretch max-lg:py-[5vh] max-lg:justify-start [@media(max-height:600px)]:!h-auto [@media(max-height:600px)]:!min-h-0 [@media(max-height:600px)]:!overflow-visible [@media(max-height:600px)]:!py-[6vh]">
         {/* Left: image (smaller than viewport, gentle parallax drift) */}
         <div className="w-1/2 flex items-center justify-center max-lg:w-full max-lg:flex-none">
           <div className="w-full max-w-[500px] aspect-[5/7] overflow-hidden rounded-md max-lg:max-w-[220px] max-lg:aspect-[1800/2732] [@media(max-height:600px)]:!max-w-[180px] [@media(max-height:600px)]:!aspect-[16/9]">
@@ -136,7 +136,7 @@ export default function RealizationsTabsSection() {
         </div>
 
         {/* Right: header + stacked items */}
-        <div className="w-1/2 h-full relative max-lg:!flex max-lg:!flex-col max-lg:!gap-5 max-lg:w-full max-lg:!h-auto max-lg:!min-h-0 [@media(max-height:600px)]:!flex [@media(max-height:600px)]:!flex-col [@media(max-height:600px)]:!gap-4 [@media(max-height:600px)]:!h-auto [@media(max-height:600px)]:!min-h-0">
+        <div className="w-1/2 h-full relative max-lg:!flex max-lg:!flex-col max-lg:!gap-2 max-lg:w-full max-lg:!h-auto max-lg:!min-h-0 [@media(max-height:600px)]:!flex [@media(max-height:600px)]:!flex-col [@media(max-height:600px)]:!gap-2 [@media(max-height:600px)]:!h-auto [@media(max-height:600px)]:!min-h-0">
           {/* Header — static, sits above the stacked items */}
           <div className="absolute top-[8vh] left-0 right-0 z-0 max-lg:!static max-lg:!mb-2 [@media(max-height:600px)]:!static">
             <p
@@ -179,29 +179,28 @@ export default function RealizationsTabsSection() {
                 zIndex: i + 1,
                 background: BG_COLOR,
               }}>
-              <div style={{ paddingBottom: "1.25rem" }}>
+              <div className="pb-3 max-lg:pb-2">
                 <div
-                  className="flex gap-3"
+                  className="flex gap-3 items-center max-lg:!h-auto max-lg:gap-2 max-lg:py-1"
                   style={{
                     height: `${STACK_OFFSET_PX}px`,
-                    alignItems: "center",
                   }}>
                   <span
-                    className="font-bold text-[#0086b0]"
+                    className="font-bold text-[#0086b0] max-lg:text-[0.85rem]"
                     style={{ fontSize: "clamp(1rem, 1.4vw, 1.4rem)" }}>
                     {item.n} |
                   </span>
                   <h3
-                    className="m-0 font-bold text-[#0a2a2e] uppercase tracking-wider"
+                    className="m-0 font-bold text-[#0a2a2e] uppercase tracking-wider max-lg:!text-[0.82rem] max-lg:!tracking-wide"
                     style={{
                       fontSize: "clamp(0.95rem, 1.2vw, 1.15rem)",
-                      lineHeight: 1.3,
+                      lineHeight: 1.25,
                     }}>
                     {item.title}
                   </h3>
                 </div>
                 <p
-                  className="m-0 text-[#3a5a60] leading-relaxed"
+                  className="m-0 text-[#3a5a60] leading-relaxed max-lg:!text-[0.82rem] max-lg:!leading-snug max-lg:!mt-1"
                   style={{
                     fontSize: "clamp(0.85rem, 1vw, 0.95rem)",
                     marginTop: "0.4rem",
