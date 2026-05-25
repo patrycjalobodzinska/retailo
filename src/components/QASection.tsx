@@ -672,7 +672,7 @@ export default function QASection({ data }: { data?: QAData } = {}) {
 
         {/* Small tiles row — 4 cards */}
         <div ref={tilesRef} className="grid grid-cols-4 gap-5">
-          {SMALL_TILES.map((tile, i) => (
+          {SMALL_TILES.map((tile) => (
             <article
               key={tile.title}
               className="relative bg-white rounded-2xl p-6 flex flex-col gap-3"
@@ -691,11 +691,6 @@ export default function QASection({ data }: { data?: QAData } = {}) {
                   }}>
                   <TileIcon kind={tile.kind} size={22} />
                 </div>
-                <span
-                  className="text-[#7a7a7a] font-semibold tabular-nums"
-                  style={{ fontSize: "0.68rem", letterSpacing: "0.05em" }}>
-                  {String(i + 1).padStart(2, "0")}
-                </span>
               </div>
               <h3
                 className="m-0 mt-1 font-semibold text-[#0f0f0f] tracking-tight"

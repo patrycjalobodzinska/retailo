@@ -171,7 +171,7 @@ export default function HeroConcept({ data }: { data?: HeroData } = {}) {
         />
         <img
           ref={imageRef}
-          src="/hero-pickupwall.png"
+          src="/model3_retailo.png"
           alt="PickUpWall"
           className="relative block h-[78vh] w-auto object-contain max-lg:h-[36dvh]"
           style={{

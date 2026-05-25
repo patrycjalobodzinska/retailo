@@ -53,46 +53,17 @@ export default function ProductShowcase() {
       });
       gsap.set(sketchRef.current, { opacity: 0 });
 
-      // Phase 1 features list — staggered fade-in on enter, time-based.
-      if (featuresRef.current && phase1Ref.current) {
-        const items = featuresRef.current.children;
-        gsap.set(items, { opacity: 0, x: -30 });
+      // Phase 1 features list — animacja usunięta, lista renderuje się
+      // od razu statycznie.
 
-        let played = false;
-        const play = () => {
-          if (played) return;
-          played = true;
-          gsap.to(items, {
-            opacity: 1,
-            x: 0,
-            duration: 0.5,
-            stagger: 0.18,
-            ease: "power2.out",
-            delay: 0.3,
-          });
-        };
-
-        const io = new IntersectionObserver(
-          (entries) => {
-            for (const entry of entries) {
-              if (entry.isIntersecting) {
-                play();
-                io.disconnect();
-                break;
-              }
-            }
-          },
-          { threshold: 0.25 },
-        );
-        io.observe(phase1Ref.current);
-      }
-
-      // Phase-2 timeline: photo→sketch wipe, time-based. Reversible.
+      // Phase-2 timeline: photo→sketch wipe + image moves down to its
+      // "draft" resting position. Reversible. Wszystkie tweeny dzielą tę
+      // samą długość / ease, żeby ruch był spójny i bez "skoków".
       const phase2Tl = gsap.timeline({ paused: true });
       phase2Tl
         .to(
           sketchRef.current,
-          { opacity: 0.95, duration: 0.4, ease: "power1.out" },
+          { opacity: 0.95, duration: 1.2, ease: "power1.inOut" },
           0,
         )
         .fromTo(
@@ -101,7 +72,17 @@ export default function ProductShowcase() {
           {
             webkitMaskSize: "100% 0%",
             maskSize: "100% 0%",
-            duration: 0.9,
+            duration: 1.2,
+            ease: "power1.inOut",
+          },
+          0,
+        )
+        .fromTo(
+          imageWrapRef.current,
+          { y: 0 },
+          {
+            y: 90,
+            duration: 1.2,
             ease: "power1.inOut",
           },
           0,
@@ -139,6 +120,9 @@ export default function ProductShowcase() {
                 ref={photoRef}
                 src="/pickupwall-photo.png"
                 alt="PickUpWall"
+                loading="eager"
+                decoding="async"
+                fetchPriority="low"
                 className="absolute z-[2] inset-0 w-full h-full object-contain"
                 style={{
                   maskImage:
@@ -151,12 +135,17 @@ export default function ProductShowcase() {
                   WebkitMaskSize: "100% 130%",
                   WebkitMaskRepeat: "no-repeat",
                   WebkitMaskPosition: "0% 0%",
+                  willChange: "mask-size, transform",
+                  transform: "translateZ(0)",
                 }}
               />
               <img
                 ref={sketchRef}
                 src="/pickupwall-sketch.png"
                 alt="PickUpWall szkic"
+                loading="eager"
+                decoding="async"
+                fetchPriority="low"
                 className="absolute inset-0 z-[1] w-full h-full object-contain opacity-0"
               />
             </div>
@@ -311,7 +300,7 @@ export default function ProductShowcase() {
               <p
                 className="absolute m-0 font-black select-none"
                 style={{
-                  top: "-4vh",
+                  top: "30vh",
                   left: "-2vw",
                   fontSize: "clamp(11rem, 20vw, 26rem)",
                   lineHeight: 1.2,
@@ -320,26 +309,8 @@ export default function ProductShowcase() {
                 }}>
                 pickup.
               </p>
-              <svg
-                className="absolute"
-                style={{ bottom: "6vh", right: "5vw", opacity: 0.32 }}
-                width="120"
-                height="80"
-                viewBox="0 0 120 80">
-                {Array.from({ length: 6 }).map((_, row) =>
-                  Array.from({ length: 9 }).map((_, col) => (
-                    <circle
-                      key={`${row}-${col}`}
-                      cx={col * 14 + 4}
-                      cy={row * 14 + 4}
-                      r="1.4"
-                      fill="#0f0f0f"
-                    />
-                  )),
-                )}
-              </svg>
             </div>
-            <div className="absolute inset-0 flex items-center justify-start pl-[6vw] pr-[4vw] py-[4vh] pointer-events-none z-[1] max-lg:relative max-lg:inset-auto max-lg:flex-col max-lg:justify-start max-lg:gap-4 max-lg:p-[0_6vw] max-lg:min-h-0">
+            <div className="absolute inset-0 flex items-start justify-start pl-[6vw] pr-[4vw] pt-[22vh] pb-[4vh] pointer-events-none z-[1] max-lg:relative max-lg:inset-auto max-lg:flex-col max-lg:justify-start max-lg:gap-4 max-lg:p-[3dvh_6vw_0] max-lg:min-h-0">
               <div className="flex flex-col w-full max-w-[680px] pointer-events-auto max-2xl:max-w-[600px] max-xl:max-w-[520px] max-lg:max-w-full">
                 <h2
                   className="uppercase tracking-widest m-0 mb-1"

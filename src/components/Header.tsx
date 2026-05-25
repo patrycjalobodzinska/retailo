@@ -13,8 +13,8 @@ type NavItem = {
 };
 
 const NAV_ITEMS: NavItem[] = [
-  { label: "Rozwiazanie", target: "rozwiazanie", vhOffset: 1.4 },
-  { label: "Realizacje", target: "realizacje", vhOffset: 0.15 },
+  { label: "Rozwiazanie", target: "rozwiazanie", vhOffset: 0.15 },
+  { label: "Realizacje", target: "realizacje", vhOffset: 0.05 },
   { label: "Kontakt", target: "kontakt" },
 ];
 
