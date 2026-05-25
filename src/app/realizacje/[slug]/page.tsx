@@ -1,11 +1,10 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import Header from "@/components/Header";
-import {
-  REALIZATIONS,
-  getNextRealizations,
-  getRealizationBySlug,
-} from "@/lib/realizations";
+import Footer from "@/components/Footer";
+import ContactCtaForm from "@/components/ContactCtaForm";
+import RealizationsCarousel from "@/components/RealizationsCarousel";
+import { REALIZATIONS, getRealizationBySlug } from "@/lib/realizations";
 
 type PageProps = {
   params: Promise<{ slug: string }>;
@@ -45,8 +44,6 @@ export default async function RealizacjaDetailPage({ params }: PageProps) {
     ["Wymiary jednostki", config?.moduleDimensions ?? "1970 × 1025 × 50 mm"],
     ["Czas wdrozenia", r.integrationTime ?? "—"],
   ];
-
-  const next = getNextRealizations(slug, 3);
 
   return (
     <>
@@ -156,19 +153,17 @@ export default async function RealizacjaDetailPage({ params }: PageProps) {
                 <p
                   className="m-0 mt-4 text-[#3a5a60] leading-relaxed"
                   style={{ fontSize: "clamp(0.95rem, 1.1vw, 1.05rem)" }}>
-                  PickUpWall jest rozwiazaniem modularnym. Instalacja sklada
-                  sie z{" "}
-                  <strong className="text-[#0a2a2e]">jednostki glownej</strong>
-                  {" "}z ekranem dotykowym oraz dowolnej liczby{" "}
+                  PickUpWall jest rozwiazaniem modularnym. Instalacja sklada sie
+                  z{" "}
+                  <strong className="text-[#0a2a2e]">jednostki glownej</strong>{" "}
+                  z ekranem dotykowym oraz dowolnej liczby{" "}
                   <strong className="text-[#0a2a2e]">
                     jednostek rozszerzajacych
-                  </strong>
-                  {" "}laczonych w jeden ciag — konfiguracja jest dobierana do
+                  </strong>{" "}
+                  laczonych w jeden ciag — konfiguracja jest dobierana do
                   spodziewanego wolumenu zamowien i dostepnej przestrzeni w
                   punkcie obslugi. Pojedyncza jednostka ma wymiary{" "}
-                  <strong className="text-[#0a2a2e]">
-                    197 × 102.5 × 5 cm
-                  </strong>
+                  <strong className="text-[#0a2a2e]">197 × 102.5 × 5 cm</strong>
                   . Realizujemy rowniez wersje niestandardowe pod konkretna
                   zabudowe lub identyfikacje wizualna marki.
                 </p>
@@ -188,8 +183,7 @@ export default async function RealizacjaDetailPage({ params }: PageProps) {
                     Schematyczny widok od frontu —{" "}
                     {config.masterCount + (config.slaveCount ?? 0)}{" "}
                     {(() => {
-                      const n =
-                        config.masterCount + (config.slaveCount ?? 0);
+                      const n = config.masterCount + (config.slaveCount ?? 0);
                       if (n === 1) return "jednostka";
                       if (n < 5) return "jednostki polaczone w ciag";
                       return "jednostek polaczonych w ciag";
@@ -275,61 +269,29 @@ export default async function RealizacjaDetailPage({ params }: PageProps) {
           </div>
         </section>
 
-        {/* Next realizations */}
-        <section className="realization-block-in realization-block-in-5 px-[6vw] py-[10vh] border-t border-[#0a2a2e]/10">
-          <div className="max-w-[1200px] mx-auto">
+        {/* Carousel: all other realizations */}
+        <section className="realization-block-in realization-block-in-5 border-t border-[#0a2a2e]/10 pt-[6vh] pb-[2vh] max-lg:pt-[4vh]">
+          <div className="max-w-[1200px] mx-auto px-[6vw] mb-2">
             <p
               className="m-0 mb-3 uppercase tracking-[0.22em] font-semibold text-[#0086b0]"
               style={{ fontSize: "0.72rem" }}>
               Zobacz tez
             </p>
             <h2
-              className="m-0 mb-8 font-bold tracking-tight text-[#0a2a2e]"
+              className="m-0 font-bold tracking-tight text-[#0a2a2e]"
               style={{
                 fontSize: "clamp(1.6rem, 3vw, 2.4rem)",
                 lineHeight: 1.05,
                 letterSpacing: "-0.02em",
               }}>
-              Kolejne realizacje.
+              Inne realizacje.
             </h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-              {next.map((n) => (
-                <Link
-                  key={n.slug}
-                  href={`/realizacje/${n.slug}`}
-                  className="group relative aspect-[4/5] rounded-2xl overflow-hidden bg-[#0f1518] no-underline transition-all hover:-translate-y-1 hover:shadow-[0_24px_60px_rgba(10,30,38,0.18)]"
-                  style={{ border: "1px solid rgba(10,42,46,0.06)" }}>
-                  <img
-                    src={n.image}
-                    alt={n.title}
-                    className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                    style={{ opacity: 0.7 }}
-                  />
-                  <div
-                    className="absolute inset-0 pointer-events-none"
-                    style={{
-                      background:
-                        "linear-gradient(to top, rgba(15,21,24,0.92) 0%, rgba(15,21,24,0.25) 55%, rgba(15,21,24,0) 100%)",
-                    }}
-                  />
-                  <div className="absolute left-5 right-5 bottom-5 z-[2]">
-                    <p
-                      className="m-0 mb-1.5 uppercase tracking-[0.2em] font-semibold text-[#7ed5e6]"
-                      style={{ fontSize: "0.66rem" }}>
-                      {n.location}
-                    </p>
-                    <p
-                      className="m-0 font-bold text-white"
-                      style={{ fontSize: "1.2rem", lineHeight: 1.15 }}>
-                      {n.title}
-                    </p>
-                  </div>
-                </Link>
-              ))}
-            </div>
           </div>
+          <RealizationsCarousel showHeader={false} excludeSlug={slug} />
         </section>
+        <ContactCtaForm />
       </main>
+      <Footer />
 
       {/* Gradient backdrop — sits behind main, matches the carousel→detail
           transition panel so the page lands seamlessly. */}

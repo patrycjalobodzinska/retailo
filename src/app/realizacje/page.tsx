@@ -1,5 +1,7 @@
 import Link from "next/link";
 import Header from "@/components/Header";
+import Footer from "@/components/Footer";
+import ContactCtaForm from "@/components/ContactCtaForm";
 import { REALIZATIONS } from "@/lib/realizations";
 
 export const metadata = {
@@ -10,16 +12,23 @@ export default function RealizacjePage() {
   return (
     <>
       <Header />
-      <main className="relative w-full bg-[#f5f7f9] text-[#0a2a2e] overflow-hidden">
-        {/* HERO — same visual language as homepage QASection: light blue
-            gradient base, giant watermark word, radial accent blobs,
-            cyan dot grid + accent stripe. */}
+      <main className="relative w-full bg-white text-[#0a2a2e] overflow-hidden">
+        {/* HERO — fades smoothly from cyan to white across the full bottom edge */}
         <section
           className="relative w-full flex flex-col justify-end overflow-hidden"
           style={{
             background:
-              "linear-gradient(180deg, #c0dbe2 0%, #d9e8ec 60%, #f5f7f9 100%)",
+              "linear-gradient(180deg, #c0dbe2 0%, #d6e4e9 45%, #ecf1f3 75%, #ffffff 100%)",
           }}>
+          {/* Extra bottom-edge fade so the section blends seamlessly into white */}
+          <div
+            aria-hidden="true"
+            className="absolute inset-x-0 bottom-0 h-[18vh] pointer-events-none z-[2]"
+            style={{
+              background:
+                "linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(255,255,255,1) 100%)",
+            }}
+          />
           <div
             aria-hidden="true"
             className="absolute inset-0 pointer-events-none"
@@ -32,12 +41,12 @@ export default function RealizacjePage() {
             aria-hidden="true"
             className="absolute m-0 font-black select-none pointer-events-none"
             style={{
-              bottom: "3vh",
+              bottom: "2vh",
               left: "-2vw",
-              fontSize: "clamp(11rem, 22vw, 30rem)",
+              fontSize: "clamp(4.5rem, 18vw, 22rem)",
               lineHeight: 1.2,
               letterSpacing: "-0.05em",
-              color: "rgba(255,255,255,0.6)",
+              color: "rgba(255,255,255,0.32)",
               zIndex: 0,
             }}>
             realizacje.
@@ -52,9 +61,7 @@ export default function RealizacjePage() {
               transformOrigin: "right top",
               fontSize: "0.72rem",
               color: "rgba(10,42,46,0.35)",
-            }}>
-            click & collect · pickup · 24/7
-          </p>
+            }}></p>
           <svg
             aria-hidden="true"
             className="absolute pointer-events-none max-md:hidden"
@@ -75,50 +82,48 @@ export default function RealizacjePage() {
             )}
           </svg>
 
-          <div className="relative z-[1] px-[6vw] pb-[8vh] pt-[140px] max-w-[1200px] mx-auto w-full max-lg:pt-[120px] max-lg:pb-[6vh]">
+          <div className="relative z-[1] px-[6vw] pb-[5vh] pt-[110px] max-w-[1200px] mx-auto w-full max-lg:pt-[92px] max-lg:pb-[4vh]">
             <Link
               href="/"
-              className="inline-flex items-center gap-2 text-[#3a5a60] no-underline hover:text-[#0a2a2e] transition-colors mb-8"
+              className="inline-flex items-center gap-2 text-[#3a5a60] no-underline hover:text-[#0a2a2e] transition-colors mb-5"
               style={{
-                fontSize: "0.75rem",
+                fontSize: "0.72rem",
                 letterSpacing: "0.18em",
                 textTransform: "uppercase",
               }}>
               <span aria-hidden="true">&larr;</span>
               Strona glowna
             </Link>
-            <div className="flex items-center gap-3 mb-4">
+            <div className="flex items-center gap-3 mb-3">
               <span
                 className="block"
-                style={{ width: 36, height: 2, background: "#0086b0" }}
+                style={{ width: 30, height: 2, background: "#0086b0" }}
               />
               <p
                 className="m-0 uppercase tracking-[0.22em] font-semibold text-[#0086b0]"
-                style={{ fontSize: "clamp(0.72rem, 0.85vw, 0.85rem)" }}>
+                style={{ fontSize: "clamp(0.7rem, 0.8vw, 0.8rem)" }}>
                 Realizacje · {REALIZATIONS.length} wdrozen
               </p>
             </div>
             <h1
-              className="m-0 mb-6 font-bold tracking-tight text-[#0a2a2e]"
+              className="m-0 mb-4 font-bold tracking-tight text-[#0a2a2e]"
               style={{
-                fontSize: "clamp(2.6rem, 7vw, 5.6rem)",
+                fontSize: "clamp(2rem, 5.2vw, 4.2rem)",
                 lineHeight: 1.02,
                 letterSpacing: "-0.025em",
               }}>
-              PickUpWall <br />
-              <span className="text-[#0a2a2e]/55">w akcji.</span>
+              PickUpWall <span className="text-[#0a2a2e]/55">w akcji.</span>
             </h1>
             <p
               className="m-0 text-[#3a5a60] leading-relaxed"
               style={{
-                fontSize: "clamp(1rem, 1.2vw, 1.2rem)",
+                fontSize: "clamp(0.95rem, 1.1vw, 1.1rem)",
                 maxWidth: "640px",
               }}>
-              Wybrane wdrozenia w punktach sprzedazy, galeriach handlowych,
-              biurowcach i osiedlach mieszkaniowych w Polsce i za granica.
-              Wiekszosc to uklad{" "}
-              <strong className="text-[#0a2a2e]">Master + Slave</strong> — 79
-              skrytek przy jednym punkcie obslugi.
+              Zobacz nasze wdrozenia dla{" "}
+              <strong className="text-[#0a2a2e]">Empik</strong>,{" "}
+              <strong className="text-[#0a2a2e]">Sephora</strong> i innych marek
+              premium — od salonu flagowego po biurowiec.
             </p>
           </div>
         </section>
@@ -126,133 +131,179 @@ export default function RealizacjePage() {
         {/* GRID — image-led cards with same overlay style as the homepage
             carousel cards, so visiting this list feels like a continuation
             of the carousel, not a different page. */}
-        <section className="relative px-[6vw] pt-[10vh] pb-[14vh] max-w-[1300px] mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-            {REALIZATIONS.map((r, i) => {
-              const slug = r.slug;
-              return (
-                <Link
-                  key={`${r.title}-${i}`}
-                  href={`/realizacje/${slug}`}
-                  className="group relative aspect-[4/5] rounded-2xl overflow-hidden bg-[#0f1518] no-underline transition-all hover:-translate-y-1 hover:shadow-[0_24px_60px_rgba(10,30,38,0.18)]"
-                  style={{
-                    border: "1px solid rgba(10,42,46,0.06)",
-                  }}>
-                  <img
-                    src={r.image}
-                    alt={r.title}
-                    className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                    style={{ opacity: 0.7 }}
+        <section className="relative w-full -mt-[4vh] pb-[14vh] z-[3]">
+          {/* Decorative background — soft blobs + dot grid behind the cards.
+              Pełna szerokość: bg leży na całym tle sekcji, nie ograniczony
+              do max-w kontenera z kartami. */}
+          <div
+            aria-hidden="true"
+            className="absolute inset-0 pointer-events-none -z-10 overflow-hidden">
+            <div
+              className="absolute"
+              style={{
+                top: "10%",
+                right: "-12%",
+                width: "55%",
+                height: "55%",
+                background:
+                  "radial-gradient(ellipse at center, rgba(0,134,176,0.10) 0%, rgba(0,134,176,0) 70%)",
+                filter: "blur(20px)",
+              }}
+            />
+            <div
+              className="absolute"
+              style={{
+                bottom: "12%",
+                left: "-10%",
+                width: "50%",
+                height: "50%",
+                background:
+                  "radial-gradient(ellipse at center, rgba(126,213,230,0.16) 0%, rgba(126,213,230,0) 70%)",
+                filter: "blur(20px)",
+              }}
+            />
+            <svg
+              className="absolute"
+              style={{
+                top: "8%",
+                left: "2%",
+                opacity: 0.22,
+              }}
+              width="160"
+              height="120"
+              viewBox="0 0 160 120">
+              {Array.from({ length: 8 }).map((_, row) =>
+                Array.from({ length: 11 }).map((_, col) => (
+                  <circle
+                    key={`${row}-${col}`}
+                    cx={col * 14 + 4}
+                    cy={row * 14 + 4}
+                    r="1.2"
+                    fill="#0086b0"
                   />
-                  <div
-                    className="absolute inset-0 pointer-events-none"
-                    style={{
-                      background:
-                        "linear-gradient(to top, rgba(15,21,24,0.95) 0%, rgba(15,21,24,0.3) 55%, rgba(15,21,24,0) 100%)",
-                    }}
+                )),
+              )}
+            </svg>
+            <svg
+              className="absolute"
+              style={{
+                bottom: "10%",
+                right: "4%",
+                opacity: 0.18,
+              }}
+              width="180"
+              height="140"
+              viewBox="0 0 180 140">
+              {Array.from({ length: 9 }).map((_, row) =>
+                Array.from({ length: 12 }).map((_, col) => (
+                  <circle
+                    key={`${row}-${col}`}
+                    cx={col * 14 + 4}
+                    cy={row * 14 + 4}
+                    r="1.2"
+                    fill="#0a2a2e"
                   />
-                  <p
-                    className="absolute top-5 left-5 m-0 uppercase tracking-widest font-bold text-[#7ed5e6]"
-                    style={{ fontSize: "0.72rem" }}>
-                    {String(i + 1).padStart(2, "0")} /{" "}
-                    {String(REALIZATIONS.length).padStart(2, "0")}
-                  </p>
-                  <span
-                    className="absolute top-5 right-5 inline-flex items-center justify-center text-white/80 transition-all group-hover:bg-[#0086b0] group-hover:text-white group-hover:border-[#0086b0]"
-                    style={{
-                      width: 36,
-                      height: 36,
-                      borderRadius: 999,
-                      background: "rgba(255,255,255,0.06)",
-                      border: "1px solid rgba(255,255,255,0.18)",
-                      backdropFilter: "blur(6px)",
-                    }}>
-                    <svg
-                      width="14"
-                      height="14"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round">
-                      <path d="M5 19l14-14M8 5h11v11" />
-                    </svg>
-                  </span>
-                  <div className="absolute left-5 right-5 bottom-5 z-[2]">
-                    <p
-                      className="m-0 mb-1.5 uppercase tracking-[0.2em] font-semibold text-[#7ed5e6]"
-                      style={{ fontSize: "0.66rem" }}>
-                      {r.location}
-                    </p>
-                    <h2
-                      className="m-0 mb-2 font-bold text-white"
-                      style={{
-                        fontSize: "1.4rem",
-                        lineHeight: 1.15,
-                        letterSpacing: "-0.015em",
-                      }}>
-                      {r.title}
-                    </h2>
-                    <p
-                      className="m-0 text-white/70 leading-snug"
-                      style={{ fontSize: "0.86rem" }}>
-                      {r.description}
-                    </p>
-                  </div>
-                </Link>
-              );
-            })}
+                )),
+              )}
+            </svg>
+          </div>
+
+          {/* Inner constrained container — karty mają max-width, ale tło
+              powyżej rozciąga się na pełną szerokość ekranu. */}
+          <div className="relative max-w-[1300px] mx-auto px-[6vw]">
+            {/* Featured: first two realizations — wider 2-column hero strip */}
+            <div className="relative grid grid-cols-1 md:grid-cols-2 gap-5 mb-5">
+              {REALIZATIONS.slice(0, 2).map((r) => (
+                <RealizationCard key={r.slug} r={r} featured />
+              ))}
+            </div>
+
+            {/* Remaining realizations — single denser 3-column grid */}
+            <div className="relative grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+              {REALIZATIONS.slice(2).map((r) => (
+                <RealizationCard key={r.slug} r={r} />
+              ))}
+            </div>
           </div>
         </section>
 
-        {/* CTA strip — dark band echoing the homepage Footer / Kontakt look,
-            so the page closes with the same beat as the main scroll. */}
-        <section className="relative bg-[#0f1518] text-white px-[6vw] py-[12vh] overflow-hidden">
-          <div
-            aria-hidden="true"
-            className="absolute inset-0 pointer-events-none"
-            style={{
-              background:
-                "radial-gradient(ellipse 50% 80% at 100% 50%, rgba(0,134,176,0.22) 0%, rgba(0,134,176,0) 70%)",
-            }}
-          />
-          <div className="relative z-[1] max-w-[1200px] mx-auto flex flex-col md:flex-row md:items-end md:justify-between gap-8">
-            <div>
-              <p
-                className="m-0 mb-3 uppercase tracking-[0.22em] font-semibold text-[#7ed5e6]"
-                style={{ fontSize: "0.72rem" }}>
-                Wlasny projekt
-              </p>
-              <h2
-                className="m-0 font-bold tracking-tight"
-                style={{
-                  fontSize: "clamp(1.8rem, 3.4vw, 3rem)",
-                  lineHeight: 1.05,
-                  letterSpacing: "-0.02em",
-                }}>
-                Planujesz wdrozenie PickUpWall?
-              </h2>
-              <p
-                className="m-0 mt-4 text-white/65 leading-relaxed"
-                style={{ fontSize: "1rem", maxWidth: "540px" }}>
-                Dostosujemy format urzadzen, liczbe skrytek, obudowe i grafike
-                pod potrzeby twojej marki i przestrzeni.
-              </p>
-            </div>
-            <Link
-              href="/#kontakt"
-              className="inline-flex items-center gap-3 px-7 py-4 rounded-full text-white font-semibold uppercase tracking-[0.18em] no-underline hover:opacity-90 transition-opacity self-start md:self-end"
-              style={{
-                fontSize: "0.78rem",
-                background: "#0086b0",
-              }}>
-              Porozmawiajmy
-              <span aria-hidden="true">&rarr;</span>
-            </Link>
-          </div>
-        </section>
+        <ContactCtaForm />
       </main>
+      <Footer />
     </>
+  );
+}
+
+type Realization = (typeof REALIZATIONS)[number];
+
+function RealizationCard({
+  r,
+  featured = false,
+}: {
+  r: Realization;
+  featured?: boolean;
+}) {
+  const brand = r.client && r.client !== "—" ? r.client : null;
+  return (
+    <Link
+      href={`/realizacje/${r.slug}`}
+      className={`relative block rounded-2xl no-underline ${
+        featured ? "aspect-[16/14]" : "aspect-[4/5]"
+      }`}
+      style={{
+        background: "rgba(172, 170, 165, 0.48)",
+        boxShadow: "0 14px 40px rgba(15,42,46,0.07)",
+      }}>
+      <div className="flex h-full flex-col p-5 md:p-6">
+        <div className="relative w-full flex-1 overflow-hidden rounded-lg">
+          <img
+            src={r.image}
+            alt={r.title}
+            className="absolute inset-0 w-full h-full object-cover"
+          />
+          {brand && (
+            <span
+              className="absolute top-3 left-3 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full uppercase tracking-[0.18em] font-bold text-[#0a2a2e]"
+              style={{
+                fontSize: "0.58rem",
+                background: "rgba(255,255,255,0.92)",
+                border: "1px solid rgba(10,42,46,0.06)",
+                boxShadow: "0 4px 14px rgba(15,21,24,0.18)",
+              }}>
+              <span
+                className="block rounded-full"
+                style={{ width: 5, height: 5, background: "#0086b0" }}
+              />
+              {brand}
+            </span>
+          )}
+        </div>
+        <div className="mt-4 flex flex-col items-center gap-1.5 text-center md:mt-5">
+          <h3
+            className="m-0 font-semibold uppercase tracking-[0.16em] text-[#0a2a2e]"
+            style={{ fontSize: "clamp(0.95rem, 1.15vw, 1.15rem)" }}>
+            {r.title}
+          </h3>
+          <p
+            className="m-0 font-light leading-snug text-[#3a5a60] line-clamp-2"
+            style={{ fontSize: "clamp(0.78rem, 0.9vw, 0.9rem)" }}>
+            {r.description}
+          </p>
+          {r.config?.lockers && (
+            <div className="mt-1.5 flex flex-wrap items-center gap-1.5 self-start justify-start">
+              <span
+                className="inline-flex items-center px-2 py-0.5 rounded-full uppercase tracking-[0.12em] font-semibold text-[#0a2a2e]/80"
+                style={{
+                  fontSize: "0.55rem",
+                  background: "rgba(255,255,255,0.55)",
+                  border: "1px solid rgba(10,42,46,0.08)",
+                }}>
+                {r.config.lockers} skrytek
+              </span>
+            </div>
+          )}
+        </div>
+      </div>
+    </Link>
   );
 }

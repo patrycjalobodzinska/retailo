@@ -1,12 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useLang } from "@/lib/i18n/LanguageProvider";
 import type { LocalizedField } from "@/lib/sanity/i18n";
-
-gsap.registerPlugin(ScrollTrigger);
 
 type QAData = {
   qaEyebrow?: LocalizedField;
@@ -15,16 +11,21 @@ type QAData = {
   qaTiles?: Array<{ title?: LocalizedField; description?: LocalizedField }>;
 } | null;
 
-// Per-tile inline SVGs. Stroke-only, cyan brand color, 1.6 width — match
-// the lightweight industrial vibe of the rest of the section without
-// pulling in an icon library.
-function TileIcon({ kind }: { kind: string }) {
+function TileIcon({
+  kind,
+  stroke = "#0f0f0f",
+  size = 26,
+}: {
+  kind: string;
+  stroke?: string;
+  size?: number;
+}) {
   const common = {
-    width: 28,
-    height: 28,
+    width: size,
+    height: size,
     viewBox: "0 0 24 24",
     fill: "none" as const,
-    stroke: "#0086b0",
+    stroke,
     strokeWidth: 1.6,
     strokeLinecap: "round" as const,
     strokeLinejoin: "round" as const,
@@ -52,9 +53,9 @@ function TileIcon({ kind }: { kind: string }) {
       return (
         <svg {...common}>
           <path d="M12 21a9 9 0 1 1 9-9c0 2-1 3-3 3h-2a2 2 0 0 0 0 4 2 2 0 0 1-2 2h-2z" />
-          <circle cx="7.5" cy="10.5" r="1" fill="#0086b0" stroke="none" />
-          <circle cx="12" cy="7.5" r="1" fill="#0086b0" stroke="none" />
-          <circle cx="16.5" cy="10.5" r="1" fill="#0086b0" stroke="none" />
+          <circle cx="7.5" cy="10.5" r="1" fill={stroke} stroke="none" />
+          <circle cx="12" cy="7.5" r="1" fill={stroke} stroke="none" />
+          <circle cx="16.5" cy="10.5" r="1" fill={stroke} stroke="none" />
         </svg>
       );
     case "Uniwersalnosc":
@@ -82,35 +83,41 @@ function TileIcon({ kind }: { kind: string }) {
   }
 }
 
-const TILES: { title: string; desc: string }[] = [
+const SMALL_TILES = [
   {
+    kind: "Modularnosc",
     title: "Modularnosc",
     desc: "Wielkosc i liczba skrytek dostosowana do potrzeb i specyfiki branzy klienta.",
+    accent: "#0086b0",
   },
   {
+    kind: "Skalowalnosc",
     title: "Skalowalnosc",
     desc: "Mozliwosc instalowania dodatkowych modulow.",
+    accent: "#34d399",
   },
   {
-    title: "Personalizacja",
-    desc: "Dedykowane grafiki i kolor obudowy. Opcjonalny ekran Digital Signage.",
-  },
-  {
-    title: "Uniwersalnosc",
-    desc: "Wymiary modulow w zgodzie ze standardami zabudow meblowych w retailu.",
-  },
-  {
+    kind: "Bezpieczenstwo",
     title: "Bezpieczenstwo",
     desc: "Bezdotykowa, bezkontaktowa obsluga zwieksza bezpieczenstwo klientow i sluzb sprzedazy.",
+    accent: "#f59e0b",
   },
   {
-    title: "Wydajnosc",
-    desc: "Odbior ponizej 15 sekund, krotsze kolejki i zwolnienie przestrzeni magazynowej zaplecza.",
+    kind: "Uniwersalnosc",
+    title: "Uniwersalnosc",
+    desc: "Wymiary modulow w zgodzie ze standardami zabudow meblowych w retailu.",
+    accent: "#a855f7",
   },
 ];
 
-const BG_COLOR = "#c0dbe2";
-const COL_INITIAL_Y = ["55vh", "32vh", "78vh"];
+const COLOR_SWATCHES = [
+  { color: "#0f0f0f", label: "Czern" },
+  { color: "#f5f3ee", label: "Biel" },
+  { color: "#0086b0", label: "Cyjan" },
+  { color: "#d4c5a8", label: "Piasek" },
+];
+
+const BG_COLOR = "#fafaf8";
 
 export default function QASection({ data }: { data?: QAData } = {}) {
   const { t } = useLang();
@@ -119,84 +126,49 @@ export default function QASection({ data }: { data?: QAData } = {}) {
   const subtitle =
     t(data?.qaSubtitle ?? null) ||
     'PickUpWall to rozwiazanie do zamowien typu "pick up in store".';
-  const tiles =
-    data?.qaTiles && data.qaTiles.length > 0
-      ? data.qaTiles.map((tile) => ({
-          title: t(tile?.title ?? null),
-          desc: t(tile?.description ?? null),
-        }))
-      : TILES;
 
   const sectionRef = useRef<HTMLElement>(null);
-  const pinRef = useRef<HTMLDivElement>(null);
-  const tileRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const headerRef = useRef<HTMLDivElement>(null);
+  const featuredRef = useRef<HTMLDivElement>(null);
+  const tilesRef = useRef<HTMLDivElement>(null);
   const scrollerRef = useRef<HTMLDivElement>(null);
   const [activeIdx, setActiveIdx] = useState(0);
 
+  // Mobile snap-scroll active dot tracker
   useEffect(() => {
     const isMobile = window.matchMedia("(max-width: 1023px)").matches;
+    if (!isMobile) return;
+    const scroller = scrollerRef.current;
+    if (!scroller) return;
+    const cards = Array.from(scroller.children) as HTMLElement[];
+    if (cards.length === 0) return;
 
-    if (isMobile) {
-      const scroller = scrollerRef.current;
-      if (!scroller) return;
-      const cards = Array.from(scroller.children) as HTMLElement[];
-      if (cards.length === 0) return;
-
-      // Pick whichever card is most-visible inside the scroller as the
-      // active one. IntersectionObserver fires reliably across snap-scroll
-      // momentum on iOS/Android, unlike raw scroll-position math.
-      const ratios = new Array(cards.length).fill(0);
-      const observer = new IntersectionObserver(
-        (entries) => {
-          for (const entry of entries) {
-            const idx = cards.indexOf(entry.target as HTMLElement);
-            if (idx >= 0) ratios[idx] = entry.intersectionRatio;
+    const ratios = new Array(cards.length).fill(0);
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          const idx = cards.indexOf(entry.target as HTMLElement);
+          if (idx >= 0) ratios[idx] = entry.intersectionRatio;
+        }
+        let bestIdx = 0;
+        let best = -1;
+        for (let i = 0; i < ratios.length; i++) {
+          if (ratios[i] > best) {
+            best = ratios[i];
+            bestIdx = i;
           }
-          let bestIdx = 0;
-          let best = -1;
-          for (let i = 0; i < ratios.length; i++) {
-            if (ratios[i] > best) {
-              best = ratios[i];
-              bestIdx = i;
-            }
-          }
-          setActiveIdx(bestIdx);
-        },
-        {
-          root: scroller,
-          threshold: [0, 0.25, 0.5, 0.75, 1],
-        },
-      );
-
-      cards.forEach((c) => observer.observe(c));
-      return () => observer.disconnect();
-    }
-
-    const ctx = gsap.context(() => {
-      const tiles = tileRefs.current.filter(Boolean) as HTMLDivElement[];
-
-      tiles.forEach((el, i) => {
-        const col = i % 3;
-        gsap.set(el, { y: COL_INITIAL_Y[col] });
-      });
-
-      gsap.to(tiles, {
-        y: 0,
-        ease: "power2.out",
-        duration: 1,
-        scrollTrigger: {
-          trigger: sectionRef.current,
-          start: "top top",
-          end: "+=120%",
-          pin: pinRef.current,
-          scrub: 1.5,
-          invalidateOnRefresh: true,
-        },
-      });
-    }, sectionRef);
-
-    return () => ctx.revert();
+        }
+        setActiveIdx(bestIdx);
+      },
+      { root: scroller, threshold: [0, 0.25, 0.5, 0.75, 1] },
+    );
+    cards.forEach((c) => observer.observe(c));
+    return () => observer.disconnect();
   }, []);
+
+  // Desktop reveal animations removed — sekcja renderuje się od razu
+  // statycznie (bez slide-in z dołu). Karty zostawiały artefakty przy
+  // scrollu w górę i utrzymywanie tej animacji nie wnosiło wartości.
 
   const scrollToCard = (i: number) => {
     const scroller = scrollerRef.current;
@@ -209,36 +181,37 @@ export default function QASection({ data }: { data?: QAData } = {}) {
     });
   };
 
+  const allMobileTiles = [
+    ...SMALL_TILES,
+    {
+      kind: "Personalizacja",
+      title: "Personalizacja",
+      desc: "Dedykowane grafiki i kolor obudowy. Opcjonalny ekran Digital Signage.",
+      accent: "#0086b0",
+    },
+    {
+      kind: "Wydajnosc",
+      title: "Wydajnosc",
+      desc: "Odbior ponizej 15 sekund, krotsze kolejki i zwolnienie przestrzeni magazynowej zaplecza.",
+      accent: "#0f0f0f",
+    },
+  ];
+
   return (
     <section
       ref={sectionRef}
-      className="relative w-full"
+      className="relative w-full py-[12vh] max-lg:pt-[6dvh] max-lg:pb-[6dvh] overflow-hidden"
       style={{ background: BG_COLOR }}>
-      {/* MOBILE: header + horizontal snap-scroll cards + pagination dots */}
-      <div className="lg:hidden relative py-[10vh] overflow-hidden">
-        {/* Decorative watermark — same idea as desktop, scaled for mobile. */}
-        <p
-          aria-hidden="true"
-          className="absolute m-0 font-black select-none pointer-events-none"
-          style={{
-            bottom: "3vh",
-            left: "-3vw",
-            fontSize: "40vw",
-            lineHeight: 1.2,
-            letterSpacing: "-0.05em",
-            color: "rgba(255,255,255,0.55)",
-            zIndex: 0,
-          }}>
-          pickup.
-        </p>
-        <div className="relative z-[1] text-center px-[6vw] mb-8">
+      {/* MOBILE: horizontal snap carousel using the desktop bento card design */}
+      <div className="lg:hidden relative">
+        <div className="relative z-[1] mb-7 max-w-[520px] px-[6vw]">
           <p
-            className="m-0 mb-3 uppercase tracking-[0.22em] font-semibold text-[#0086b0]"
-            style={{ fontSize: "0.72rem" }}>
+            className="m-0 mb-3 uppercase tracking-[0.28em] font-semibold text-[#7a7a7a]"
+            style={{ fontSize: "0.68rem" }}>
             {eyebrow}
           </p>
           <h2
-            className="m-0 mb-3 font-bold text-[#0a2a2e]"
+            className="m-0 mb-3 font-semibold text-[#0f0f0f] tracking-tight"
             style={{
               fontSize: "clamp(1.9rem, 8vw, 2.6rem)",
               lineHeight: 1.05,
@@ -247,53 +220,224 @@ export default function QASection({ data }: { data?: QAData } = {}) {
             {headline}
           </h2>
           <p
-            className="m-0 mx-auto text-[#3a5a60]"
-            style={{
-              fontSize: "0.95rem",
-              lineHeight: 1.5,
-              maxWidth: "440px",
-            }}>
+            className="m-0 text-[#5a5a5a] font-light"
+            style={{ fontSize: "0.95rem", lineHeight: 1.5 }}>
             {subtitle}
           </p>
         </div>
 
         <div
           ref={scrollerRef}
-          className="relative z-[1] flex overflow-x-auto snap-x snap-mandatory gap-4 px-[6vw] pb-4 no-scrollbar"
-          style={{ scrollPadding: "0 6vw" }}>
-          {tiles.map((tile, i) => (
-            <div
-              key={tile.title}
-              className="flex-none w-[82vw] snap-center bg-white rounded-2xl p-7 flex flex-col gap-3"
+          className="flex overflow-x-auto snap-x snap-mandatory gap-4 px-[6vw] pb-10 no-scrollbar"
+          style={{ scrollPaddingInline: "6vw" }}>
+          {/* Personalizacja */}
+          <article
+            className="flex-none w-[82vw] snap-center relative rounded-3xl overflow-hidden p-6 flex flex-col justify-between"
+            style={{
+              background:
+                "linear-gradient(135deg, #ecebe6 0%, #dedcd6 60%, #cdcac3 100%)",
+              minHeight: "320px",
+              border: "1px solid rgba(15,15,15,0.06)",
+              boxShadow:
+                "0 1px 2px rgba(15,15,15,0.04), 0 14px 32px rgba(15,15,15,0.06)",
+            }}>
+            <img
+              src="/empik.png"
+              alt=""
+              aria-hidden="true"
+              className="absolute pointer-events-none select-none"
               style={{
-                boxShadow: "0 12px 28px rgba(10, 30, 38, 0.10)",
-                minHeight: "260px",
-              }}>
-              <div className="flex items-center justify-between">
-                <span
-                  className="text-[#0086b0] font-bold uppercase tracking-widest"
-                  style={{ fontSize: "0.78rem" }}>
-                  {String(i + 1).padStart(2, "0")}
-                </span>
-                <TileIcon kind={tile.title} />
+                right: "-2%",
+                bottom: "-4%",
+                width: "56%",
+                opacity: 0.95,
+                filter: "drop-shadow(0 16px 28px rgba(15,15,15,0.22))",
+              }}
+            />
+            <div
+              aria-hidden="true"
+              className="absolute pointer-events-none"
+              style={{
+                top: "-20%",
+                left: "-10%",
+                width: "60%",
+                height: "60%",
+                background:
+                  "radial-gradient(ellipse at center, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0) 70%)",
+              }}
+            />
+
+            <div className="relative z-[1] max-w-[160px]">
+              <div
+                className="inline-flex items-center justify-center rounded-2xl mb-4"
+                style={{
+                  width: 44,
+                  height: 44,
+                  background: "rgba(15,15,15,0.05)",
+                  border: "1px solid rgba(15,15,15,0.06)",
+                }}>
+                <TileIcon kind="Personalizacja" stroke="#0f0f0f" size={20} />
               </div>
               <h3
-                className="m-0 font-bold text-[#0a2a2e] uppercase tracking-wide"
-                style={{ fontSize: "1.35rem", lineHeight: 1.2 }}>
-                {tile.title}
+                className="m-0 mb-2 text-[#0f0f0f] font-semibold tracking-tight"
+                style={{
+                  fontSize: "1.45rem",
+                  lineHeight: 1.1,
+                  letterSpacing: "-0.02em",
+                }}>
+                Personalizacja.
               </h3>
               <p
-                className="m-0 text-[#3a5a60] leading-relaxed"
-                style={{ fontSize: "0.98rem" }}>
-                {tile.desc}
+                className="m-0 text-[#5a5a5a] leading-relaxed font-light"
+                style={{ fontSize: "0.85rem", maxWidth: "150px" }}>
+                Dedykowane grafiki i kolor obudowy.
               </p>
             </div>
-          ))}
+
+            <div className="relative z-[1] flex items-center gap-2 mt-4">
+              {COLOR_SWATCHES.map((swatch) => (
+                <span
+                  key={swatch.color}
+                  aria-label={swatch.label}
+                  title={swatch.label}
+                  className="block rounded-full"
+                  style={{
+                    width: 24,
+                    height: 24,
+                    background: swatch.color,
+                    border: "2px solid rgba(255,255,255,0.9)",
+                    boxShadow: "0 4px 10px rgba(15,15,15,0.18)",
+                  }}
+                />
+              ))}
+            </div>
+          </article>
+
+          {/* Wydajnosc */}
+          <article
+            className="flex-none w-[82vw] snap-center relative rounded-3xl overflow-hidden p-6 flex flex-col justify-between"
+            style={{
+              background: "white",
+              minHeight: "320px",
+              border: "1px solid rgba(15,15,15,0.06)",
+              boxShadow:
+                "0 1px 2px rgba(15,15,15,0.04), 0 14px 32px rgba(15,15,15,0.06)",
+            }}>
+            <svg
+              aria-hidden="true"
+              className="absolute pointer-events-none"
+              style={{
+                left: 0,
+                right: 0,
+                bottom: "-15%",
+                width: "100%",
+                opacity: 0.08,
+              }}
+              viewBox="0 0 400 200"
+              preserveAspectRatio="none"
+              fill="none">
+              {Array.from({ length: 14 }).map((_, i) => (
+                <path
+                  key={i}
+                  d={`M-50 ${30 + i * 10} Q 100 ${100 - i * 6} 200 ${
+                    80 + i * 8
+                  } T 450 ${60 + i * 5}`}
+                  stroke="#0f0f0f"
+                  strokeWidth="0.8"
+                  fill="none"
+                />
+              ))}
+            </svg>
+
+            <div className="relative z-[1]">
+              <div
+                className="inline-flex items-center justify-center rounded-2xl mb-4"
+                style={{
+                  width: 44,
+                  height: 44,
+                  background: "rgba(15,15,15,0.05)",
+                }}>
+                <TileIcon kind="Wydajnosc" size={20} />
+              </div>
+              <div className="flex items-baseline gap-2 mb-3">
+                <span
+                  className="font-semibold text-[#0f0f0f] leading-none tracking-tighter"
+                  style={{ fontSize: "2.8rem", letterSpacing: "-0.04em" }}>
+                  &lt;15s
+                </span>
+              </div>
+              <h3
+                className="m-0 mb-2 font-semibold text-[#0f0f0f] tracking-tight"
+                style={{
+                  fontSize: "1.3rem",
+                  lineHeight: 1.1,
+                  letterSpacing: "-0.015em",
+                }}>
+                Wydajnosc.
+              </h3>
+              <p
+                className="m-0 text-[#5a5a5a] leading-relaxed font-light"
+                style={{ fontSize: "0.88rem" }}>
+                Odbior ponizej 15 sekund, krotsze kolejki.
+              </p>
+            </div>
+          </article>
+
+          {/* Small tiles — grouped 2 per snap slide, stacked vertically. */}
+          {Array.from({ length: Math.ceil(SMALL_TILES.length / 2) }).map(
+            (_, slideIdx) => (
+              <div
+                key={`tile-slide-${slideIdx}`}
+                className="flex-none w-[82vw] snap-center flex flex-col gap-3"
+                style={{ minHeight: "320px" }}>
+                {SMALL_TILES.slice(slideIdx * 2, slideIdx * 2 + 2).map(
+                  (tile) => (
+                    <article
+                      key={tile.title}
+                      className="relative bg-white rounded-3xl p-5 flex flex-1 flex-col gap-2"
+                      style={{
+                        border: "1px solid rgba(15,15,15,0.06)",
+                        boxShadow:
+                          "0 1px 2px rgba(15,15,15,0.04), 0 14px 32px rgba(15,15,15,0.06)",
+                      }}>
+                      <div className="flex items-center gap-3">
+                        <div
+                          className="flex items-center justify-center rounded-xl shrink-0"
+                          style={{
+                            width: 40,
+                            height: 40,
+                            background: "rgba(15,15,15,0.05)",
+                          }}>
+                          <TileIcon kind={tile.kind} size={20} />
+                        </div>
+                        <h3
+                          className="m-0 font-semibold text-[#0f0f0f] tracking-tight"
+                          style={{
+                            fontSize: "1.05rem",
+                            lineHeight: 1.15,
+                            letterSpacing: "-0.015em",
+                          }}>
+                          {tile.title}
+                        </h3>
+                      </div>
+                      <p
+                        className="m-0 text-[#5a5a5a] leading-relaxed font-light"
+                        style={{ fontSize: "0.88rem" }}>
+                        {tile.desc}
+                      </p>
+                    </article>
+                  ),
+                )}
+              </div>
+            ),
+          )}
         </div>
 
-        {/* Pagination dots */}
-        <div className="relative z-[1] flex justify-center gap-2 mt-5 px-[6vw]">
-          {tiles.map((_, i) => (
+        {/* Pagination dots — tight under cards, inside shadow zone */}
+        <div className="flex justify-center gap-2 -mt-2 px-[6vw]">
+          {Array.from({
+            length: 2 + Math.ceil(SMALL_TILES.length / 2),
+          }).map((_, i) => (
             <button
               key={i}
               type="button"
@@ -306,7 +450,7 @@ export default function QASection({ data }: { data?: QAData } = {}) {
                   width: i === activeIdx ? "24px" : "8px",
                   height: "8px",
                   background:
-                    i === activeIdx ? "#0086b0" : "rgba(0,134,176,0.25)",
+                    i === activeIdx ? "#0f0f0f" : "rgba(15,15,15,0.18)",
                 }}
               />
             </button>
@@ -314,129 +458,259 @@ export default function QASection({ data }: { data?: QAData } = {}) {
         </div>
       </div>
 
-      {/* DESKTOP: pinned 6-tile staircase wave */}
+      {/* Decorative background — watermark + dot grid + radial accents */}
       <div
-        ref={pinRef}
-        className="max-lg:hidden h-screen min-h-[640px] w-full relative overflow-hidden">
-        {/* Decorative background — gradient wash + giant watermark word +
-            accent dots/lines. Pointer-events-none so nothing interferes
-            with the staircase tiles in front. */}
+        aria-hidden="true"
+        className="absolute inset-0 pointer-events-none overflow-hidden max-lg:hidden"
+        style={{
+          background:
+            "radial-gradient(ellipse 80% 60% at 15% 110%, rgba(15,15,15,0.04) 0%, rgba(15,15,15,0) 60%), radial-gradient(ellipse 60% 50% at 90% -10%, rgba(15,15,15,0.03) 0%, rgba(15,15,15,0) 60%)",
+        }}>
         <div
-          aria-hidden="true"
-          className="absolute inset-0 pointer-events-none"
-          style={{
-            background:
-              "radial-gradient(ellipse 80% 60% at 15% 110%, rgba(0,134,176,0.18) 0%, rgba(0,134,176,0) 60%), radial-gradient(ellipse 60% 50% at 90% -10%, rgba(126,213,230,0.25) 0%, rgba(126,213,230,0) 60%)",
-          }}
-        />
-        <p
-          aria-hidden="true"
-          className="absolute m-0 font-black select-none pointer-events-none"
-          style={{
-            // lineHeight 1.2 contains the Roboto Black descender inside
-            // the element box; bottom: 3vh leaves just enough margin so
-            // the glyph doesn't kiss the section edge but the watermark
-            // still reads as anchored to the bottom.
-            bottom: 0,
-            left: "-2vw",
-            fontSize: "clamp(11rem, 20vw, 26rem)",
-            lineHeight: 1.2,
-            letterSpacing: "-0.05em",
-            color: "rgba(255,255,255,0.55)",
-            zIndex: 0,
-          }}>
-          pickup.
-        </p>
-
-        {/* Accent dot grid in the bottom-right corner */}
-        <svg
-          aria-hidden="true"
-          className="absolute pointer-events-none"
-          style={{ bottom: "6vh", right: "5vw", opacity: 0.4 }}
-          width="120"
-          height="80"
-          viewBox="0 0 120 80">
-          {Array.from({ length: 6 }).map((_, row) =>
-            Array.from({ length: 9 }).map((_, col) => (
-              <circle
-                key={`${row}-${col}`}
-                cx={col * 14 + 4}
-                cy={row * 14 + 4}
-                r="1.4"
-                fill="#0086b0"
-              />
-            )),
-          )}
-        </svg>
-        {/* Cyan accent stripe near the heading */}
-        <div
-          aria-hidden="true"
-          className="absolute pointer-events-none"
+          className="absolute"
           style={{
             top: "8vh",
             left: "8vw",
-            width: "60px",
-            height: "3px",
-            background: "#0086b0",
+            width: "48px",
+            height: "1px",
+            background: "#0f0f0f",
           }}
         />
-        <div className="relative z-[1] text-center max-w-[760px] mx-auto px-[6vw] pt-[10vh] pb-[2vh]">
-          <p
-            className="m-0 mb-3 uppercase tracking-[0.22em] font-semibold text-[#0086b0]"
-            style={{ fontSize: "clamp(0.72rem, 0.8vw, 0.85rem)" }}>
+      </div>
+
+      {/* DESKTOP: bento layout */}
+      <div className="max-lg:hidden relative max-w-[1280px] mx-auto px-[6vw]">
+        {/* Header */}
+        <div
+          ref={headerRef}
+          className="mb-10 max-w-[680px]"
+          style={{ transform: "translateY(40px)" }}>
+          <span
+            className="block uppercase tracking-[0.3em] font-semibold text-[#7a7a7a] mb-4"
+            style={{ fontSize: "0.72rem" }}>
             {eyebrow}
-          </p>
+          </span>
           <h2
-            className="m-0 mb-4 font-bold text-[#0a2a2e]"
+            className="m-0 mb-4 font-semibold text-[#0f0f0f] tracking-tight"
             style={{
-              fontSize: "clamp(2rem, 4vw, 3.4rem)",
+              fontSize: "clamp(2rem, 3.8vw, 3.4rem)",
               lineHeight: 1.05,
-              letterSpacing: "-0.02em",
+              letterSpacing: "-0.025em",
             }}>
             {headline}
           </h2>
           <p
-            className="m-0 mx-auto text-[#3a5a60]"
+            className="m-0 text-[#5a5a5a] font-light leading-relaxed"
             style={{
-              fontSize: "clamp(1rem, 1.2vw, 1.15rem)",
-              lineHeight: 1.5,
+              fontSize: "clamp(1rem, 1.1vw, 1.13rem)",
               maxWidth: "560px",
             }}>
             {subtitle}
           </p>
         </div>
 
-        <div className="relative z-[1] grid grid-cols-3 gap-6 px-[6vw] mt-[3vh]">
-          {tiles.map((tile, i) => (
-            <div
-              key={tile.title}
-              ref={(el) => {
-                tileRefs.current[i] = el;
+        {/* Featured row — 2 wide cards (Bezpieczenstwo dark + Wydajnosc light) */}
+        <div ref={featuredRef} className="grid grid-cols-2 gap-5 mb-5">
+          {/* DARK CARD — Personalizacja with bleeding image + color swatches */}
+          <article
+            className="relative rounded-3xl overflow-hidden p-7 flex flex-col justify-between"
+            style={{
+              background:
+                "linear-gradient(135deg, #ecebe6 0%, #dedcd6 60%, #cdcac3 100%)",
+              minHeight: "340px",
+              border: "1px solid rgba(15,15,15,0.06)",
+              boxShadow:
+                "0 1px 2px rgba(15,15,15,0.04), 0 14px 32px rgba(15,15,15,0.06)",
+            }}>
+            <img
+              src="/empik.png"
+              alt=""
+              aria-hidden="true"
+              className="absolute pointer-events-none select-none"
+              style={{
+                right: "-8%",
+                bottom: "-18%",
+                width: "52%",
+                opacity: 0.95,
+                filter: "drop-shadow(0 20px 36px rgba(15,15,15,0.22))",
               }}
-              className="bg-white p-8 rounded-md flex flex-col gap-3 will-change-transform"
-              style={{ boxShadow: "0 6px 22px rgba(10, 30, 38, 0.06)" }}>
-              <div className="flex items-center justify-between">
-                <span
-                  className="text-[#0086b0] font-bold uppercase tracking-widest"
-                  style={{ fontSize: "0.78rem" }}>
-                  {String(i + 1).padStart(2, "0")}
-                </span>
-                <TileIcon kind={tile.title} />
+            />
+            <div
+              aria-hidden="true"
+              className="absolute pointer-events-none"
+              style={{
+                top: "-20%",
+                left: "-10%",
+                width: "60%",
+                height: "60%",
+                background:
+                  "radial-gradient(ellipse at center, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0) 70%)",
+              }}
+            />
+
+            <div className="relative z-[1] max-w-[240px]">
+              <div
+                className="inline-flex items-center justify-center rounded-2xl mb-5"
+                style={{
+                  width: 48,
+                  height: 48,
+                  background: "rgba(15,15,15,0.05)",
+                  border: "1px solid rgba(15,15,15,0.06)",
+                }}>
+                <TileIcon kind="Personalizacja" stroke="#0f0f0f" size={22} />
               </div>
               <h3
-                className="m-0 font-bold text-[#0a2a2e] uppercase tracking-wide"
+                className="m-0 mb-3 text-[#0f0f0f] font-semibold tracking-tight"
                 style={{
-                  fontSize: "clamp(1.05rem, 1.3vw, 1.3rem)",
-                  lineHeight: 1.25,
+                  fontSize: "clamp(1.35rem, 1.85vw, 1.8rem)",
+                  lineHeight: 1.1,
+                  letterSpacing: "-0.02em",
+                }}>
+                Personalizacja.
+              </h3>
+              <p
+                className="m-0 text-[#5a5a5a] leading-relaxed font-light"
+                style={{ fontSize: "0.95rem" }}>
+                Dedykowane grafiki i kolor obudowy. Opcjonalny ekran Digital
+                Signage pod brand klienta.
+              </p>
+            </div>
+
+            <div className="relative z-[1] flex items-center gap-2 mt-5">
+              {COLOR_SWATCHES.map((swatch) => (
+                <span
+                  key={swatch.color}
+                  aria-label={swatch.label}
+                  title={swatch.label}
+                  className="block rounded-full"
+                  style={{
+                    width: 28,
+                    height: 28,
+                    background: swatch.color,
+                    border: "2px solid rgba(255,255,255,0.9)",
+                    boxShadow: "0 4px 10px rgba(15,15,15,0.18)",
+                  }}
+                />
+              ))}
+            </div>
+          </article>
+
+          {/* LIGHT CARD — Wydajnosc with giant <15s + wave illustration */}
+          <article
+            className="relative rounded-3xl overflow-hidden p-7 flex flex-col justify-between"
+            style={{
+              background: "white",
+              minHeight: "340px",
+              border: "1px solid rgba(15,15,15,0.06)",
+              boxShadow:
+                "0 1px 2px rgba(15,15,15,0.04), 0 14px 32px rgba(15,15,15,0.06)",
+            }}>
+            <svg
+              aria-hidden="true"
+              className="absolute pointer-events-none"
+              style={{
+                left: 0,
+                right: 0,
+                bottom: "-15%",
+                width: "100%",
+                opacity: 0.08,
+              }}
+              viewBox="0 0 400 200"
+              preserveAspectRatio="none"
+              fill="none">
+              {Array.from({ length: 14 }).map((_, i) => (
+                <path
+                  key={i}
+                  d={`M-50 ${30 + i * 10} Q 100 ${100 - i * 6} 200 ${
+                    80 + i * 8
+                  } T 450 ${60 + i * 5}`}
+                  stroke="#0f0f0f"
+                  strokeWidth="0.8"
+                  fill="none"
+                />
+              ))}
+            </svg>
+
+            <div className="relative z-[1]">
+              <div
+                className="inline-flex items-center justify-center rounded-2xl mb-5"
+                style={{
+                  width: 48,
+                  height: 48,
+                  background: "rgba(15,15,15,0.05)",
+                }}>
+                <TileIcon kind="Wydajnosc" size={22} />
+              </div>
+              <div className="flex items-baseline gap-2 mb-4">
+                <span
+                  className="font-semibold text-[#0f0f0f] leading-none tracking-tighter"
+                  style={{
+                    fontSize: "clamp(2.6rem, 3.8vw, 3.8rem)",
+                    letterSpacing: "-0.04em",
+                  }}>
+                  &lt;15s
+                </span>
+              </div>
+              <h3
+                className="m-0 mb-2 font-semibold text-[#0f0f0f] tracking-tight"
+                style={{
+                  fontSize: "clamp(1.25rem, 1.7vw, 1.6rem)",
+                  lineHeight: 1.1,
+                  letterSpacing: "-0.015em",
+                }}>
+                Wydajnosc.
+              </h3>
+              <p
+                className="m-0 text-[#5a5a5a] leading-relaxed font-light max-w-[360px]"
+                style={{ fontSize: "0.95rem" }}>
+                Odbior ponizej 15 sekund, krotsze kolejki i zwolnienie
+                przestrzeni magazynowej zaplecza.
+              </p>
+            </div>
+          </article>
+        </div>
+
+        {/* Small tiles row — 4 cards */}
+        <div ref={tilesRef} className="grid grid-cols-4 gap-5">
+          {SMALL_TILES.map((tile, i) => (
+            <article
+              key={tile.title}
+              className="relative bg-white rounded-2xl p-6 flex flex-col gap-3"
+              style={{
+                border: "1px solid rgba(15,15,15,0.06)",
+                boxShadow:
+                  "0 1px 2px rgba(15,15,15,0.04), 0 12px 28px rgba(15,15,15,0.05)",
+              }}>
+              <div className="flex items-center justify-between">
+                <div
+                  className="flex items-center justify-center rounded-xl"
+                  style={{
+                    width: 42,
+                    height: 42,
+                    background: "rgba(15,15,15,0.05)",
+                  }}>
+                  <TileIcon kind={tile.kind} size={22} />
+                </div>
+                <span
+                  className="text-[#7a7a7a] font-semibold tabular-nums"
+                  style={{ fontSize: "0.68rem", letterSpacing: "0.05em" }}>
+                  {String(i + 1).padStart(2, "0")}
+                </span>
+              </div>
+              <h3
+                className="m-0 mt-1 font-semibold text-[#0f0f0f] tracking-tight"
+                style={{
+                  fontSize: "clamp(1rem, 1.2vw, 1.2rem)",
+                  lineHeight: 1.2,
                 }}>
                 {tile.title}
               </h3>
               <p
-                className="m-0 text-[#3a5a60] leading-relaxed"
-                style={{ fontSize: "clamp(0.9rem, 1.05vw, 1rem)" }}>
+                className="m-0 text-[#5a5a5a] leading-relaxed font-light"
+                style={{ fontSize: "clamp(0.85rem, 0.98vw, 0.95rem)" }}>
                 {tile.desc}
               </p>
-            </div>
+            </article>
           ))}
         </div>
       </div>

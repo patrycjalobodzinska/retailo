@@ -1,6 +1,6 @@
 import nextDynamic from "next/dynamic";
 import Header from "@/components/Header";
-import Hero from "@/components/Hero";
+import HeroConcept from "@/components/HeroConcept";
 import QASection from "@/components/QASection";
 import { getHomePage, type HomePage } from "@/lib/sanity/fetch";
 
@@ -9,14 +9,10 @@ import { getHomePage, type HomePage } from "@/lib/sanity/fetch";
 // loading them lets the hero animation kick off as soon as React hydrates
 // the small set of above-the-fold components.
 const ProductShowcase = nextDynamic(() => import("@/components/ProductShowcase"));
-const RealizationsSection = nextDynamic(
-  () => import("@/components/RealizationsSection"),
-);
-const RealizationsTabsSection = nextDynamic(
-  () => import("@/components/RealizationsTabsSection"),
+const RealizationsCarousel = nextDynamic(
+  () => import("@/components/RealizationsCarousel"),
 );
 const GlobalSection = nextDynamic(() => import("@/components/GlobalSection"));
-const Footer = nextDynamic(() => import("@/components/Footer"));
 
 // Force / to be prerendered as static at build time. Without this, the
 // async nature of the page + the wrapped Sanity fetch could make Next
@@ -45,15 +41,14 @@ export default async function Home() {
   return (
     <>
       <Header />
-      <Hero data={home} />
+      <HeroConcept data={home} />
       <QASection data={home} />
       <div id="rozwiazanie">
         <ProductShowcase />
       </div>
       <div id="realizacje">
-        <RealizationsSection data={home} />
+        <RealizationsCarousel />
       </div>
-      <RealizationsTabsSection />
       <GlobalSection />
     </>
   );

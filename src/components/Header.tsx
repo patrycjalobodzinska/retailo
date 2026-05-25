@@ -70,8 +70,11 @@ export default function Header() {
         <a
           href="/"
           onClick={(e) => {
-            e.preventDefault();
             setOpen(false);
+            // On subpages let the browser navigate normally to "/".
+            // On the home page intercept and smooth-scroll to the top.
+            if (isSubpage) return;
+            e.preventDefault();
             const lenis = window.__lenis;
             if (lenis) lenis.scrollTo(0, { duration: 1.1 });
             else window.scrollTo({ top: 0, behavior: "smooth" });
@@ -185,38 +188,153 @@ export default function Header() {
         </button>
       </header>
 
-      {/* Mobile drawer */}
+      {/* Mobile drawer — editorial light style pasujący do Hero/QASection */}
       <div
-        className={`md:hidden fixed inset-0 z-[99] transition-opacity duration-400 ${
+        className={`md:hidden fixed inset-0 z-[99] transition-opacity duration-300 ${
           open
             ? "opacity-100 pointer-events-auto"
             : "opacity-0 pointer-events-none"
         }`}
-        style={{ background: "rgba(15, 21, 24, 0.96)" }}
+        style={{
+          background:
+            "linear-gradient(180deg, #fafaf8 0%, #f4efe6 60%, #ebe4d5 100%)",
+        }}
         onClick={() => setOpen(false)}>
-        <nav
-          className="flex flex-col gap-2 px-[8vw] pt-[18vh]"
+        <div
+          className="relative flex h-full flex-col"
           onClick={(e) => e.stopPropagation()}>
-          {NAV_ITEMS.map((item, i) => (
-            <a
-              key={item.label}
-              href={`#${item.target}`}
-              onClick={(e) => handleNavClick(e, item)}
-              className="text-white text-3xl font-bold no-underline tracking-tight py-2 transition-transform"
+          {/* Subtelna siatka kropek w tle */}
+          <svg
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-0 h-full w-full"
+            style={{ opacity: 0.4 }}>
+            <defs>
+              <pattern
+                id="menu-dots"
+                width="20"
+                height="20"
+                patternUnits="userSpaceOnUse">
+                <circle cx="1" cy="1" r="1" fill="#0a2a2e" fillOpacity="0.12" />
+              </pattern>
+            </defs>
+            <rect width="100%" height="100%" fill="url(#menu-dots)" />
+          </svg>
+
+          {/* Top bar — eyebrow + close */}
+          <div className="relative z-[1] flex items-center justify-between px-[6vw] pt-[2dvh]">
+            <span
+              className="font-mono uppercase tracking-[0.28em] text-[#0a2a2e]/55"
+              style={{ fontSize: "0.58rem" }}>
+              Menu · v2026
+            </span>
+            <button
+              type="button"
+              aria-label="Zamknij menu"
+              onClick={() => setOpen(false)}
+              className="flex h-10 w-10 items-center justify-center rounded-full border border-[#0a2a2e]/10 bg-white/60 text-[#0a2a2e] transition active:scale-95"
               style={{
-                transform: open ? "translateX(0)" : "translateX(-20px)",
+                backdropFilter: "blur(8px)",
+                WebkitBackdropFilter: "blur(8px)",
+              }}>
+              <svg
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true">
+                <path d="M6 6L18 18M6 18L18 6" />
+              </svg>
+            </button>
+          </div>
+
+          {/* Nav list — numbered items with hairline dividers */}
+          <nav className="relative z-[1] mt-[10dvh] flex flex-col px-[6vw]">
+            {NAV_ITEMS.map((item, i) => (
+              <a
+                key={item.label}
+                href={`#${item.target}`}
+                onClick={(e) => handleNavClick(e, item)}
+                className="group relative flex items-end justify-between gap-4 border-b border-[#0a2a2e]/10 py-5 no-underline transition-transform"
+                style={{
+                  transform: open ? "translateY(0)" : "translateY(20px)",
+                  opacity: open ? 1 : 0,
+                  transitionDuration: "400ms",
+                  transitionDelay: open ? `${120 + i * 70}ms` : "0ms",
+                  transitionProperty: "transform, opacity",
+                }}>
+                <div className="flex items-baseline gap-4">
+                  <span
+                    className="font-mono uppercase tracking-[0.2em] text-[#0a2a2e]/40"
+                    style={{ fontSize: "0.58rem" }}>
+                    {String(i + 1).padStart(2, "0")}
+                  </span>
+                  <span
+                    className="font-semibold tracking-tight text-[#0a2a2e]"
+                    style={{
+                      fontSize: "clamp(1.8rem, 8vw, 2.4rem)",
+                      lineHeight: 1.05,
+                      letterSpacing: "-0.025em",
+                    }}>
+                    {item.label}
+                  </span>
+                </div>
+                <span
+                  aria-hidden
+                  className="mb-1.5 flex h-7 w-7 items-center justify-center rounded-full bg-[#0a2a2e] text-white transition-transform group-active:scale-95">
+                  <svg
+                    width="11"
+                    height="11"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2.2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round">
+                    <path d="M5 12h14M19 12l-6-6M19 12l-6 6" />
+                  </svg>
+                </span>
+              </a>
+            ))}
+          </nav>
+
+          {/* Footer area — language switcher + contact pill */}
+          <div className="relative z-[1] mt-auto flex flex-col gap-4 px-[6vw] pb-[5dvh] pt-8">
+            <div
+              className="flex items-center gap-3"
+              style={{
+                transform: open ? "translateY(0)" : "translateY(20px)",
                 opacity: open ? 1 : 0,
                 transitionDuration: "400ms",
-                transitionDelay: open ? `${100 + i * 60}ms` : "0ms",
+                transitionDelay: open ? "320ms" : "0ms",
                 transitionProperty: "transform, opacity",
               }}>
-              {item.label}
+              <span
+                className="font-mono uppercase tracking-[0.22em] text-[#0a2a2e]/55"
+                style={{ fontSize: "0.56rem" }}>
+                Jezyk
+              </span>
+              <span className="block h-px flex-1 bg-[#0a2a2e]/15" />
+              <LanguageSwitcher variant="drawer" />
+            </div>
+            <a
+              href="mailto:info@retailo.pl"
+              className="font-mono uppercase tracking-[0.22em] text-[#0a2a2e]/65 no-underline"
+              style={{
+                fontSize: "0.56rem",
+                transform: open ? "translateY(0)" : "translateY(20px)",
+                opacity: open ? 1 : 0,
+                transitionDuration: "400ms",
+                transitionDelay: open ? "380ms" : "0ms",
+                transitionProperty: "transform, opacity",
+              }}>
+              info@retailo.pl
             </a>
-          ))}
-          <div className="mt-8">
-            <LanguageSwitcher variant="drawer" />
           </div>
-        </nav>
+        </div>
       </div>
     </>
   );

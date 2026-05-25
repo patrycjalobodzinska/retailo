@@ -210,16 +210,28 @@ html, body {
   user-select: none;
   overflow: hidden;
 }
+/* Rozmycie tła w starej karuzeli — pasujący efekt do ciemniejszej maski.
+   Skala 1.08 ukrywa miękkie krawędzie powstające przy filter: blur. */
+.rl-carousel__bg > img,
+.rl-carousel__bg-image img {
+  filter: blur(10px);
+  transform: scale(1.08);
+  transform-origin: center;
+}
+.rl-carousel__bg-image img {
+  /* Bg-image ma już własny transform na rodzicu — tu blur i delikatne
+     powiększenie wystarczą, transform skali nakładamy na obrazek. */
+  transform: scale(1.08);
+}
 .rl-carousel__bg::before {
   content: "";
   position: absolute;
   inset: 0;
   background: #000;
   z-index: 1;
-  /* Overlay starts at 0.45 during the hold (slide visible) and deepens to
-     0.75 by the end of the exit, when the reveal-text lines are on screen
-     and need solid contrast against the bg. */
-  opacity: calc(0.45 + var(--reveal-progress, 0) * 0.3);
+  /* Ciemniejsze tło: zaczyna od 0.6, dociemnia do 0.85 przy końcu reveal.
+     Wcześniej było 0.45→0.75 — robiło wrażenie zbyt prześwitującego. */
+  opacity: calc(0.6 + var(--reveal-progress, 0) * 0.25);
 }
 /* Full-screen variant when bg sits at pinChild level (extends 40vh below the
    pin, so the image continues into the next section as user scrolls past). */

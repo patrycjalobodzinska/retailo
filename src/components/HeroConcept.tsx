@@ -1,0 +1,385 @@
+"use client";
+
+import { useEffect, useRef } from "react";
+import gsap from "gsap";
+import { useLang } from "@/lib/i18n/LanguageProvider";
+import type { LocalizedField } from "@/lib/sanity/i18n";
+
+type HeroData = {
+  heroSubtitle?: LocalizedField;
+  heroDescription?: LocalizedField;
+  heroScrollLabel?: LocalizedField;
+} | null;
+
+// Clone głównego Hero ze strony głównej — punkt wyjścia do dalszych
+// modyfikacji wariantu koncepcyjnego.
+export default function HeroConcept({ data }: { data?: HeroData } = {}) {
+  const { t } = useLang();
+  const subtitle = t(data?.heroSubtitle ?? null) || "PickUpWall";
+  const description =
+    "Automatyczne, modulowe systemy odbioru przesylek typu pick-up in store dla sieci retailu. Projektujemy, produkujemy i wdrazamy rozwiazania dopasowane do specyfiki marki — od jednostki glownej z dotykowym ekranem po skalowalna konfiguracje skrytek i bezdotykowy odbior ponizej 15 sekund.";
+
+  const heroRef = useRef<HTMLElement>(null);
+  const titleRef = useRef<HTMLHeadingElement>(null);
+  const imageRef = useRef<HTMLImageElement>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
+  const cardRef = useRef<HTMLAnchorElement>(null);
+  const statsWrapRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const ctx = gsap.context(() => {
+      const tl = gsap.timeline({ defaults: { ease: "power3.out" } });
+      tl.fromTo(
+        imageRef.current,
+        { x: -40, opacity: 0 },
+        { x: 0, opacity: 1, duration: 1.1, ease: "power2.out", delay: 0.1 },
+      )
+        .fromTo(
+          titleRef.current,
+          { y: 30, opacity: 0 },
+          { y: 0, opacity: 0.1, duration: 0.9 },
+          "-=0.8",
+        )
+        .fromTo(
+          contentRef.current,
+          { y: 20, opacity: 0 },
+          { y: 0, opacity: 1, duration: 0.8 },
+          "-=0.6",
+        )
+        .fromTo(
+          cardRef.current,
+          { y: 20, opacity: 0 },
+          { y: 0, opacity: 1, duration: 0.7 },
+          "-=0.55",
+        )
+        .fromTo(
+          statsWrapRef.current?.children
+            ? Array.from(statsWrapRef.current.children)
+            : [],
+          { y: 20, opacity: 0 },
+          { y: 0, opacity: 1, duration: 0.7, stagger: 0.12 },
+          "-=0.5",
+        );
+    }, heroRef);
+    return () => ctx.revert();
+  }, []);
+
+  return (
+    <section
+      ref={heroRef}
+      className="relative w-full h-screen min-h-[720px] overflow-hidden flex items-stretch max-lg:h-auto max-lg:min-h-[100dvh] max-lg:flex-col"
+      style={{
+        background:
+          "linear-gradient(45deg, #ffffff 0%, #f4f2ee 35%, #e0ddd8 70%, #cbc8c2 100%)",
+      }}>
+      {/* Dodatkowy świetlisty hotspot w lewym dolnym rogu — jeszcze
+          mocniej rozjaśnia jasną część gradientu i zmiękcza przejście. */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0"
+        style={{
+          background:
+            "radial-gradient(ellipse 50% 50% at 0% 100%, rgba(255,255,255,0.85) 0%, rgba(255,255,255,0) 60%)",
+        }}
+      />
+
+      {/* Gigantyczny napis "pickupwall" — pełni rolę głównego tytułu,
+          startuje w tym samym miejscu co stary <h1>, rozciąga się pod
+          zdjęcie produktu (poza krawędź sekcji), nieco większe opacity. */}
+      {/* Desktop watermark */}
+      <h1
+        ref={titleRef}
+        className="pointer-events-none absolute select-none m-0 font-black tracking-tighter text-[#0f0f0f] leading-[0.78] max-lg:hidden"
+        style={{
+          left: "5vw",
+          top: "calc(18vh + 60px)",
+          right: "-2vw",
+          fontSize: "clamp(3.5rem, 10vw, 11rem)",
+          letterSpacing: "-0.06em",
+          opacity: 0.1,
+          zIndex: 1,
+          whiteSpace: "nowrap",
+        }}>
+        pickupwall.
+      </h1>
+      {/* Mobile watermark — wyżej i większy */}
+      <h1
+        className="pointer-events-none absolute select-none m-0 font-black tracking-tighter text-[#0f0f0f] leading-[0.82] lg:hidden"
+        style={{
+          left: "-2vw",
+          top: "9dvh",
+          right: "-2vw",
+          fontSize: "clamp(4.5rem, 20vw, 8rem)",
+          letterSpacing: "-0.06em",
+          opacity: 0.13,
+          zIndex: 1,
+          whiteSpace: "nowrap",
+        }}>
+        pickupwall.
+      </h1>
+
+      {/* LEFT: text content */}
+      <div
+        ref={contentRef}
+        className="relative z-[2] flex flex-col justify-start pl-[5vw] pr-[2vw] pt-[18vh] w-[32%] max-2xl:w-[34%] max-xl:w-[38%] max-lg:w-full max-lg:pl-[6vw] max-lg:pr-[6vw] max-lg:pt-[17dvh]"
+        style={{ opacity: 0, transform: "translateY(20px)" }}>
+        <img
+          src="/retailologo.webp"
+          alt="retailo"
+          className="block self-start h-[34px] w-auto mb-7 max-lg:hidden"
+          style={{ width: "auto" }}
+        />
+
+        {/* Desktop-only spacer — rezerwuje miejsce nad opisem na obszar
+            zajęty przez wielki watermark "pickupwall", żeby opis się
+            z nim nie nakładał. */}
+        <div
+          aria-hidden="true"
+          className="hidden lg:block mb-7"
+          style={{
+            height: "clamp(3.4rem, 6.6vw, 7.6rem)",
+            lineHeight: 0.9,
+          }}
+        />
+
+        <div
+          className="w-10 h-px mb-6 max-lg:hidden"
+          style={{ background: "#0f0f0f" }}
+        />
+        <p
+          className="m-0 mb-8 text-[#3a3a3a] leading-relaxed font-light max-lg:hidden"
+          style={{
+            fontSize: "clamp(1rem, 1.1vw, 1.1rem)",
+            maxWidth: "440px",
+          }}>
+          {description}
+        </p>
+      </div>
+
+      {/* RIGHT: image przesunięte lekko w lewo (większa prawa przestrzeń) */}
+      <div className="relative z-[2] flex-1 flex items-center justify-end pl-[6vw] pr-[14vw] pt-[10vh] pb-[8vh] max-lg:flex-none max-lg:pl-[2vw] max-lg:pr-[2vw] max-lg:justify-center max-lg:pt-0 max-lg:pb-0 max-lg:flex-col">
+        <div
+          aria-hidden="true"
+          className="absolute bottom-[10vh] right-[20vw] pointer-events-none max-lg:hidden"
+          style={{
+            width: "40%",
+            height: "60px",
+            background:
+              "radial-gradient(ellipse at center, rgba(15,15,15,0.18) 0%, rgba(15,15,15,0) 70%)",
+            filter: "blur(14px)",
+          }}
+        />
+        <img
+          ref={imageRef}
+          src="/hero-pickupwall.png"
+          alt="PickUpWall"
+          className="relative block h-[78vh] w-auto object-contain max-lg:h-[36dvh]"
+          style={{
+            opacity: 0,
+            transform: "translateX(-40px)",
+            filter:
+              "drop-shadow(0 18px 30px rgba(15,15,15,0.18)) drop-shadow(0 6px 12px rgba(15,15,15,0.10))",
+          }}
+        />
+        <p
+          className="hidden max-lg:block m-0 mt-5 px-[6vw] text-[#3a3a3a] leading-relaxed font-light"
+          style={{ fontSize: "0.95rem" }}>
+          {description}
+        </p>
+      </div>
+
+      {/* 3 osobne pływające badge'e z backdrop-blur, rozrzucone wokół
+          i nachodzące na zdjęcie produktu */}
+      <div ref={statsWrapRef} className="contents max-lg:hidden">
+        {[
+          {
+            value: "<15 s",
+            label: "Czas odbioru",
+            cls: "top-[18vh] right-[11vw]",
+            icon: (
+              <>
+                <circle cx="12" cy="12" r="8.5" strokeWidth="1.4" />
+                <path
+                  d="M12 7.5v4.5l3 1.8"
+                  strokeWidth="1.4"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </>
+            ),
+          },
+          {
+            value: "Modulowy",
+            label: "System skrytek",
+            cls: "top-[44vh] right-[4vw]",
+            icon: (
+              <>
+                <rect
+                  x="3.5"
+                  y="3.5"
+                  width="7"
+                  height="7"
+                  rx="1"
+                  strokeWidth="1.4"
+                />
+                <rect
+                  x="13.5"
+                  y="3.5"
+                  width="7"
+                  height="7"
+                  rx="1"
+                  strokeWidth="1.4"
+                />
+                <rect
+                  x="3.5"
+                  y="13.5"
+                  width="7"
+                  height="7"
+                  rx="1"
+                  strokeWidth="1.4"
+                />
+                <rect
+                  x="13.5"
+                  y="13.5"
+                  width="7"
+                  height="7"
+                  rx="1"
+                  strokeWidth="1.4"
+                />
+              </>
+            ),
+          },
+          {
+            value: "API",
+            label: "Integracja",
+            cls: "top-[58vh] left-[46vw]",
+            icon: (
+              <>
+                <path
+                  d="M7 9.5L4 12l3 2.5M17 9.5L20 12l-3 2.5M14 6l-4 12"
+                  strokeWidth="1.4"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </>
+            ),
+          },
+        ].map((b) => (
+          <div
+            key={b.label}
+            className={`absolute z-[4] flex flex-col items-start gap-2 rounded-2xl px-4 py-3 text-left backdrop-blur-md ${b.cls}`}
+            style={{
+              background: "rgba(255,255,255,0.4)",
+              border: "1px solid rgba(15,15,15,0.08)",
+              boxShadow:
+                "0 1px 2px rgba(15,15,15,0.04), 0 14px 32px rgba(15,15,15,0.10)",
+              opacity: 0,
+              transform: "translateY(20px)",
+              minWidth: "120px",
+            }}>
+            <span
+              className="flex h-9 w-9 items-center justify-center rounded-full"
+              style={{
+                background: "rgba(255,255,255,0.55)",
+                border: "1px solid rgba(15,15,15,0.06)",
+              }}>
+              <svg
+                width="17"
+                height="17"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="#0f0f0f"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true">
+                {b.icon}
+              </svg>
+            </span>
+            <div className="flex flex-col items-start">
+              <span
+                className="font-medium text-[#0f0f0f] tracking-tight"
+                style={{ fontSize: "0.92rem", lineHeight: 1.1 }}>
+                {b.value}
+              </span>
+              <span
+                className="mt-0.5 uppercase tracking-[0.18em] font-medium text-[#7a7a7a]"
+                style={{ fontSize: "0.55rem" }}>
+                {b.label}
+              </span>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Install reference card — lewy dolny róg, flex-row, translucent
+          szarawe tło z backdrop-blur */}
+      <a
+        ref={cardRef}
+        href="#realizacje"
+        className="absolute bottom-[5vh] left-[5vw] z-[5] flex w-[min(460px,40vw)] items-stretch overflow-hidden rounded-2xl no-underline backdrop-blur-md transition-transform hover:-translate-y-0.5 max-lg:relative max-lg:bottom-auto max-lg:left-auto max-lg:mt-[1dvh] max-lg:mb-[2dvh] max-lg:mx-[5vw] max-lg:!w-[calc(100%-10vw)]"
+        style={{
+          background: "rgba(225,225,222,0.55)",
+          border: "1px solid rgba(15,15,15,0.08)",
+          boxShadow:
+            "0 1px 2px rgba(15,15,15,0.04), 0 18px 40px rgba(15,15,15,0.10)",
+          opacity: 0,
+          transform: "translateY(20px)",
+          minHeight: "150px",
+        }}>
+        <div
+          className="flex w-[170px] shrink-0 items-center justify-center overflow-hidden self-stretch max-lg:w-[110px]"
+          style={{ background: "rgba(240,239,235,0.7)" }}>
+          <img
+            src="/sephora-pickupwall.jpeg"
+            alt="Wdrozenie PickUpWall"
+            className="block h-full w-full object-cover"
+          />
+        </div>
+        <div className="flex flex-1 items-center justify-between gap-2.5 px-4 py-3 max-lg:px-3">
+          <div className="flex-1 min-w-0">
+            <span
+              className="block uppercase tracking-[0.24em] font-semibold text-[#7a7a7a] mb-1"
+              style={{ fontSize: "0.56rem" }}>
+              Zaufali nam
+            </span>
+            <p
+              className="m-0 mb-0.5 font-bold tracking-tight text-[#0f0f0f] max-lg:text-[0.92rem] max-lg:leading-tight"
+              style={{
+                fontSize: "clamp(1rem, 1.15vw, 1.2rem)",
+                lineHeight: 1.1,
+                letterSpacing: "-0.01em",
+              }}>
+              Wdrazamy dla najwiekszych marek.
+            </p>
+            <p
+              className="m-0 text-[#5a5a5a] font-light max-lg:hidden"
+              style={{ fontSize: "0.72rem", lineHeight: 1.4 }}>
+              Sieci kosmetyczne, fashion, elektronika.
+            </p>
+          </div>
+          <span
+            className="inline-flex items-center justify-center rounded-full flex-shrink-0 max-lg:w-7 max-lg:h-7"
+            style={{
+              width: 38,
+              height: 38,
+              background: "#0f0f0f",
+              color: "white",
+            }}>
+            <svg
+              width="15"
+              height="15"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true">
+              <path d="M7 17L17 7M9 7h8v8" />
+            </svg>
+          </span>
+        </div>
+      </a>
+    </section>
+  );
+}

@@ -21,6 +21,7 @@ export type Realization = {
   client?: string;
   year?: number;
   integrationTime?: string;
+  tags?: string[];
 };
 
 // Default config that most installs share — referenced inline below for
@@ -35,6 +36,69 @@ const STANDARD_CONFIG = {
 } as const;
 
 export const REALIZATIONS: Realization[] = [
+  {
+    slug: "pickupwall-sephora",
+    title: "PickUpWall Sephora",
+    location: "Salon Sephora",
+    description:
+      "Wdrozenie PickUpWall w salonie Sephora — dedykowana grafika obudowy, integracja z platforma sprzedazowa marki, obsluga Click & Collect dla zamowien internetowych.",
+    image: "/realizacja-sephora.jpeg",
+    config: STANDARD_CONFIG,
+    client: "Sephora",
+    year: 2025,
+    integrationTime: "5 tygodni",
+    tags: ["Click & Collect", "API", "Master + Slave"],
+  },
+  {
+    slug: "pickupwall-empik",
+    title: "PickUpWall Empik",
+    location: "Salon Empik",
+    description:
+      "Wdrozenie PickUpWall w salonie Empik — Click & Collect dla zamowien internetowych, integracja z platforma sprzedazowa, dedykowana grafika obudowy w identyfikacji marki.",
+    image: "/realizacja-wloclawek.jpg",
+    config: STANDARD_CONFIG,
+    client: "Empik",
+    year: 2025,
+    integrationTime: "5 tygodni",
+    tags: ["Click & Collect", "Brand graphic", "Master + Slave"],
+  },
+  {
+    slug: "pickupwall-milano",
+    title: "PickUpWall Milano",
+    location: "Vittorio Emanuele · Mediolan",
+    description:
+      "Instalacja w lokalizacji premium przy Vittorio Emanuele w Mediolanie. Master + Slave, integracja z systemem zamowien klienta.",
+    image: "/realizacja-milano.jpg",
+    config: STANDARD_CONFIG,
+    client: "—",
+    year: 2024,
+    integrationTime: "6 tygodni",
+    tags: ["Premium", "API"],
+  },
+  {
+    slug: "pickupwall-wloclawek",
+    title: "PickUpWall Wloclawek",
+    location: "Pulaskiego · Wloclawek",
+    description:
+      "Wdrozenie Click & Collect przy Pulaskiego we Wloclawku. Standardowy uklad Master + Slave, dedykowana grafika obudowy.",
+    image: "/realizacja-wloclawek.jpg",
+    config: STANDARD_CONFIG,
+    client: "—",
+    year: 2023,
+    integrationTime: "4 tygodnie",
+  },
+  {
+    slug: "pickupwall-2023",
+    title: "PickUpWall Retail 2023",
+    location: "Sklep stacjonarny",
+    description:
+      "Realizacja Click & Collect w punkcie sprzedazy z 2023 roku. Master + Slave, integracja API.",
+    image: "/realizacja-photo-2023.jpg",
+    config: STANDARD_CONFIG,
+    client: "—",
+    year: 2023,
+    integrationTime: "4 tygodnie",
+  },
   {
     slug: "pickupwall-click-collect",
     title: "PickUpWall Click & Collect",
@@ -70,78 +134,6 @@ export const REALIZATIONS: Realization[] = [
     client: "—",
     year: 2025,
     integrationTime: "5 tygodni",
-  },
-  {
-    slug: "pickupwall-biurowiec",
-    title: "PickUpWall Biurowiec",
-    location: "Biurowiec · Warszawa",
-    description:
-      "Wewnetrzny punkt odbioru paczek dla pracownikow. Master + Slave, dedykowana grafika obudowy.",
-    image: "/realizacja-pickupwall.jpg",
-    config: STANDARD_CONFIG,
-    client: "—",
-    year: 2024,
-    integrationTime: "3 tygodnie",
-  },
-  {
-    slug: "pickupwall-osiedle",
-    title: "PickUpWall Osiedle",
-    location: "Osiedle mieszkaniowe",
-    description:
-      "Calodobowy punkt odbioru przesylek na osiedlu. 2 × Slave dla zwiekszonego wolumenu.",
-    image: "/realizacja-pickupwall-2.jpg",
-    config: {
-      masterCount: 1,
-      slaveCount: 2,
-      lockers: 119,
-      moduleDimensions: "1970 × 1025 × 50 mm",
-      notes: "Master + 2× Slave, calodobowy dostep.",
-    },
-    client: "—",
-    year: 2024,
-    integrationTime: "6 tygodni",
-  },
-  {
-    slug: "pickupwall-pickup-store",
-    title: "PickUpWall Pick up in store",
-    location: "Sklep ecommerce",
-    description:
-      "Rozwiazanie do zamowien Click & Collect oraz odbioru zamowien internetowych w punkcie sprzedazy.",
-    image: "/realizacja-pickupwall.jpg",
-    config: STANDARD_CONFIG,
-    client: "—",
-    year: 2024,
-    integrationTime: "4 tygodnie",
-  },
-  {
-    slug: "pickupwall-retail",
-    title: "PickUpWall Retail",
-    location: "Sklep stacjonarny",
-    description:
-      "Modularna szafa w strefie kasowej. Wymiary modulu zgodne ze standardami zabudow meblowych w retailu.",
-    image: "/realizacja-pickupwall-2.jpg",
-    config: STANDARD_CONFIG,
-    client: "—",
-    year: 2024,
-    integrationTime: "3 tygodnie",
-  },
-  {
-    slug: "pickupwall-custom",
-    title: "PickUpWall Custom",
-    location: "Wersja dedykowana",
-    description:
-      "Niestandardowe wydanie pod konkretna zabudowe. Dedykowane wymiary, grafika i konfiguracja skrytek.",
-    image: "/realizacja-pickupwall.jpg",
-    config: {
-      masterCount: 1,
-      slaveCount: 3,
-      lockers: 159,
-      moduleDimensions: "wymiary custom",
-      notes: "Wersja na specjalne zamowienie klienta.",
-    },
-    client: "—",
-    year: 2025,
-    integrationTime: "8 tygodni",
   },
 ];
 
