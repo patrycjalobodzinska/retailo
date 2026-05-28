@@ -26,6 +26,9 @@ export type Language = {
 export type SiteSettings = {
   logoText?: string;
   metaTitle?: string;
+  metaDescription?: string;
+  ogImage?: string;
+  siteUrl?: string;
   navigation?: Array<{
     href: string;
     label: LocalizedField;

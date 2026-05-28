@@ -20,6 +20,9 @@ export const SITE_SETTINGS_QUERY = /* groq */ `
   *[_type == "siteSettings"][0] {
     logoText,
     metaTitle,
+    metaDescription,
+    "ogImage": ogImage.asset->url,
+    siteUrl,
     navigation[]{
       href,
       label ${localized}

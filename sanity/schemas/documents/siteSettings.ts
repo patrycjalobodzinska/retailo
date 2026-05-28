@@ -18,6 +18,28 @@ export const siteSettings = defineType({
       initialValue: "Retailo",
     }),
     defineField({
+      name: "metaDescription",
+      title: "Meta description (SEO / OG / Google snippet)",
+      type: "text",
+      rows: 3,
+      description:
+        "Opis strony pokazywany w wynikach Google i przy udostępnianiu linku (Facebook, Slack, Twitter).",
+    }),
+    defineField({
+      name: "ogImage",
+      title: "Obrazek OG (1200×630 px, do udostępniania linku)",
+      type: "image",
+      options: { hotspot: true },
+      description:
+        "Obrazek pokazywany przy udostępnianiu strony na Facebooku, Slacku, LinkedIn, Twitterze.",
+    }),
+    defineField({
+      name: "siteUrl",
+      title: "URL strony (np. https://retailo.pl)",
+      type: "string",
+      description: "Używany do absolutnych URL-i w OG tagach.",
+    }),
+    defineField({
       name: "navigation",
       title: "Nawigacja",
       type: "array",

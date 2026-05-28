@@ -24,15 +24,55 @@ const raleway = Raleway({
   variable: "--font-raleway",
 });
 
+const FALLBACK_TITLE =
+  "Retailo — Automatyczne systemy odbioru przesyłek PickUpWall";
+const FALLBACK_DESCRIPTION =
+  "PickUpWall — automatyczne, modułowe systemy odbioru przesyłek pick-up in store dla sieci retailu. Projektujemy, produkujemy i wdrażamy w całej Europie.";
+const FALLBACK_OG_IMAGE = "/model3_retailo.png";
+const FALLBACK_URL = "https://retailo.pl";
+
 export async function generateMetadata(): Promise<Metadata> {
+  let settings: Awaited<ReturnType<typeof getSiteSettings>> = null;
   try {
-    const settings = await getSiteSettings();
-    return {
-      title: settings?.metaTitle ?? "Retailo",
-    };
+    settings = await getSiteSettings();
   } catch {
-    return { title: "Retailo" };
+    // pad do fallbackow
   }
+
+  const title = settings?.metaTitle || FALLBACK_TITLE;
+  const description = settings?.metaDescription || FALLBACK_DESCRIPTION;
+  const baseUrl = settings?.siteUrl || FALLBACK_URL;
+  const ogImagePath = settings?.ogImage || FALLBACK_OG_IMAGE;
+  const ogImageUrl = ogImagePath.startsWith("http")
+    ? ogImagePath
+    : `${baseUrl.replace(/\/$/, "")}${ogImagePath}`;
+
+  return {
+    metadataBase: new URL(baseUrl),
+    title,
+    description,
+    openGraph: {
+      type: "website",
+      url: baseUrl,
+      title,
+      description,
+      siteName: "Retailo",
+      images: [
+        {
+          url: ogImageUrl,
+          width: 1200,
+          height: 630,
+          alt: title,
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: [ogImageUrl],
+    },
+  };
 }
 
 export default async function RootLayout({

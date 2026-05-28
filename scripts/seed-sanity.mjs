@@ -164,7 +164,10 @@ async function run() {
     _id: "siteSettings",
     _type: "siteSettings",
     logoText: "retailo.",
-    metaTitle: "Retailo",
+    metaTitle: "Retailo — Automatyczne systemy odbioru przesyłek PickUpWall",
+    metaDescription:
+      "PickUpWall — automatyczne, modułowe systemy odbioru przesyłek pick-up in store dla sieci retailu. Projektujemy, produkujemy i wdrażamy w całej Europie.",
+    siteUrl: "https://retailo.pl",
     navigation: [
       {
         _key: "n1",
