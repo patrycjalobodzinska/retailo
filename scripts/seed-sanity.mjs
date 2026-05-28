@@ -209,6 +209,32 @@ async function run() {
       "Automatyczne systemy odbioru przesyłek.\nProjektujemy, produkujemy i wdrażamy.",
     ),
     heroScrollLabel: t("Scroll down"),
+    heroBadges: [
+      {
+        ...k("hb1"),
+        value: t("<15 s"),
+        label: t({ pl: "Czas odbioru", en: "Pickup time" }),
+      },
+      {
+        ...k("hb2"),
+        value: t({ pl: "Modulowy", en: "Modular" }),
+        label: t({ pl: "System skrytek", en: "Locker system" }),
+      },
+      {
+        ...k("hb3"),
+        value: t("API"),
+        label: t({ pl: "Integracja", en: "Integration" }),
+      },
+    ],
+    heroInstallEyebrow: t({ pl: "Zaufali nam", en: "Trusted by" }),
+    heroInstallTitle: t({
+      pl: "Wdrażamy dla największych marek.",
+      en: "We deploy for the biggest brands.",
+    }),
+    heroInstallSubtitle: t({
+      pl: "Sieci kosmetyczne, fashion, elektronika.",
+      en: "Beauty, fashion, and electronics chains.",
+    }),
 
     qaEyebrow: t("Nasze rozwiązanie"),
     qaHeadline: t("PickUpWall."),

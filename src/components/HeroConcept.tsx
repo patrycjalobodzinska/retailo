@@ -9,6 +9,10 @@ type HeroData = {
   heroSubtitle?: LocalizedField;
   heroDescription?: LocalizedField;
   heroScrollLabel?: LocalizedField;
+  heroBadges?: Array<{ value?: LocalizedField; label?: LocalizedField }>;
+  heroInstallEyebrow?: LocalizedField;
+  heroInstallTitle?: LocalizedField;
+  heroInstallSubtitle?: LocalizedField;
 } | null;
 
 // Clone głównego Hero ze strony głównej — punkt wyjścia do dalszych
@@ -19,6 +23,39 @@ export default function HeroConcept({ data }: { data?: HeroData } = {}) {
   const description =
     t(data?.heroDescription ?? null) ||
     "Automatyczne, modulowe systemy odbioru przesylek typu pick-up in store dla sieci retailu. Projektujemy, produkujemy i wdrazamy rozwiazania dopasowane do specyfiki marki — od jednostki glownej z dotykowym ekranem po skalowalna konfiguracje skrytek i bezdotykowy odbior ponizej 15 sekund.";
+  const installEyebrow =
+    t(data?.heroInstallEyebrow ?? null) || "Zaufali nam";
+  const installTitle =
+    t(data?.heroInstallTitle ?? null) || "Wdrazamy dla najwiekszych marek.";
+  const installSubtitle =
+    t(data?.heroInstallSubtitle ?? null) ||
+    "Sieci kosmetyczne, fashion, elektronika.";
+
+  // Layout (pozycja + ikona) jest lokalny; value/label z Sanity.
+  const BADGE_LAYOUT = [
+    {
+      cls: "top-[18vh] right-[11vw]",
+      fallbackValue: "<15 s",
+      fallbackLabel: "Czas odbioru",
+    },
+    {
+      cls: "top-[44vh] right-[4vw]",
+      fallbackValue: "Modulowy",
+      fallbackLabel: "System skrytek",
+    },
+    {
+      cls: "top-[58vh] left-[46vw]",
+      fallbackValue: "API",
+      fallbackLabel: "Integracja",
+    },
+  ];
+  const badgeText = (i: number) => {
+    const d = data?.heroBadges?.[i];
+    return {
+      value: t(d?.value ?? null) || BADGE_LAYOUT[i].fallbackValue,
+      label: t(d?.label ?? null) || BADGE_LAYOUT[i].fallbackLabel,
+    };
+  };
 
   const heroRef = useRef<HTMLElement>(null);
   const titleRef = useRef<HTMLHeadingElement>(null);
@@ -217,8 +254,7 @@ export default function HeroConcept({ data }: { data?: HeroData } = {}) {
       <div ref={statsWrapRef} className="contents max-lg:hidden">
         {[
           {
-            value: "<15 s",
-            label: "Czas odbioru",
+            ...badgeText(0),
             cls: "top-[18vh] right-[11vw]",
             icon: (
               <>
@@ -233,8 +269,7 @@ export default function HeroConcept({ data }: { data?: HeroData } = {}) {
             ),
           },
           {
-            value: "Modulowy",
-            label: "System skrytek",
+            ...badgeText(1),
             cls: "top-[44vh] right-[4vw]",
             icon: (
               <>
@@ -274,8 +309,7 @@ export default function HeroConcept({ data }: { data?: HeroData } = {}) {
             ),
           },
           {
-            value: "API",
-            label: "Integracja",
+            ...badgeText(2),
             cls: "top-[58vh] left-[46vw]",
             icon: (
               <>
@@ -364,7 +398,7 @@ export default function HeroConcept({ data }: { data?: HeroData } = {}) {
             <span
               className="block uppercase tracking-[0.24em] font-semibold text-[#7a7a7a] mb-1"
               style={{ fontSize: "0.56rem" }}>
-              Zaufali nam
+              {installEyebrow}
             </span>
             <p
               className="m-0 mb-0.5 font-bold tracking-tight text-[#0f0f0f] max-lg:text-[0.92rem] max-lg:leading-tight"
@@ -373,12 +407,12 @@ export default function HeroConcept({ data }: { data?: HeroData } = {}) {
                 lineHeight: 1.1,
                 letterSpacing: "-0.01em",
               }}>
-              Wdrazamy dla najwiekszych marek.
+              {installTitle}
             </p>
             <p
               className="m-0 text-[#5a5a5a] font-light max-lg:hidden"
               style={{ fontSize: "0.72rem", lineHeight: 1.4 }}>
-              Sieci kosmetyczne, fashion, elektronika.
+              {installSubtitle}
             </p>
           </div>
           <span

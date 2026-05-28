@@ -32,6 +32,58 @@ export const homePage = defineType({
       type: "localizedString",
       group: "hero",
     }),
+    defineField({
+      name: "heroBadges",
+      title: "Hero — pływające badge'e (max 3)",
+      type: "array",
+      group: "hero",
+      of: [
+        {
+          type: "object",
+          name: "heroBadge",
+          fields: [
+            defineField({
+              name: "value",
+              title: "Wartość (np. <15 s, Modulowy, API)",
+              type: "localizedString",
+              validation: (rule) => rule.required(),
+            }),
+            defineField({
+              name: "label",
+              title: "Etykieta (np. Czas odbioru)",
+              type: "localizedString",
+              validation: (rule) => rule.required(),
+            }),
+          ],
+          preview: {
+            select: { items: "value.translations" },
+            prepare: ({ items }) => {
+              const list = (items as { value?: string }[] | undefined) ?? [];
+              const first = list.find((i) => i?.value)?.value;
+              return { title: first ?? "(badge)" };
+            },
+          },
+        },
+      ],
+    }),
+    defineField({
+      name: "heroInstallEyebrow",
+      title: "Hero — eyebrow karty referencji (np. Zaufali nam)",
+      type: "localizedString",
+      group: "hero",
+    }),
+    defineField({
+      name: "heroInstallTitle",
+      title: "Hero — tytuł karty referencji",
+      type: "localizedString",
+      group: "hero",
+    }),
+    defineField({
+      name: "heroInstallSubtitle",
+      title: "Hero — podtytuł karty referencji",
+      type: "localizedString",
+      group: "hero",
+    }),
 
     /* Nasze rozwiązanie */
     defineField({

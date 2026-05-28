@@ -47,6 +47,10 @@ export type HomePage = {
   heroSubtitle?: LocalizedField;
   heroDescription?: LocalizedField;
   heroScrollLabel?: LocalizedField;
+  heroBadges?: Array<{ value: LocalizedField; label: LocalizedField }>;
+  heroInstallEyebrow?: LocalizedField;
+  heroInstallTitle?: LocalizedField;
+  heroInstallSubtitle?: LocalizedField;
 
   qaEyebrow?: LocalizedField;
   qaHeadline?: LocalizedField;

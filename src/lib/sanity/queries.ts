@@ -41,6 +41,13 @@ export const HOME_PAGE_QUERY = /* groq */ `
     heroSubtitle ${localized},
     heroDescription ${localized},
     heroScrollLabel ${localized},
+    heroBadges[]{
+      value ${localized},
+      label ${localized}
+    },
+    heroInstallEyebrow ${localized},
+    heroInstallTitle ${localized},
+    heroInstallSubtitle ${localized},
 
     qaEyebrow ${localized},
     qaHeadline ${localized},
