@@ -3,6 +3,7 @@ import { Roboto, Raleway } from "next/font/google";
 import "./globals.css";
 import SmoothScroll from "@/components/SmoothScroll";
 import { LanguageProvider } from "@/lib/i18n/LanguageProvider";
+import { IntlBridge } from "@/lib/i18n/IntlBridge";
 import {
   getDefaultLanguage,
   getLanguages,
@@ -58,6 +59,28 @@ export default async function RootLayout({
       lang={defaultLang}
       className={`${roboto.variable} ${raleway.variable}`}>
       <head>
+        {/* Preload hero image — najważniejszy LCP element strony głównej */}
+        <link
+          rel="preload"
+          as="image"
+          href="/model3_retailo.png"
+          fetchPriority="high"
+        />
+        {/* Preload below-the-fold heavy images that cause first-pass lag
+            in the spec section. fetchPriority="low" pozwala przeglądarce
+            ściągnąć je w tle bez konkurowania z LCP. */}
+        <link
+          rel="preload"
+          as="image"
+          href="/pickupwall-photo.png"
+          fetchPriority="low"
+        />
+        <link
+          rel="preload"
+          as="image"
+          href="/pickupwall-sketch.png"
+          fetchPriority="low"
+        />
         {/* Runs before <body> is parsed so the browser never gets a chance
             to restore the previous scroll position. Without this, hard
             refreshes mid-page land the user at the old scrollY (often
@@ -72,8 +95,10 @@ export default async function RootLayout({
       </head>
       <body className="font-[family-name:var(--font-roboto)]">
         <LanguageProvider languages={languages} defaultLang={defaultLang}>
-          <SmoothScroll />
-          {children}
+          <IntlBridge>
+            <SmoothScroll />
+            {children}
+          </IntlBridge>
         </LanguageProvider>
       </body>
     </html>

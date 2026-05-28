@@ -96,7 +96,17 @@ export default function GlobeInner({ width, height }: GlobeInnerProps) {
   }
 
   return (
-    <div ref={wrapRef} style={{ opacity: isVisible && polygonsReady ? 1 : 0, transition: "opacity 0.8s ease-out" }}>
+    <div
+      ref={wrapRef}
+      style={{
+        opacity: isVisible && polygonsReady ? 1 : 0,
+        transition: "opacity 0.8s ease-out",
+        // Globus jest dekoracyjny (kontrolki wyłączone). Bez tego
+        // OrbitControls przechwytuje dotyk na mobile i blokuje scroll
+        // strony nad obszarem globusa.
+        pointerEvents: "none",
+      }}>
+
       {isVisible ? (
         <Globe
           ref={globeRef}

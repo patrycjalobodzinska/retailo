@@ -3,7 +3,12 @@ import Hero from "@/components/Hero";
 import QASection from "@/components/QASection";
 import QASectionV1 from "@/components/QASectionV1";
 import RealizationsCarousel from "@/components/RealizationsCarousel";
-import { getHomePage, type HomePage } from "@/lib/sanity/fetch";
+import {
+  getHomePage,
+  getRealizationsList,
+  type HomePage,
+  type Realization,
+} from "@/lib/sanity/fetch";
 import HeroConcept from "@/components/HeroConcept";
 
 const RealizationsSection = nextDynamic(
@@ -30,8 +35,19 @@ async function safeGetHomePage(): Promise<HomePage | null> {
   }
 }
 
+async function safeGetRealizations(): Promise<Realization[]> {
+  try {
+    return await getRealizationsList();
+  } catch {
+    return [];
+  }
+}
+
 export default async function ComponentsPage() {
-  const home = await safeGetHomePage();
+  const [home, realizations] = await Promise.all([
+    safeGetHomePage(),
+    safeGetRealizations(),
+  ]);
 
   return (
     <>
@@ -40,8 +56,12 @@ export default async function ComponentsPage() {
       <QASectionV1 data={home} />
       <QASection data={home} />
       <RealizationsSection data={home} />
-      <RealizationsCarousel />
-      <RealizationsCarousel variant="dark" showHeader={false} />
+      <RealizationsCarousel items={realizations} />
+      <RealizationsCarousel
+        variant="dark"
+        showHeader={false}
+        items={realizations}
+      />
       <ModelsSection />
     </>
   );

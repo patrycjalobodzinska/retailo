@@ -1,10 +1,13 @@
 import { createClient } from "@sanity/client";
-import { apiVersion, dataset, projectId } from "./env";
+import { apiVersion, dataset, projectId, writeToken } from "./env";
 
 /**
  * Read-only client used by Server Components.
- * The CDN flag gives free, fast caching; if you want preview/draft mode,
- * add a perspective: 'previewDrafts' instance with the read token.
+ * Token jest dołączany jeśli dostępny — pozwala czytać też z prywatnych
+ * datasets (Editor token i tak ma `read+write`). Bez tokenu client działa
+ * tylko z publicznym datasetem.
+ * CDN flag = free, fast caching. Dla preview/draft mode użyj osobnego
+ * klienta z `perspective: 'previewDrafts'`.
  */
 export const sanityClient = createClient({
   projectId,
@@ -12,4 +15,5 @@ export const sanityClient = createClient({
   apiVersion,
   useCdn: true,
   perspective: "published",
+  token: writeToken || undefined,
 });

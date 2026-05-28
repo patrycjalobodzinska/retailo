@@ -1,18 +1,27 @@
 import nextDynamic from "next/dynamic";
 import Header from "@/components/Header";
 import HeroConcept from "@/components/HeroConcept";
-import QASection from "@/components/QASection";
-import { getHomePage, type HomePage } from "@/lib/sanity/fetch";
+import {
+  getHomePage,
+  getRealizationsList,
+  type HomePage,
+  type Realization,
+} from "@/lib/sanity/fetch";
 
 // Below-the-fold sections — heavy GSAP / ScrollTrigger / WebGL work that
 // blocks initial hydration if eager-imported alongside the hero. Lazy
 // loading them lets the hero animation kick off as soon as React hydrates
 // the small set of above-the-fold components.
-const ProductShowcase = nextDynamic(() => import("@/components/ProductShowcase"));
+const QASection = nextDynamic(() => import("@/components/QASection"));
+const ProductShowcase = nextDynamic(
+  () => import("@/components/ProductShowcase"),
+);
 const RealizationsCarousel = nextDynamic(
   () => import("@/components/RealizationsCarousel"),
 );
-const GlobalSection = nextDynamic(() => import("@/components/GlobalSection"));
+const EuropeGlobeSection = nextDynamic(
+  () => import("@/components/EuropeGlobeSection"),
+);
 
 // Force / to be prerendered as static at build time. Without this, the
 // async nature of the page + the wrapped Sanity fetch could make Next
@@ -35,21 +44,33 @@ async function safeGetHomePage(): Promise<HomePage | null> {
   }
 }
 
+async function safeGetRealizations(): Promise<Realization[]> {
+  try {
+    return await getRealizationsList();
+  } catch (e) {
+    console.error("[Home] Realizations fetch failed:", e);
+    return [];
+  }
+}
+
 export default async function Home() {
-  const home = await safeGetHomePage();
+  const [home, realizations] = await Promise.all([
+    safeGetHomePage(),
+    safeGetRealizations(),
+  ]);
 
   return (
     <>
       <Header />
       <HeroConcept data={home} />
-      <QASection data={home} />
       <div id="rozwiazanie">
-        <ProductShowcase />
+        <QASection data={home} />
       </div>
+      <ProductShowcase />
       <div id="realizacje">
-        <RealizationsCarousel />
+        <RealizationsCarousel items={realizations} />
       </div>
-      <GlobalSection />
+      <EuropeGlobeSection />
     </>
   );
 }

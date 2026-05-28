@@ -2,13 +2,28 @@ import Link from "next/link";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ContactCtaForm from "@/components/ContactCtaForm";
-import { REALIZATIONS } from "@/lib/realizations";
+import {
+  getRealizationsList,
+  type Realization,
+} from "@/lib/sanity/fetch";
 
 export const metadata = {
   title: "Realizacje · Retailo",
 };
 
-export default function RealizacjePage() {
+export const revalidate = 3600;
+
+async function safeFetch(): Promise<Realization[]> {
+  try {
+    return await getRealizationsList();
+  } catch (e) {
+    console.error("[/realizacje] fetch failed:", e);
+    return [];
+  }
+}
+
+export default async function RealizacjePage() {
+  const REALIZATIONS = await safeFetch();
   return (
     <>
       <Header />
@@ -233,8 +248,6 @@ export default function RealizacjePage() {
     </>
   );
 }
-
-type Realization = (typeof REALIZATIONS)[number];
 
 function RealizationCard({
   r,

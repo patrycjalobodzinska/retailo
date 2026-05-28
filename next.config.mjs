@@ -6,6 +6,14 @@ const nextConfig = {
   // export as missing. Forcing Next.js to transpile sanity through its
   // own pipeline makes the import resolve correctly.
   transpilePackages: ["sanity", "@sanity/ui", "@sanity/vision"],
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "cdn.sanity.io",
+      },
+    ],
+  },
 };
 
 export default nextConfig;

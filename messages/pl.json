@@ -1,0 +1,70 @@
+{
+  "nav": {
+    "rozwiazanie": "Rozwiazanie",
+    "realizacje": "Realizacje",
+    "kontakt": "Kontakt",
+    "stronaGlowna": "Strona glowna",
+    "menu": "Menu",
+    "openMenu": "Otworz menu",
+    "closeMenu": "Zamknij menu"
+  },
+  "hero": {
+    "eyebrow": "Pick up · in · store",
+    "description": "Automatyczne, modulowe systemy odbioru przesylek typu pick-up in store dla sieci retailu. Projektujemy, produkujemy i wdrazamy rozwiazania dopasowane do specyfiki marki — od jednostki glownej z dotykowym ekranem po skalowalna konfiguracje skrytek i bezdotykowy odbior ponizej 15 sekund.",
+    "stats": {
+      "czasOdbioru": "Czas odbioru",
+      "modulowy": "Modulowy",
+      "systemSkrytek": "System skrytek",
+      "api": "API",
+      "integracja": "Integracja"
+    },
+    "zaufaliNam": "Zaufali nam",
+    "wdrazamyDla": "Wdrazamy dla najwiekszych marek.",
+    "sieciKosmetyczne": "Sieci kosmetyczne, fashion, elektronika.",
+    "porozmawiajmy": "Porozmawiajmy",
+    "zobaczRealizacje": "Zobacz realizacje"
+  },
+  "qa": {
+    "wdrozenieKrokPoKroku": "Wdrozenie krok po kroku"
+  },
+  "realizations": {
+    "title": "Realizacje",
+    "wspolpracujemy": "Wspolpracujemy z",
+    "najwiekszymiMarkami": "najwiekszymi markami",
+    "subtitle": "PickUpWall wdrazany w salonach kosmetycznych, fashion i elektroniki.",
+    "zobaczWszystkie": "Zobacz wszystkie realizacje",
+    "skrytek": "skrytek",
+    "tejStronyNieMa": "Tej strony tu nie ma."
+  },
+  "global": {
+    "wdrozeniaWEuropie": "Wdrozenia w calej Europie",
+    "napiszDoNas": "Napisz do nas",
+    "odezwiemySie": "Odezwiemy się w ciągu 24h.",
+    "imieINazwisko": "Imię i nazwisko",
+    "email": "E-mail",
+    "wiadomosc": "Wiadomość...",
+    "wyslij": "Wyslij",
+    "porozmawiajmy": "Porozmawiajmy"
+  },
+  "footer": {
+    "automatyczneSystemy": "Automatyczne systemy odbioru przesylek",
+    "kontakt": "Kontakt",
+    "adres": "Adres",
+    "politykaPrywatnosci": "Polityka prywatnosci",
+    "regulamin": "Regulamin",
+    "wszelkiePrawa": "Wszelkie prawa zastrzezone"
+  },
+  "contact": {
+    "wlasnyProjekt": "Wlasny projekt",
+    "planujesz": "Planujesz wdrozenie PickUpWall?",
+    "dostosujemy": "Dostosujemy format urzadzen, liczbe skrytek, obudowe i grafike pod potrzeby twojej marki i przestrzeni.",
+    "wszystkiePola": "Wszystkie pola wymagane.",
+    "firma": "Firma (opcjonalnie)",
+    "opiszTemat": "Opisz krotko temat rozmowy..."
+  },
+  "notFound": {
+    "blad": "Blad 404 · Strona nie znaleziona",
+    "title": "Tej strony tu nie ma.",
+    "description": "Strona, ktorej szukasz, mogla zostac przeniesiona, usunieta, albo adres jest po prostu niewlasciwy. Sprawdz link albo wroc na strone glowna."
+  }
+}

@@ -1,19 +1,21 @@
 import nextDynamic from "next/dynamic";
 import Header from "@/components/Header";
-import Hero from "@/components/Hero";
-import QASectionV1 from "@/components/QASectionV1";
-import { getHomePage, type HomePage } from "@/lib/sanity/fetch";
+import HeroConcept from "@/components/HeroConcept";
+import {
+  getHomePage,
+  getRealizationsList,
+  type HomePage,
+  type Realization,
+} from "@/lib/sanity/fetch";
 
-const ProductShowcaseV1 = nextDynamic(
-  () => import("@/components/ProductShowcaseV1"),
+const QASection = nextDynamic(() => import("@/components/QASection"));
+const ProductShowcase = nextDynamic(() => import("@/components/ProductShowcase"));
+const RealizationsCarousel = nextDynamic(
+  () => import("@/components/RealizationsCarousel"),
 );
-const RealizationsSection = nextDynamic(
-  () => import("@/components/RealizationsSection"),
+const EuropeGlobeSection = nextDynamic(
+  () => import("@/components/EuropeGlobeSection"),
 );
-const RealizationsTabsSection = nextDynamic(
-  () => import("@/components/RealizationsTabsSection"),
-);
-const GlobalSection = nextDynamic(() => import("@/components/GlobalSection"));
 
 export const dynamic = "force-static";
 export const revalidate = 3600;
@@ -27,22 +29,28 @@ async function safeGetHomePage(): Promise<HomePage | null> {
   }
 }
 
+async function safeGetRealizations(): Promise<Realization[]> {
+  try {
+    return await getRealizationsList();
+  } catch {
+    return [];
+  }
+}
+
 export default async function Test2() {
-  const home = await safeGetHomePage();
+  const [home, realizations] = await Promise.all([
+    safeGetHomePage(),
+    safeGetRealizations(),
+  ]);
 
   return (
     <>
       <Header />
-      <Hero data={home} />
-      <QASectionV1 data={home} />
-      <div id="rozwiazanie">
-        <ProductShowcaseV1 />
-      </div>
-      <div id="realizacje">
-        <RealizationsSection data={home} />
-      </div>
-      <RealizationsTabsSection />
-      <GlobalSection />
+      <HeroConcept data={home} />
+      <QASection data={home} />
+      <ProductShowcase />
+      <RealizationsCarousel items={realizations} />
+      {/* <EuropeGlobeSection /> */}
     </>
   );
 }

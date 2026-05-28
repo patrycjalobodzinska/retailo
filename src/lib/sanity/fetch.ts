@@ -1,4 +1,5 @@
 import { sanityClient } from "./client";
+import imageUrlBuilder from "@sanity/image-url";
 import {
   HOME_PAGE_QUERY,
   LANGUAGES_QUERY,
@@ -9,6 +10,10 @@ import {
   SITE_SETTINGS_QUERY,
 } from "./queries";
 import type { LocalizedField } from "./i18n";
+import { projectId, dataset } from "./env";
+
+const builder = imageUrlBuilder({ projectId, dataset });
+const urlFor = (src: unknown) => builder.image(src as never).url();
 
 export type Language = {
   _id: string;
@@ -97,14 +102,89 @@ export async function getRealizationsPage() {
   return sanityClient.fetch(REALIZATIONS_PAGE_QUERY, {}, fetchOpts);
 }
 
-export async function getRealizationsList() {
-  return sanityClient.fetch(REALIZATIONS_LIST_QUERY, {}, fetchOpts);
+// Płaski typ Realization używany przez RealizationsCarousel, listę
+// /realizacje i detal /realizacje/[slug]. Zlokalizowane pola Sanity
+// (LocalizedField) zostawiamy do resolve'owania na kliencie via useLang.
+export type Realization = {
+  slug: string;
+  title: string;
+  location: string;
+  description: string;
+  image: string;
+  client?: string;
+  year?: number;
+  integrationTime?: string;
+  config?: {
+    lockers?: number;
+    masterCount?: number;
+    slaveCount?: number;
+    moduleDimensions?: string;
+    notes?: string;
+  };
+  tags?: string[];
+};
+
+// Pomocnik wyciągania pierwszego tłumaczenia z LocalizedField — używany
+// po stronie serwera, bo komponenty konsumujące oczekują plain string.
+type LocalizedRaw = {
+  translations?: { value?: string; language?: { code?: string } }[];
+};
+const pickString = (f: unknown, preferCode = "pl"): string => {
+  const t = (f as LocalizedRaw | undefined)?.translations ?? [];
+  const exact = t.find((x) => x?.language?.code === preferCode)?.value;
+  return exact ?? t.find((x) => x?.value)?.value ?? "";
+};
+
+type SanityRealizationRaw = {
+  slug?: string;
+  title?: LocalizedField;
+  location?: LocalizedField;
+  summary?: LocalizedField;
+  story?: LocalizedField;
+  client?: string;
+  year?: number;
+  lockerCount?: number;
+  rolloutTime?: LocalizedField;
+  coverImage?: unknown;
+};
+
+const normalize = (r: SanityRealizationRaw): Realization => ({
+  slug: r.slug ?? "",
+  title: pickString(r.title),
+  location: pickString(r.location),
+  description: pickString(r.summary) || pickString(r.story),
+  image: r.coverImage ? urlFor(r.coverImage) : "",
+  client: r.client,
+  year: r.year,
+  integrationTime: pickString(r.rolloutTime),
+  config: r.lockerCount ? { lockers: r.lockerCount } : undefined,
+});
+
+export async function getRealizationsList(): Promise<Realization[]> {
+  const raw = await sanityClient.fetch<SanityRealizationRaw[]>(
+    REALIZATIONS_LIST_QUERY,
+    {},
+    fetchOpts,
+  );
+  return (raw ?? []).map(normalize);
 }
 
-export async function getRealizationBySlug(slug: string) {
-  return sanityClient.fetch(REALIZATION_BY_SLUG_QUERY, { slug }, fetchOpts);
+export async function getRealizationBySlug(
+  slug: string,
+): Promise<Realization | null> {
+  const raw = await sanityClient.fetch<SanityRealizationRaw | null>(
+    REALIZATION_BY_SLUG_QUERY,
+    { slug },
+    fetchOpts,
+  );
+  return raw ? normalize(raw) : null;
 }
 
-export async function getNextRealizations(slug: string) {
-  return sanityClient.fetch(NEXT_REALIZATIONS_QUERY, { slug }, fetchOpts);
+export async function getNextRealizations(slug: string): Promise<Realization[]> {
+  const raw = await sanityClient.fetch<SanityRealizationRaw[]>(
+    NEXT_REALIZATIONS_QUERY,
+    { slug },
+    fetchOpts,
+  );
+  return (raw ?? []).map(normalize);
 }

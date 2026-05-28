@@ -10,9 +10,9 @@ export default function ProductShowcase() {
   const sectionRef = useRef<HTMLElement>(null);
   const phase1Ref = useRef<HTMLDivElement>(null);
   const phase2Ref = useRef<HTMLDivElement>(null);
-  const imageWrapRef = useRef<HTMLDivElement>(null);
   const photoRef = useRef<HTMLImageElement>(null);
   const sketchRef = useRef<HTMLImageElement>(null);
+  const imageWrapRef = useRef<HTMLDivElement>(null);
   const featuresRef = useRef<HTMLOListElement>(null);
   const [mobilePhase2InView, setMobilePhase2InView] =
     useState<boolean>(false);
@@ -43,22 +43,14 @@ export default function ProductShowcase() {
         window.matchMedia("(max-width: 1023px)").matches;
       if (isMobile) return; // mobile uses inline images, no sticky/GSAP
 
-      const enterScale = isMobile ? 0.85 : 0.9;
-      gsap.set(imageWrapRef.current, {
-        xPercent: isMobile ? -50 : 0,
-        yPercent: -50,
-        scale: enterScale,
-        x: 0,
-        y: 0,
-      });
       gsap.set(sketchRef.current, { opacity: 0 });
 
       // Phase 1 features list — animacja usunięta, lista renderuje się
       // od razu statycznie.
 
-      // Phase-2 timeline: photo→sketch wipe + image moves down to its
-      // "draft" resting position. Reversible. Wszystkie tweeny dzielą tę
-      // samą długość / ease, żeby ruch był spójny i bez "skoków".
+      // Phase-2 timeline: czysty crossfade opacity (GPU-accelerated,
+      // bez transformów na wrap'erze, bez mask-size — wszystko co
+      // generowało zacinanie zostało usunięte).
       const phase2Tl = gsap.timeline({ paused: true });
       phase2Tl
         .to(
@@ -66,25 +58,15 @@ export default function ProductShowcase() {
           { opacity: 0.95, duration: 1.2, ease: "power1.inOut" },
           0,
         )
-        .fromTo(
+        .to(
           photoRef.current,
-          { webkitMaskSize: "100% 130%", maskSize: "100% 130%" },
-          {
-            webkitMaskSize: "100% 0%",
-            maskSize: "100% 0%",
-            duration: 1.2,
-            ease: "power1.inOut",
-          },
+          { opacity: 0, duration: 1.2, ease: "power1.inOut" },
           0,
         )
         .fromTo(
           imageWrapRef.current,
           { y: 0 },
-          {
-            y: 90,
-            duration: 1.2,
-            ease: "power1.inOut",
-          },
+          { y: 160, duration: 1.2, ease: "power1.inOut" },
           0,
         );
 
@@ -106,39 +88,16 @@ export default function ProductShowcase() {
       </div>
       <section
         ref={sectionRef}
-        className="relative w-full grid grid-cols-1"
+        className="relative w-full"
         style={{
           background: "linear-gradient(180deg, #c0dbe2 0%, #e9e2d8 100%)",
         }}>
-        {/* Sticky image layer — desktop only; mobile has inline images per phase. */}
-        <div className="col-start-1 row-start-1 pointer-events-none z-[5] max-lg:hidden">
+
+        {/* Desktop sticky image layer — photo crossfades to sketch when
+            entering phase 2 (Specyfikacja techniczna). */}
+        <div className="pointer-events-none absolute inset-0 z-[5] max-lg:hidden">
           <div className="sticky top-0 h-screen w-full">
-            <div
-              ref={imageWrapRef}
-              className="absolute overflow-hidden will-change-transform right-[5vw] top-1/2 w-[600px] h-[700px] max-2xl:!right-[4vw] max-2xl:!w-[520px] max-2xl:!h-[610px] max-xl:!right-[3vw] max-xl:!w-[420px] max-xl:!h-[500px] max-lg:!right-auto max-lg:!left-1/2 max-lg:!top-1/2 max-lg:!w-[min(clamp(150px,30vh,340px),66vw)] max-lg:!h-[min(clamp(150px,30vh,340px),66vw)]">
-              <img
-                ref={photoRef}
-                src="/pickupwall-photo.png"
-                alt="PickUpWall"
-                loading="eager"
-                decoding="async"
-                fetchPriority="low"
-                className="absolute z-[2] inset-0 w-full h-full object-contain"
-                style={{
-                  maskImage:
-                    "linear-gradient(to bottom, black 0%, black 50%, transparent 100%)",
-                  maskSize: "100% 130%",
-                  maskRepeat: "no-repeat",
-                  maskPosition: "0% 0%",
-                  WebkitMaskImage:
-                    "linear-gradient(to bottom, black 0%, black 50%, transparent 100%)",
-                  WebkitMaskSize: "100% 130%",
-                  WebkitMaskRepeat: "no-repeat",
-                  WebkitMaskPosition: "0% 0%",
-                  willChange: "mask-size, transform",
-                  transform: "translateZ(0)",
-                }}
-              />
+            <div ref={imageWrapRef} className="absolute right-[5vw] top-1/2 -translate-y-1/2 w-[480px] aspect-square max-2xl:!w-[420px] max-xl:!w-[360px] max-xl:!right-[3vw]">
               <img
                 ref={sketchRef}
                 src="/pickupwall-sketch.png"
@@ -146,14 +105,24 @@ export default function ProductShowcase() {
                 loading="eager"
                 decoding="async"
                 fetchPriority="low"
-                className="absolute inset-0 z-[1] w-full h-full object-contain opacity-0"
+                className="absolute inset-0 w-full h-full object-contain opacity-0"
+              />
+              <img
+                ref={photoRef}
+                src="/pickupwall-photo.png"
+                alt="PickUpWall"
+                loading="eager"
+                decoding="async"
+                fetchPriority="low"
+                className="absolute inset-0 w-full h-full object-contain"
+                style={{ willChange: "opacity" }}
               />
             </div>
           </div>
         </div>
 
         {/* Content stack — two viewport-tall subsections. */}
-        <div className="col-start-1 row-start-1 relative">
+        <div className="relative">
           {/* Phase 1 */}
           <div
             ref={phase1Ref}
@@ -184,7 +153,7 @@ export default function ProductShowcase() {
               </div>
               <ol
                 ref={featuresRef}
-                className="absolute top-[24vh] left-[5vw] m-0 p-0 list-none flex flex-col gap-5 max-w-[440px] pointer-events-auto will-change-[transform,opacity] max-lg:relative max-lg:top-auto max-lg:bottom-auto max-lg:left-auto max-lg:px-[6vw] max-lg:max-w-none max-lg:gap-3">
+                className="absolute top-[24vh] left-[5vw] m-0 p-0 list-none flex flex-col gap-5 max-w-[440px] pointer-events-auto max-lg:relative max-lg:top-auto max-lg:bottom-auto max-lg:left-auto max-lg:px-[6vw] max-lg:max-w-none max-lg:gap-3">
                 <li className="m-0 p-0">
                   <p
                     className="m-0 mb-4 uppercase tracking-[0.22em] font-bold max-lg:mb-3"
@@ -215,7 +184,7 @@ export default function ProductShowcase() {
                 ].map(([title, desc], i) => (
                   <li
                     key={title}
-                    className="flex items-start gap-4 text-left will-change-[transform,opacity] max-lg:gap-3">
+                    className="flex items-start gap-4 text-left max-lg:gap-3">
                     <span
                       className="flex-shrink-0 flex items-center justify-center font-bold tabular-nums"
                       style={{
@@ -253,7 +222,7 @@ export default function ProductShowcase() {
           {/* Phase 2 */}
           <div
             ref={phase2Ref}
-            className="relative h-[80vh] min-h-[560px] max-lg:h-auto max-lg:min-h-0 max-lg:pt-[1dvh] max-lg:pb-[3dvh]">
+            className="relative h-[88vh] min-h-[600px] pb-[8vh] max-lg:h-auto max-lg:min-h-0 max-lg:pt-[1dvh] max-lg:pb-[8dvh]">
             {/* Mobile-only inline image with photo → draft wavy mask wipe on enter */}
             <div className="hidden max-lg:flex justify-center px-[6vw] mb-6">
               <div className="relative w-[68vw] max-w-[320px] aspect-square">
@@ -268,47 +237,18 @@ export default function ProductShowcase() {
                     transitionDelay: mobilePhase2InView ? "300ms" : "0ms",
                   }}
                 />
-                {/* Photo on top — mask wipes from full to zero height */}
+                {/* Photo on top — opacity crossfade (mask-size było zbyt wolne) */}
                 <img
                   src="/pickupwall-photo.png"
                   alt="PickUpWall"
-                  className="absolute inset-0 w-full h-full object-contain"
+                  className="absolute inset-0 w-full h-full object-contain transition-opacity ease-out"
                   style={{
-                    maskImage:
-                      "linear-gradient(to bottom, black 0%, black 50%, transparent 100%)",
-                    WebkitMaskImage:
-                      "linear-gradient(to bottom, black 0%, black 50%, transparent 100%)",
-                    maskRepeat: "no-repeat",
-                    WebkitMaskRepeat: "no-repeat",
-                    maskPosition: "0% 0%",
-                    WebkitMaskPosition: "0% 0%",
-                    maskSize: mobilePhase2InView ? "100% 0%" : "100% 130%",
-                    WebkitMaskSize: mobilePhase2InView
-                      ? "100% 0%"
-                      : "100% 130%",
-                    transition:
-                      "mask-size 1100ms cubic-bezier(0.65, 0, 0.35, 1), -webkit-mask-size 1100ms cubic-bezier(0.65, 0, 0.35, 1)",
-                    transitionDelay: mobilePhase2InView ? "700ms" : "0ms",
+                    opacity: mobilePhase2InView ? 0 : 1,
+                    transitionDuration: "900ms",
+                    transitionDelay: mobilePhase2InView ? "200ms" : "0ms",
                   }}
                 />
               </div>
-            </div>
-            {/* Decorative background — "pickup." watermark + dot grid, bottom of section. */}
-            <div
-              aria-hidden="true"
-              className="absolute inset-0 pointer-events-none overflow-hidden z-[0] max-lg:hidden">
-              <p
-                className="absolute m-0 font-black select-none"
-                style={{
-                  top: "30vh",
-                  left: "-2vw",
-                  fontSize: "clamp(11rem, 20vw, 26rem)",
-                  lineHeight: 1.2,
-                  letterSpacing: "-0.05em",
-                  color: "rgba(15,15,15,0.05)",
-                }}>
-                pickup.
-              </p>
             </div>
             <div className="absolute inset-0 flex items-start justify-start pl-[6vw] pr-[4vw] pt-[22vh] pb-[4vh] pointer-events-none z-[1] max-lg:relative max-lg:inset-auto max-lg:flex-col max-lg:justify-start max-lg:gap-4 max-lg:p-[3dvh_6vw_0] max-lg:min-h-0">
               <div className="flex flex-col w-full max-w-[680px] pointer-events-auto max-2xl:max-w-[600px] max-xl:max-w-[520px] max-lg:max-w-full">

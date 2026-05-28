@@ -20,9 +20,9 @@ const NAV_ITEMS: NavItem[] = [
 
 export default function Header() {
   const pathname = usePathname();
-  // Homepage uses the light-text variant (sits over the dark hero image
-  // at the top); every other route uses the dark-text variant.
-  const isSubpage = pathname !== "/";
+  // Homepage (i test2 = klon homepage) uses the dark-pill variant nad
+  // jasnym hero; każda inna trasa używa light variant nad ciemnym tłem.
+  const isSubpage = pathname !== "/" && pathname !== "/test2";
 
   const [open, setOpen] = useState(false);
 
@@ -79,18 +79,19 @@ export default function Header() {
             if (lenis) lenis.scrollTo(0, { duration: 1.1 });
             else window.scrollTo({ top: 0, behavior: "smooth" });
           }}
-          className="inline-flex backdrop-blur-sm items-center no-underline"
+          className="inline-flex items-center no-underline"
           aria-label="retailo. — strona glowna"
           style={{
             background: isSubpage
-              ? "rgba(255,255,255,0.4)"
-              : "rgba(15,21,24,0.2)",
-            WebkitBackdropFilter: "blur(14px) saturate(140%)",
+              ? "rgba(255,255,255,0.85)"
+              : "rgba(42,56,64,0.5)",
             border: isSubpage
               ? "1px solid rgba(10,42,46,0.08)"
               : "1px solid rgba(255,255,255,0.12)",
             padding: "8px 16px",
             borderRadius: 999,
+            backdropFilter: "blur(14px)",
+            WebkitBackdropFilter: "blur(14px)",
           }}>
           <img
             src={isSubpage ? "/retailologo.webp" : "/retailologo_light.webp"}
@@ -105,15 +106,15 @@ export default function Header() {
           style={{
             gap: 4,
             background: isSubpage
-              ? "rgba(255,255,255,0.4)"
-              : "rgba(15,21,24,0.2)",
-            backdropFilter: "blur(14px) saturate(140%)",
-            WebkitBackdropFilter: "blur(14px) saturate(140%)",
+              ? "rgba(255,255,255,0.85)"
+              : "rgba(42,56,64,0.5)",
             border: isSubpage
               ? "1px solid rgba(10,42,46,0.08)"
               : "1px solid rgba(255,255,255,0.12)",
             borderRadius: 999,
             padding: "6px 8px",
+            backdropFilter: "blur(14px)",
+            WebkitBackdropFilter: "blur(14px)",
           }}>
           {NAV_ITEMS.map((item) => (
             <a
@@ -147,14 +148,14 @@ export default function Header() {
           className="md:hidden flex flex-col gap-1.5 cursor-pointer w-12 h-12 justify-center items-center"
           style={{
             background: isSubpage
-              ? "rgba(255,255,255,0.88)"
-              : "rgba(15,21,24,0.55)",
-            backdropFilter: "blur(14px) saturate(140%)",
-            WebkitBackdropFilter: "blur(14px) saturate(140%)",
+              ? "rgba(255,255,255,0.92)"
+              : "rgba(42,56,64,0.7)",
             border: isSubpage
               ? "1px solid rgba(10,42,46,0.08)"
               : "1px solid rgba(255,255,255,0.12)",
             borderRadius: 999,
+            backdropFilter: "blur(14px)",
+            WebkitBackdropFilter: "blur(14px)",
           }}>
           {(() => {
             const bar = isSubpage ? "block bg-[#0a2a2e]" : "block bg-white";

@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { REALIZATIONS } from "@/lib/realizations";
+import type { Realization } from "@/lib/sanity/fetch";
 
 // Mobile: cards take most of the viewport with a small side peek.
 // Desktop overridden via responsive Tailwind classes below.
@@ -17,17 +17,21 @@ type RealizationsCarouselProps = {
   showHeader?: boolean;
   excludeSlug?: string;
   variant?: "light" | "dark";
+  items?: Realization[];
 };
 
 export default function RealizationsCarousel({
   showHeader = true,
   excludeSlug,
   variant = "light",
+  items: itemsProp,
 }: RealizationsCarouselProps = {}) {
   const router = useRouter();
-  const items = excludeSlug
-    ? REALIZATIONS.filter((r) => r.slug !== excludeSlug)
-    : REALIZATIONS;
+  const items = (
+    excludeSlug
+      ? (itemsProp ?? []).filter((r) => r.slug !== excludeSlug)
+      : (itemsProp ?? [])
+  );
   const len = items.length;
 
   // Render items 3 times so there is always a neighbour on each side of

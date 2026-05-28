@@ -1,0 +1,70 @@
+{
+  "nav": {
+    "rozwiazanie": "Solution",
+    "realizacje": "Realizations",
+    "kontakt": "Contact",
+    "stronaGlowna": "Home",
+    "menu": "Menu",
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu"
+  },
+  "hero": {
+    "eyebrow": "Pick up · in · store",
+    "description": "Automated, modular pick-up in store parcel systems for retail chains. We design, manufacture and deploy solutions tailored to the brand — from a master unit with a touchscreen to a scalable locker configuration with contactless pick-up in under 15 seconds.",
+    "stats": {
+      "czasOdbioru": "Pick-up time",
+      "modulowy": "Modular",
+      "systemSkrytek": "Locker system",
+      "api": "API",
+      "integracja": "Integration"
+    },
+    "zaufaliNam": "They trust us",
+    "wdrazamyDla": "We deploy for the biggest brands.",
+    "sieciKosmetyczne": "Beauty, fashion, electronics chains.",
+    "porozmawiajmy": "Let's talk",
+    "zobaczRealizacje": "See realizations"
+  },
+  "qa": {
+    "wdrozenieKrokPoKroku": "Deployment step by step"
+  },
+  "realizations": {
+    "title": "Realizations",
+    "wspolpracujemy": "We work with",
+    "najwiekszymiMarkami": "the biggest brands",
+    "subtitle": "PickUpWall deployed in beauty, fashion and electronics stores.",
+    "zobaczWszystkie": "See all realizations",
+    "skrytek": "lockers",
+    "tejStronyNieMa": "This page doesn't exist."
+  },
+  "global": {
+    "wdrozeniaWEuropie": "Deployments across Europe",
+    "napiszDoNas": "Write to us",
+    "odezwiemySie": "We'll get back to you within 24h.",
+    "imieINazwisko": "Full name",
+    "email": "E-mail",
+    "wiadomosc": "Message...",
+    "wyslij": "Send",
+    "porozmawiajmy": "Let's talk"
+  },
+  "footer": {
+    "automatyczneSystemy": "Automated parcel pick-up systems",
+    "kontakt": "Contact",
+    "adres": "Address",
+    "politykaPrywatnosci": "Privacy policy",
+    "regulamin": "Terms",
+    "wszelkiePrawa": "All rights reserved"
+  },
+  "contact": {
+    "wlasnyProjekt": "Your project",
+    "planujesz": "Planning a PickUpWall deployment?",
+    "dostosujemy": "We adapt unit size, locker count, casing and graphics to your brand and space.",
+    "wszystkiePola": "All fields required.",
+    "firma": "Company (optional)",
+    "opiszTemat": "Briefly describe what you'd like to talk about..."
+  },
+  "notFound": {
+    "blad": "Error 404 · Page not found",
+    "title": "This page doesn't exist.",
+    "description": "The page you're looking for may have been moved, removed, or the URL is simply wrong. Check the link or go back to the home page."
+  }
+}

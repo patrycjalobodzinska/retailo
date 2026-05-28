@@ -27,6 +27,29 @@ export default function HeroConcept({ data }: { data?: HeroData } = {}) {
   const statsWrapRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    // Na mobile animacje wejścia się przycinają — pomijamy timeline i od
+    // razu pokazujemy elementy w stanie końcowym (startują z inline
+    // opacity:0 / transform, więc trzeba je jawnie odsłonić).
+    const isDesktop = window.matchMedia("(min-width: 1024px)").matches;
+    if (!isDesktop) {
+      gsap.set([imageRef.current, contentRef.current], {
+        opacity: 1,
+        x: 0,
+        y: 0,
+      });
+      // Karta ma `transition-transform` (dla hover) — bez wyłączenia
+      // tranzycji ustawienie y:0 animowałoby wjazd z translateY(20px).
+      const card = cardRef.current;
+      if (card) {
+        card.style.transition = "none";
+        gsap.set(card, { opacity: 1, x: 0, y: 0 });
+        requestAnimationFrame(() => {
+          card.style.transition = "";
+        });
+      }
+      return;
+    }
+
     const ctx = gsap.context(() => {
       const tl = gsap.timeline({ defaults: { ease: "power3.out" } });
       tl.fromTo(

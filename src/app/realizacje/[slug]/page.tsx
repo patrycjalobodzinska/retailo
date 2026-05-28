@@ -4,19 +4,29 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ContactCtaForm from "@/components/ContactCtaForm";
 import RealizationsCarousel from "@/components/RealizationsCarousel";
-import { REALIZATIONS, getRealizationBySlug } from "@/lib/realizations";
+import {
+  getRealizationBySlug,
+  getRealizationsList,
+} from "@/lib/sanity/fetch";
 
 type PageProps = {
   params: Promise<{ slug: string }>;
 };
 
+export const revalidate = 3600;
+
 export async function generateStaticParams() {
-  return REALIZATIONS.map((r) => ({ slug: r.slug }));
+  try {
+    const list = await getRealizationsList();
+    return list.map((r) => ({ slug: r.slug }));
+  } catch {
+    return [];
+  }
 }
 
 export async function generateMetadata({ params }: PageProps) {
   const { slug } = await params;
-  const r = getRealizationBySlug(slug);
+  const r = await getRealizationBySlug(slug);
   return {
     title: r ? `${r.title} · Realizacje · Retailo` : "Realizacja · Retailo",
   };
@@ -24,24 +34,20 @@ export async function generateMetadata({ params }: PageProps) {
 
 export default async function RealizacjaDetailPage({ params }: PageProps) {
   const { slug } = await params;
-  const r = getRealizationBySlug(slug);
+  const [r, all] = await Promise.all([
+    getRealizationBySlug(slug),
+    getRealizationsList(),
+  ]);
   if (!r) notFound();
 
   const config = r.config;
-  const totalUnits = (config?.masterCount ?? 0) + (config?.slaveCount ?? 0);
 
   const META_ROWS: Array<[string, string]> = [
     ["Klient", r.client ?? "—"],
     ["Lokalizacja", r.location],
     ["Rok wdrozenia", r.year ? String(r.year) : "—"],
-    [
-      "Liczba jednostek",
-      totalUnits > 0
-        ? `${totalUnits}${totalUnits === 1 ? " (jednostka glowna)" : ""}`
-        : "—",
-    ],
     ["Liczba skrytek", config?.lockers ? String(config.lockers) : "—"],
-    ["Wymiary jednostki", config?.moduleDimensions ?? "1970 × 1025 × 50 mm"],
+    ["Wymiary jednostki", "1970 × 1025 × 50 mm"],
     ["Czas wdrozenia", r.integrationTime ?? "—"],
   ];
 
@@ -287,7 +293,7 @@ export default async function RealizacjaDetailPage({ params }: PageProps) {
               Inne realizacje.
             </h2>
           </div>
-          <RealizationsCarousel showHeader={false} excludeSlug={slug} />
+          <RealizationsCarousel showHeader={false} excludeSlug={slug} items={all} />
         </section>
         <ContactCtaForm />
       </main>

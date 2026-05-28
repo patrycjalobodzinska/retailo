@@ -7,7 +7,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 gsap.registerPlugin(ScrollTrigger);
 
-const GlobeComponent = dynamic(() => import("./GlobeInner"), {
+const EuropeGlobeInner = dynamic(() => import("./EuropeGlobeInner"), {
   ssr: false,
 });
 
@@ -29,29 +29,14 @@ const RIGHT_COUNTRIES = [
   { name: "Holandia", flag: "🇳🇱" },
 ];
 
-/** Wysokość scrolla sekcji — mniejsza = szybciej „mija” sekcję. */
 const SECTION_SCROLL_VH = 130;
-/** Stopka + CTA pojawiają się czasowo (po wejściu sekcji w viewport),
-    a nie wraz z postępem scrolla. */
-const FOOTER_REVEAL_DELAY = 0.6; // s
-const FOOTER_REVEAL_DURATION = 0.9; // s
-/**
- * Po jakiej części przewinięcia sekcji (0–1) startuje animacja krajów — sam scroll tylko ją odpala;
- * kolejka jest płynna w czasie (GSAP), nie „przypięta” do dalszego ruchu scrolla.
- * Musi być < (wrap.h − section.h) / wrap.h = (175 − 100) / 175 ≈ 0.43, inaczej
- * trigger pali się dopiero PO odklejeniu sticky sekcji — countries lecą do
- * opacity:1 nad viewportem i ich nie widać.
- */
+const FOOTER_REVEAL_DELAY = 0.6;
+const FOOTER_REVEAL_DURATION = 0.9;
 const COUNTRY_SCROLL_PROGRESS = 0.18;
-/** Odstęp między kolejnymi parami (s) — większe = wolniejsza kolejka. */
 const COUNTRY_STAGGER_SEC = 0.12;
-/** Długość wejścia jednego wiersza (s) — większe = bardziej płynnie. */
 const COUNTRY_ITEM_DURATION = 0.78;
-/** Wyjście — proporcjonalnie do wejścia (krótsze = szybsze znikanie). */
-const COUNTRY_EXIT_DURATION = COUNTRY_ITEM_DURATION * 0.55;
-const COUNTRY_EXIT_STAGGER = COUNTRY_STAGGER_SEC * 0.9;
 
-export default function GlobalSection() {
+export default function EuropeGlobeSection() {
   const wrapRef = useRef<HTMLDivElement>(null);
   const sectionRef = useRef<HTMLDivElement>(null);
   const introRef = useRef<HTMLDivElement>(null);
@@ -61,27 +46,21 @@ export default function GlobalSection() {
   const rightRef = useRef<HTMLDivElement>(null);
   const footerRef = useRef<HTMLDivElement>(null);
   const ctaRef = useRef<HTMLDivElement>(null);
-  const [globeSize, setGlobeSize] = useState(1500);
   const [mobileCtaOpen, setMobileCtaOpen] = useState(false);
+  const [size, setSize] = useState(760);
 
   useEffect(() => {
-    const updateSize = () =>
-      setGlobeSize(
-        window.innerWidth < 768 ? 760 : window.innerWidth < 900 ? 600 : 1100,
-      );
-    updateSize();
-    window.addEventListener("resize", updateSize);
-    return () => window.removeEventListener("resize", updateSize);
+    const update = () =>
+      setSize(Math.min(Math.max(window.innerWidth, window.innerHeight), 1050));
+    update();
+    window.addEventListener("resize", update);
+    return () => window.removeEventListener("resize", update);
   }, []);
 
   useEffect(() => {
     const ctx = gsap.context(() => {
-      // Globus i napis GLOBAL — bez scroll-scruba. Wcześniej przesuwanie
-      // y na scrollu powodowało zacinanie/lagowanie (zwłaszcza na mobile).
-      // Teraz globus stoi w jednym miejscu, napis GLOBAL też nie driftuje.
       gsap.set(globeWrapRef.current, { xPercent: -50, y: 0 });
 
-      // Intro fades out early
       gsap.to(introRef.current, {
         y: "-30vh",
         opacity: 0,
@@ -94,10 +73,6 @@ export default function GlobalSection() {
         },
       });
 
-      // Kraje: przy progu scrolla w sekcji odpala się timeline — potem płynna kolejka w czasie (nie scrub do scrolla).
-      // Na mobile pomijamy animację — wrap i sticky mają tę samą wysokość,
-      // więc ScrollTrigger nie odpala się w spodziewanym momencie i karty
-      // zostawały na opacity:0. Mobile od razu pokazuje je statycznie.
       const isMobile =
         typeof window !== "undefined" &&
         window.matchMedia("(max-width: 1023px)").matches;
@@ -111,37 +86,20 @@ export default function GlobalSection() {
       }
 
       const maxLen = Math.max(leftItems.length, rightItems.length);
-
-      // Build a single timeline with the country reveal at progress 0.
-      // GSAP's play()/reverse() handle scroll up/down naturally — far more
-      // robust than the previous countryShown/exitRunning state machine,
-      // which could get stuck if the user oscillated across the threshold
-      // mid-tween (the kill-and-restart logic left items half-faded).
       const countryTl = gsap.timeline({ paused: true });
-      const easeCountry = "power3.out";
       for (let i = 0; i < maxLen; i++) {
         const t = i * COUNTRY_STAGGER_SEC;
         if (leftItems[i]) {
           countryTl.to(
             leftItems[i],
-            {
-              x: 0,
-              opacity: 1,
-              duration: COUNTRY_ITEM_DURATION,
-              ease: easeCountry,
-            },
+            { x: 0, opacity: 1, duration: COUNTRY_ITEM_DURATION, ease: "power3.out" },
             t,
           );
         }
         if (rightItems[i]) {
           countryTl.to(
             rightItems[i],
-            {
-              x: 0,
-              opacity: 1,
-              duration: COUNTRY_ITEM_DURATION,
-              ease: easeCountry,
-            },
+            { x: 0, opacity: 1, duration: COUNTRY_ITEM_DURATION, ease: "power3.out" },
             t + 0.05,
           );
         }
@@ -152,53 +110,31 @@ export default function GlobalSection() {
         start: `${Math.round(COUNTRY_SCROLL_PROGRESS * 100)}% top`,
         end: "bottom bottom",
         invalidateOnRefresh: true,
-        // Once the badges have appeared they stay — no reverse on leave.
-        // Earlier the timeline reversed when scrolling past the trigger
-        // end (or back above start), and the flags blinked out as the
-        // user kept scrolling.
         onEnter: () => countryTl.timeScale(1).play(),
         onEnterBack: () => countryTl.timeScale(1).play(),
       });
 
-      // Stopka + CTA + uniesienie globusa: pojawiają się czasowo po wejściu
-      // sekcji w viewport (delay + płynna animacja własna), niezależnie od
-      // tempa scrolla użytkownika. Animacja jest wielorazowa — gra się przy
-      // każdym wejściu sekcji w viewport, a cofa przy wyjściu.
       gsap.set(footerRef.current, { autoAlpha: 0, yPercent: 100 });
       gsap.set(ctaRef.current, { autoAlpha: 0, y: 40 });
 
-      // Globus nie jest już animowany w tym timeline'em — pełen zakres
-      // ruchu obsługuje pojedynczy scrub powyżej, dzięki czemu nie ma
-      // konkurujących tweenów na tej samej własności (efekt "skoku").
       const revealTl = gsap
         .timeline({ paused: true, defaults: { ease: "power3.out" } })
         .to(
           footerRef.current,
-          {
-            autoAlpha: 1,
-            yPercent: 0,
-            duration: FOOTER_REVEAL_DURATION,
-          },
+          { autoAlpha: 1, yPercent: 0, duration: FOOTER_REVEAL_DURATION },
           FOOTER_REVEAL_DELAY,
         )
         .to(
           ctaRef.current,
-          {
-            autoAlpha: 1,
-            y: 0,
-            duration: FOOTER_REVEAL_DURATION,
-          },
+          { autoAlpha: 1, y: 0, duration: FOOTER_REVEAL_DURATION },
           FOOTER_REVEAL_DELAY,
         );
 
       const revealIo = new IntersectionObserver(
         (entries) => {
           for (const entry of entries) {
-            if (entry.isIntersecting) {
-              revealTl.timeScale(1).play();
-            } else {
-              revealTl.timeScale(1.6).reverse();
-            }
+            if (entry.isIntersecting) revealTl.timeScale(1).play();
+            else revealTl.timeScale(1.6).reverse();
           }
         },
         { threshold: 0.45 },
@@ -207,9 +143,7 @@ export default function GlobalSection() {
       return () => revealIo.disconnect();
     }, wrapRef);
 
-    const raf = requestAnimationFrame(() => {
-      ScrollTrigger.refresh();
-    });
+    const raf = requestAnimationFrame(() => ScrollTrigger.refresh());
     return () => {
       cancelAnimationFrame(raf);
       ctx.revert();
@@ -221,7 +155,6 @@ export default function GlobalSection() {
       ref={wrapRef}
       className="relative max-lg:!h-[100dvh]"
       style={{ height: `${SECTION_SCROLL_VH}vh` }}>
-      {/* Sticky section */}
       <div
         ref={sectionRef}
         className="sticky top-0 w-full h-screen min-h-[640px] overflow-hidden max-lg:h-[100dvh] max-lg:min-h-[100dvh]"
@@ -263,11 +196,11 @@ export default function GlobalSection() {
           GLOBAL
         </div>
 
-        {/* Globe */}
+        {/* Mapa 3D (kolorowe kontynenty + neonowe piny) zamiast globusa. */}
         <div
           ref={globeWrapRef}
-          className="absolute left-[50%] top-[28%] z-[3] md:top-[24%]">
-          <GlobeComponent width={globeSize} height={globeSize} />
+          className="absolute left-1/2 top-[36vh] z-[3] -translate-x-1/2 md:top-[30vh]">
+          <EuropeGlobeInner width={size} height={size} />
         </div>
 
         {/* Left countries */}
@@ -302,12 +235,11 @@ export default function GlobalSection() {
           ))}
         </div>
 
-        {/* CTA: desktop — formularz na stałe; mobile — toggle button → form */}
+        {/* CTA formularz */}
         <div
           ref={ctaRef}
           id="kontakt"
-          className="pointer-events-auto absolute bottom-[130px] left-[5vw] z-30 w-[min(360px,calc(100vw-32px))] max-lg:bottom-[120px] max-lg:left-1/2 max-lg:-translate-x-1/2 max-lg:w-[min(240px,calc(100vw-48px))]">
-          {/* Mobile-only toggle button — pokazywany kiedy formularz zwinięty */}
+          className="pointer-events-auto absolute bottom-[150px] left-[5vw] z-30 w-[min(360px,calc(100vw-32px))] max-lg:bottom-[140px] max-lg:left-1/2 max-lg:-translate-x-1/2 max-lg:w-[min(240px,calc(100vw-48px))]">
           {!mobileCtaOpen && (
             <button
               type="button"
@@ -345,7 +277,6 @@ export default function GlobalSection() {
             </button>
           )}
 
-          {/* Formularz — zawsze widoczny na desktop, na mobile tylko gdy otwarty */}
           <div
             className={`rounded-2xl border border-white/20 bg-black/85 px-3.5 py-3 shadow-lg backdrop-blur-2xl ${
               mobileCtaOpen ? "max-lg:block" : "max-lg:hidden"
@@ -369,9 +300,7 @@ export default function GlobalSection() {
             </div>
             <form
               className="flex flex-col gap-1.5"
-              onSubmit={(e) => {
-                e.preventDefault();
-              }}>
+              onSubmit={(e) => e.preventDefault()}>
               <div className="grid grid-cols-2 gap-1.5">
                 <input
                   name="name"
@@ -418,7 +347,7 @@ export default function GlobalSection() {
           </div>
         </div>
 
-        {/* Dolny blok: stopka */}
+        {/* Stopka */}
         <div className="absolute bottom-0 left-0 right-0 z-20 flex flex-col items-stretch pointer-events-none pb-[env(safe-area-inset-bottom)]">
           <footer
             ref={footerRef}
@@ -428,7 +357,7 @@ export default function GlobalSection() {
               className="pointer-events-auto border-t border-white/10"
               style={{
                 background:
-                  "linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.18) 50%, rgba(0,0,0,0.38) 100%)",
+                  "linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.3) 45%, rgba(0,0,0,0.6) 100%)",
               }}>
               <div className="px-[5vw] pt-3 pb-3 md:pt-4 md:pb-4">
                 <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between sm:gap-x-6 sm:gap-y-2">

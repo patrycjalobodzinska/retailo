@@ -7,9 +7,23 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 gsap.registerPlugin(ScrollTrigger);
 
-const GlobeComponent = dynamic(() => import("./GlobeInner"), {
-  ssr: false,
-});
+const WorldMap = dynamic(() => import("./WorldMap"), { ssr: false });
+
+// Łuki Warszawa → stolice europejskie (te same co miały być na globie).
+const ROUTES = [
+  { start: { lat: 52.23, lng: 21.01 }, end: { lat: 52.52, lng: 13.41 } },
+  { start: { lat: 52.23, lng: 21.01 }, end: { lat: 50.08, lng: 14.44 } },
+  { start: { lat: 52.23, lng: 21.01 }, end: { lat: 48.15, lng: 17.11 } },
+  { start: { lat: 52.23, lng: 21.01 }, end: { lat: 48.21, lng: 16.37 } },
+  { start: { lat: 52.23, lng: 21.01 }, end: { lat: 48.86, lng: 2.35 } },
+  { start: { lat: 52.23, lng: 21.01 }, end: { lat: 40.42, lng: -3.7 } },
+  { start: { lat: 52.23, lng: 21.01 }, end: { lat: 41.9, lng: 12.5 } },
+  { start: { lat: 52.23, lng: 21.01 }, end: { lat: 44.43, lng: 26.1 } },
+  { start: { lat: 52.23, lng: 21.01 }, end: { lat: 59.33, lng: 18.07 } },
+  { start: { lat: 52.23, lng: 21.01 }, end: { lat: 52.37, lng: 4.9 } },
+  { start: { lat: 52.23, lng: 21.01 }, end: { lat: 51.51, lng: -0.13 } },
+  { start: { lat: 52.23, lng: 21.01 }, end: { lat: 47.5, lng: 19.04 } },
+];
 
 const LEFT_COUNTRIES = [
   { name: "Polska", flag: "🇵🇱" },
@@ -51,7 +65,7 @@ const COUNTRY_ITEM_DURATION = 0.78;
 const COUNTRY_EXIT_DURATION = COUNTRY_ITEM_DURATION * 0.55;
 const COUNTRY_EXIT_STAGGER = COUNTRY_STAGGER_SEC * 0.9;
 
-export default function GlobalSection() {
+export default function GlobalSectionMap() {
   const wrapRef = useRef<HTMLDivElement>(null);
   const sectionRef = useRef<HTMLDivElement>(null);
   const introRef = useRef<HTMLDivElement>(null);
@@ -61,18 +75,7 @@ export default function GlobalSection() {
   const rightRef = useRef<HTMLDivElement>(null);
   const footerRef = useRef<HTMLDivElement>(null);
   const ctaRef = useRef<HTMLDivElement>(null);
-  const [globeSize, setGlobeSize] = useState(1500);
   const [mobileCtaOpen, setMobileCtaOpen] = useState(false);
-
-  useEffect(() => {
-    const updateSize = () =>
-      setGlobeSize(
-        window.innerWidth < 768 ? 760 : window.innerWidth < 900 ? 600 : 1100,
-      );
-    updateSize();
-    window.addEventListener("resize", updateSize);
-    return () => window.removeEventListener("resize", updateSize);
-  }, []);
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -263,11 +266,12 @@ export default function GlobalSection() {
           GLOBAL
         </div>
 
-        {/* Globe */}
+        {/* Dotted world map — lekki SVG zamiennik dla webgl globusa.
+            Łuki Warszawa → stolice europejskie animowane motion/react. */}
         <div
           ref={globeWrapRef}
-          className="absolute left-[50%] top-[28%] z-[3] md:top-[24%]">
-          <GlobeComponent width={globeSize} height={globeSize} />
+          className="absolute left-1/2 top-[24vh] z-[3] w-[80vw] max-w-[820px] -translate-x-1/2 md:top-[18vh]">
+          <WorldMap dots={ROUTES} lineColor="#7ed5e6" dotColor="#FFFFFF35" />
         </div>
 
         {/* Left countries */}
@@ -306,7 +310,7 @@ export default function GlobalSection() {
         <div
           ref={ctaRef}
           id="kontakt"
-          className="pointer-events-auto absolute bottom-[130px] left-[5vw] z-30 w-[min(360px,calc(100vw-32px))] max-lg:bottom-[120px] max-lg:left-1/2 max-lg:-translate-x-1/2 max-lg:w-[min(240px,calc(100vw-48px))]">
+          className="pointer-events-auto absolute bottom-[180px] left-[5vw] z-30 w-[min(360px,calc(100vw-32px))] max-lg:bottom-[170px] max-lg:left-1/2 max-lg:-translate-x-1/2 max-lg:w-[min(240px,calc(100vw-48px))]">
           {/* Mobile-only toggle button — pokazywany kiedy formularz zwinięty */}
           {!mobileCtaOpen && (
             <button
@@ -420,15 +424,14 @@ export default function GlobalSection() {
 
         {/* Dolny blok: stopka */}
         <div className="absolute bottom-0 left-0 right-0 z-20 flex flex-col items-stretch pointer-events-none pb-[env(safe-area-inset-bottom)]">
-          <footer
-            ref={footerRef}
-            className="pointer-events-none"
-            style={{ background: "rgba(0,0,0,0.22)" }}>
+          <footer ref={footerRef} className="pointer-events-none">
             <div
               className="pointer-events-auto border-t border-white/10"
               style={{
                 background:
-                  "linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.18) 50%, rgba(0,0,0,0.38) 100%)",
+                  "linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.5) 35%, rgba(0,0,0,0.72) 100%)",
+                backdropFilter: "blur(10px)",
+                WebkitBackdropFilter: "blur(10px)",
               }}>
               <div className="px-[5vw] pt-3 pb-3 md:pt-4 md:pb-4">
                 <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between sm:gap-x-6 sm:gap-y-2">
