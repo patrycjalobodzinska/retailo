@@ -27,6 +27,8 @@ const PINS: Pin[] = [
 const MAP_STYLE = {
   version: 8 as const,
   glyphs: "https://demotiles.maplibre.org/font/{fontstack}/{range}.pbf",
+  // Globus od pierwszej klatki — bez krótkiego błysku 2D prostokąta.
+  projection: { type: "globe" as const },
   sources: {
     countries: {
       type: "geojson" as const,
@@ -117,6 +119,7 @@ export default function EuropeGlobeInner({
   height,
 }: EuropeGlobeInnerProps) {
   const containerRef = useRef<HTMLDivElement>(null);
+  const wrapperRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     injectPinStyles();
@@ -136,7 +139,9 @@ export default function EuropeGlobeInner({
     const markers: maplibregl.Marker[] = [];
 
     map.on("load", () => {
-      map.setProjection({ type: "globe" });
+      // Pokaż globus dopiero po załadowaniu — bez błysku pustego
+      // prostokąta przy szybkim scrollu w dół.
+      if (wrapperRef.current) wrapperRef.current.style.opacity = "1";
 
       // Markery — DOM piny, anchor: 'bottom' żeby tip kreski siedział
       // dokładnie w lat/lng.
@@ -158,12 +163,15 @@ export default function EuropeGlobeInner({
 
   return (
     <div
+      ref={wrapperRef}
       style={{
         width,
         height,
         position: "relative",
         // Dekoracyjny — żeby map nie blokował scrolla na mobile.
         pointerEvents: "none",
+        opacity: 0,
+        transition: "opacity 0.5s ease-out",
       }}>
       <div
         ref={containerRef}
