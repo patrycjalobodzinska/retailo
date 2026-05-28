@@ -73,14 +73,14 @@ export default async function Home() {
 
   return (
     <>
-      <Header />
+      <Header settings={settings} />
       <HeroConcept data={home} />
       <div id="rozwiazanie">
         <QASection data={home} />
       </div>
-      <ProductShowcase />
+      <ProductShowcase data={home} />
       <div id="realizacje">
-        <RealizationsCarousel items={realizations} />
+        <RealizationsCarousel items={realizations} data={home} />
       </div>
       <EuropeGlobeSection data={home} settings={settings} />
     </>

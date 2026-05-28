@@ -221,6 +221,77 @@ export const homePage = defineType({
       ],
     }),
 
+    defineField({
+      name: "productStepsLabel",
+      title: "Phase 1 — etykieta listy kroków (Wdrozenie krok po kroku)",
+      type: "localizedString",
+      group: "product",
+    }),
+    defineField({
+      name: "productSpecsHeadline",
+      title: "Phase 2 — nagłówek (Specyfikacja techniczna)",
+      type: "localizedString",
+      group: "product",
+    }),
+    defineField({
+      name: "productHardwareLabel",
+      title: "Phase 2 — etykieta tabeli (Hardware)",
+      type: "localizedString",
+      group: "product",
+    }),
+    defineField({
+      name: "productHardwareMinLabel",
+      title: "Phase 2 — etykieta kolumny Minimum",
+      type: "localizedString",
+      group: "product",
+    }),
+    defineField({
+      name: "productHardwareMaxLabel",
+      title: "Phase 2 — etykieta kolumny Maximum",
+      type: "localizedString",
+      group: "product",
+    }),
+    defineField({
+      name: "productHardwareRows",
+      title: "Phase 2 — wiersze tabeli Hardware",
+      type: "array",
+      group: "product",
+      of: [
+        {
+          type: "object",
+          name: "hwRow",
+          fields: [
+            defineField({
+              name: "label",
+              type: "localizedString",
+              title: "Etykieta (np. Liczba skrytek)",
+              validation: (rule) => rule.required(),
+            }),
+            defineField({
+              name: "min",
+              type: "string",
+              title: "Minimum (np. 39 szt)",
+              validation: (rule) => rule.required(),
+            }),
+            defineField({
+              name: "max",
+              type: "string",
+              title: "Maximum (np. 159 szt)",
+              validation: (rule) => rule.required(),
+            }),
+          ],
+          preview: {
+            select: { items: "label.translations" },
+            prepare: ({ items }) => {
+              const list = (items as { value?: string }[] | undefined) ?? [];
+              const first = list.find((i) => i?.value)?.value;
+              return { title: first ?? "(wiersz)" };
+            },
+          },
+        },
+      ],
+    }),
+
     /* RealizationsSection */
     defineField({
       name: "realizationsEyebrow",
@@ -407,25 +478,25 @@ export const homePage = defineType({
     }),
     defineField({
       name: "globalCtaNamePlaceholder",
-      title: "Formularz – placeholder „Imię i nazwisko"",
+      title: "Formularz – placeholder Imię i nazwisko",
       type: "localizedString",
       group: "global",
     }),
     defineField({
       name: "globalCtaEmailPlaceholder",
-      title: "Formularz – placeholder „E-mail"",
+      title: "Formularz – placeholder E-mail",
       type: "localizedString",
       group: "global",
     }),
     defineField({
       name: "globalCtaMessagePlaceholder",
-      title: "Formularz – placeholder „Wiadomość"",
+      title: "Formularz – placeholder Wiadomość",
       type: "localizedString",
       group: "global",
     }),
     defineField({
       name: "globalCtaSubmitLabel",
-      title: "Formularz – tekst przycisku „Wyślij"",
+      title: "Formularz – tekst przycisku Wyślij",
       type: "localizedString",
       group: "global",
     }),

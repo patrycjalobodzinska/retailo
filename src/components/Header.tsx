@@ -3,6 +3,8 @@
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import LanguageSwitcher from "./LanguageSwitcher";
+import { useLang } from "@/lib/i18n/LanguageProvider";
+import type { SiteSettings } from "@/lib/sanity/fetch";
 
 type NavItem = {
   label: string;
@@ -12,14 +14,35 @@ type NavItem = {
   vhOffset?: number;
 };
 
-const NAV_ITEMS: NavItem[] = [
+const NAV_ITEMS_FALLBACK: NavItem[] = [
   { label: "Rozwiazanie", target: "rozwiazanie", vhOffset: 0.15 },
   { label: "Realizacje", target: "realizacje", vhOffset: 0.05 },
   { label: "Kontakt", target: "kontakt" },
 ];
 
-export default function Header() {
+// vhOffset per target — przesunięcie scrolla dla docelowej kotwicy.
+const TARGET_OFFSETS: Record<string, number> = {
+  rozwiazanie: 0.15,
+  realizacje: 0.05,
+};
+
+export default function Header({
+  settings,
+}: { settings?: SiteSettings } = {}) {
+  const { t } = useLang();
   const pathname = usePathname();
+
+  const navItems: NavItem[] =
+    settings?.navigation && settings.navigation.length > 0
+      ? settings.navigation.map((n) => {
+          const target = (n.href || "").replace(/^#/, "");
+          return {
+            label: t(n.label) || target,
+            target,
+            vhOffset: TARGET_OFFSETS[target],
+          };
+        })
+      : NAV_ITEMS_FALLBACK;
   // Homepage (i test2 = klon homepage) uses the dark-pill variant nad
   // jasnym hero; każda inna trasa używa light variant nad ciemnym tłem.
   const isSubpage = pathname !== "/" && pathname !== "/test2";
@@ -116,7 +139,7 @@ export default function Header() {
             backdropFilter: "blur(14px)",
             WebkitBackdropFilter: "blur(14px)",
           }}>
-          {NAV_ITEMS.map((item) => (
+          {navItems.map((item) => (
             <a
               key={item.label}
               href={`#${item.target}`}
@@ -254,7 +277,7 @@ export default function Header() {
 
           {/* Nav list — numbered items with hairline dividers */}
           <nav className="relative z-[1] mt-[10dvh] flex flex-col px-[6vw]">
-            {NAV_ITEMS.map((item, i) => (
+            {navItems.map((item, i) => (
               <a
                 key={item.label}
                 href={`#${item.target}`}

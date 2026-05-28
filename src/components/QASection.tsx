@@ -83,27 +83,33 @@ function TileIcon({
   }
 }
 
+// Seed kolejność qaTiles: 0=Modularność, 1=Skalowalność, 2=Personalizacja,
+// 3=Uniwersalność, 4=Bezpieczeństwo, 5=Wydajność.
 const SMALL_TILES = [
   {
     kind: "Modularnosc",
+    seedIdx: 0,
     title: "Modularnosc",
     desc: "Wielkosc i liczba skrytek dostosowana do potrzeb i specyfiki branzy klienta.",
     accent: "#0086b0",
   },
   {
     kind: "Skalowalnosc",
+    seedIdx: 1,
     title: "Skalowalnosc",
     desc: "Mozliwosc instalowania dodatkowych modulow.",
     accent: "#34d399",
   },
   {
     kind: "Bezpieczenstwo",
+    seedIdx: 4,
     title: "Bezpieczenstwo",
     desc: "Bezdotykowa, bezkontaktowa obsluga zwieksza bezpieczenstwo klientow i sluzb sprzedazy.",
     accent: "#f59e0b",
   },
   {
     kind: "Uniwersalnosc",
+    seedIdx: 3,
     title: "Uniwersalnosc",
     desc: "Wymiary modulow w zgodzie ze standardami zabudow meblowych w retailu.",
     accent: "#a855f7",
@@ -126,6 +132,32 @@ export default function QASection({ data }: { data?: QAData } = {}) {
   const subtitle =
     t(data?.qaSubtitle ?? null) ||
     'PickUpWall to rozwiazanie do zamowien typu "pick up in store".';
+
+  // Lokalna helper — wyciąga tytuł/opis z data.qaTiles[seedIdx] z
+  // fallbackiem na hardcoded wartości.
+  const tileText = (seedIdx: number, fallbackTitle: string, fallbackDesc: string) => {
+    const d = data?.qaTiles?.[seedIdx];
+    return {
+      title: t(d?.title ?? null) || fallbackTitle,
+      desc: t(d?.description ?? null) || fallbackDesc,
+    };
+  };
+
+  // Zlokalizowane warianty kafelków.
+  const smallTiles = SMALL_TILES.map((tile) => {
+    const lt = tileText(tile.seedIdx, tile.title, tile.desc);
+    return { ...tile, title: lt.title, desc: lt.desc };
+  });
+  const personalizacja = tileText(
+    2,
+    "Personalizacja",
+    "Dedykowane grafiki i kolor obudowy. Opcjonalny ekran Digital Signage.",
+  );
+  const wydajnosc = tileText(
+    5,
+    "Wydajnosc",
+    "Odbior ponizej 15 sekund, krotsze kolejki i zwolnienie przestrzeni magazynowej zaplecza.",
+  );
 
   const sectionRef = useRef<HTMLElement>(null);
   const headerRef = useRef<HTMLDivElement>(null);
@@ -182,17 +214,17 @@ export default function QASection({ data }: { data?: QAData } = {}) {
   };
 
   const allMobileTiles = [
-    ...SMALL_TILES,
+    ...smallTiles,
     {
       kind: "Personalizacja",
-      title: "Personalizacja",
-      desc: "Dedykowane grafiki i kolor obudowy. Opcjonalny ekran Digital Signage.",
+      title: personalizacja.title,
+      desc: personalizacja.desc,
       accent: "#0086b0",
     },
     {
       kind: "Wydajnosc",
-      title: "Wydajnosc",
-      desc: "Odbior ponizej 15 sekund, krotsze kolejki i zwolnienie przestrzeni magazynowej zaplecza.",
+      title: wydajnosc.title,
+      desc: wydajnosc.desc,
       accent: "#0f0f0f",
     },
   ];
@@ -285,12 +317,12 @@ export default function QASection({ data }: { data?: QAData } = {}) {
                   lineHeight: 1.1,
                   letterSpacing: "-0.02em",
                 }}>
-                Personalizacja.
+                {personalizacja.title}.
               </h3>
               <p
                 className="m-0 text-[#5a5a5a] leading-relaxed font-light"
                 style={{ fontSize: "0.85rem", maxWidth: "150px" }}>
-                Dedykowane grafiki i kolor obudowy.
+                {personalizacja.desc}
               </p>
             </div>
 
@@ -373,24 +405,24 @@ export default function QASection({ data }: { data?: QAData } = {}) {
                   lineHeight: 1.1,
                   letterSpacing: "-0.015em",
                 }}>
-                Wydajnosc.
+                {wydajnosc.title}.
               </h3>
               <p
                 className="m-0 text-[#5a5a5a] leading-relaxed font-light"
                 style={{ fontSize: "0.88rem" }}>
-                Odbior ponizej 15 sekund, krotsze kolejki.
+                {wydajnosc.desc}
               </p>
             </div>
           </article>
 
           {/* Small tiles — grouped 2 per snap slide, stacked vertically. */}
-          {Array.from({ length: Math.ceil(SMALL_TILES.length / 2) }).map(
+          {Array.from({ length: Math.ceil(smallTiles.length / 2) }).map(
             (_, slideIdx) => (
               <div
                 key={`tile-slide-${slideIdx}`}
                 className="flex-none w-[82vw] snap-center flex flex-col gap-3"
                 style={{ minHeight: "320px" }}>
-                {SMALL_TILES.slice(slideIdx * 2, slideIdx * 2 + 2).map(
+                {smallTiles.slice(slideIdx * 2, slideIdx * 2 + 2).map(
                   (tile) => (
                     <article
                       key={tile.title}
@@ -436,7 +468,7 @@ export default function QASection({ data }: { data?: QAData } = {}) {
         {/* Pagination dots — tight under cards, inside shadow zone */}
         <div className="flex justify-center gap-2 -mt-2 px-[6vw]">
           {Array.from({
-            length: 2 + Math.ceil(SMALL_TILES.length / 2),
+            length: 2 + Math.ceil(smallTiles.length / 2),
           }).map((_, i) => (
             <button
               key={i}
@@ -566,13 +598,12 @@ export default function QASection({ data }: { data?: QAData } = {}) {
                   lineHeight: 1.1,
                   letterSpacing: "-0.02em",
                 }}>
-                Personalizacja.
+                {personalizacja.title}.
               </h3>
               <p
                 className="m-0 text-[#5a5a5a] leading-relaxed font-light"
                 style={{ fontSize: "0.95rem" }}>
-                Dedykowane grafiki i kolor obudowy. Opcjonalny ekran Digital
-                Signage pod brand klienta.
+                {personalizacja.desc}
               </p>
             </div>
 
@@ -658,13 +689,12 @@ export default function QASection({ data }: { data?: QAData } = {}) {
                   lineHeight: 1.1,
                   letterSpacing: "-0.015em",
                 }}>
-                Wydajnosc.
+                {wydajnosc.title}.
               </h3>
               <p
                 className="m-0 text-[#5a5a5a] leading-relaxed font-light max-w-[360px]"
                 style={{ fontSize: "0.95rem" }}>
-                Odbior ponizej 15 sekund, krotsze kolejki i zwolnienie
-                przestrzeni magazynowej zaplecza.
+                {wydajnosc.desc}
               </p>
             </div>
           </article>
@@ -672,7 +702,7 @@ export default function QASection({ data }: { data?: QAData } = {}) {
 
         {/* Small tiles row — 4 cards */}
         <div ref={tilesRef} className="grid grid-cols-4 gap-5">
-          {SMALL_TILES.map((tile) => (
+          {smallTiles.map((tile) => (
             <article
               key={tile.title}
               className="relative bg-white rounded-2xl p-6 flex flex-col gap-3"

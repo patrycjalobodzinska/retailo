@@ -61,6 +61,16 @@ export type HomePage = {
   productSpecs?: Array<{ label: LocalizedField; value: LocalizedField }>;
   productBenefitsHeadline?: LocalizedField;
   productBenefits?: LocalizedItem[];
+  productStepsLabel?: LocalizedField;
+  productSpecsHeadline?: LocalizedField;
+  productHardwareLabel?: LocalizedField;
+  productHardwareMinLabel?: LocalizedField;
+  productHardwareMaxLabel?: LocalizedField;
+  productHardwareRows?: Array<{
+    label: LocalizedField;
+    min: string;
+    max: string;
+  }>;
 
   realizationsEyebrow?: LocalizedField;
   realizationsHeadline?: LocalizedField;

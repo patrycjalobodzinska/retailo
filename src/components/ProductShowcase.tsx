@@ -3,10 +3,78 @@
 import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { useLang } from "@/lib/i18n/LanguageProvider";
+import type { HomePage } from "@/lib/sanity/fetch";
 
 gsap.registerPlugin(ScrollTrigger);
 
-export default function ProductShowcase() {
+const STEPS_FALLBACK = [
+  [
+    "Integracja",
+    "Gwarantujemy elastycznosc w integracji — w sposobie komunikacji, jak i zakresie przesylanych danych.",
+  ],
+  [
+    "RODO",
+    "Zagwarantujemy zgodnosc z zasadami przetwarzania danych osobowych.",
+  ],
+  [
+    "Instalacja",
+    "Instalacja i konfiguracja systemu z klientem, upewnienie sie czy zakres jest adekwatny do oczekiwan.",
+  ],
+  [
+    "Wsparcie",
+    "Dedykowane pakiety serwisowe i rozwoj systemu zapewniajace trwalosc i stabilnosc rozwiazania.",
+  ],
+] as const;
+
+const SPECS_FALLBACK = [
+  ["Jednostka glowna", "39 skrytek + ekran"],
+  ["Jednostka rozszerzajaca", "40 skrytek"],
+  ["Ekran", '21.5" dotykowy'],
+  ["Integracja", "API / Middleware"],
+] as const;
+
+const HARDWARE_FALLBACK = [
+  ["Liczba skrytek", "39 szt", "159 szt"],
+  ["Szerokosc", "1 m", "4 m"],
+  ["Wysokosc", "2.2 m", "2.2 m"],
+  ["Glebokosc", "0.5 m", "0.5 m"],
+] as const;
+
+export default function ProductShowcase({
+  data,
+}: { data?: HomePage } = {}) {
+  const { t } = useLang();
+  const eyebrow = t(data?.productEyebrow ?? null) || "Nasze rozwiazanie";
+  const headline = t(data?.productHeadline ?? null) || "PickUpWall";
+  const stepsLabel =
+    t(data?.productStepsLabel ?? null) || "Wdrozenie krok po kroku";
+  const brandLabel = t(data?.productBrandLabel ?? null) || "retailo.";
+  const specsHeadline =
+    t(data?.productSpecsHeadline ?? null) || "Specyfikacja techniczna";
+  const hardwareLabel = t(data?.productHardwareLabel ?? null) || "Hardware";
+  const hardwareMinLabel =
+    t(data?.productHardwareMinLabel ?? null) || "Minimum";
+  const hardwareMaxLabel =
+    t(data?.productHardwareMaxLabel ?? null) || "Maximum";
+
+  const steps: Array<[string, string]> =
+    data?.productFeatures && data.productFeatures.length > 0
+      ? data.productFeatures.map((f) => [
+          t(f.title) || "",
+          t(f.description) || "",
+        ])
+      : STEPS_FALLBACK.map((s) => [s[0], s[1]] as [string, string]);
+  const specs: Array<[string, string]> =
+    data?.productSpecs && data.productSpecs.length > 0
+      ? data.productSpecs.map((s) => [t(s.label) || "", t(s.value) || ""])
+      : SPECS_FALLBACK.map((s) => [s[0], s[1]] as [string, string]);
+  const hardwareRows: Array<[string, string, string]> =
+    data?.productHardwareRows && data.productHardwareRows.length > 0
+      ? data.productHardwareRows.map((r) => [t(r.label) || "", r.min, r.max])
+      : HARDWARE_FALLBACK.map(
+          (r) => [r[0], r[1], r[2]] as [string, string, string],
+        );
   const sectionRef = useRef<HTMLElement>(null);
   const phase1Ref = useRef<HTMLDivElement>(null);
   const phase2Ref = useRef<HTMLDivElement>(null);
@@ -144,10 +212,10 @@ export default function ProductShowcase() {
                 <p
                   className="text-[#2a2a2a]/80 font-light m-0 mb-2 leading-tight max-lg:text-[1.05rem] max-lg:mb-2"
                   style={{ fontSize: "clamp(1.2rem, 2vw, 1.8rem)" }}>
-                  Nasze rozwiazanie
+                  {eyebrow}
                   <br />
                   <span className="font-semibold" style={{ color: "#0086b0" }}>
-                    PickUpWall
+                    {headline}
                   </span>
                 </p>
               </div>
@@ -161,27 +229,10 @@ export default function ProductShowcase() {
                       fontSize: "clamp(0.78rem, 0.9vw, 0.92rem)",
                       color: "#0086b0",
                     }}>
-                    Wdrozenie krok po kroku
+                    {stepsLabel}
                   </p>
                 </li>
-                {[
-                  [
-                    "Integracja",
-                    "Gwarantujemy elastycznosc w integracji — w sposobie komunikacji, jak i zakresie przesylanych danych.",
-                  ],
-                  [
-                    "RODO",
-                    "Zagwarantujemy zgodnosc z zasadami przetwarzania danych osobowych.",
-                  ],
-                  [
-                    "Instalacja",
-                    "Instalacja i konfiguracja systemu z klientem, upewnienie sie czy zakres jest adekwatny do oczekiwan.",
-                  ],
-                  [
-                    "Wsparcie",
-                    "Dedykowane pakiety serwisowe i rozwoj systemu zapewniajace trwalosc i stabilnosc rozwiazania.",
-                  ],
-                ].map(([title, desc], i) => (
+                {steps.map(([title, desc], i) => (
                   <li
                     key={title}
                     className="flex items-start gap-4 text-left max-lg:gap-3">
@@ -258,22 +309,17 @@ export default function ProductShowcase() {
                     fontSize: "clamp(0.85rem, 1.1vw, 1.1rem)",
                     color: "#0086b0",
                   }}>
-                  retailo.
+                  {brandLabel}
                 </h2>
                 <p
                   className="font-bold m-0 mb-7 leading-none tracking-tighter text-[#2a2a2a] max-lg:mb-5"
                   style={{ fontSize: "clamp(1.8rem, 3.2vw, 3.2rem)" }}>
-                  Specyfikacja techniczna
+                  {specsHeadline}
                 </p>
 
                 {/* Component-level specs */}
                 <div className="grid grid-cols-2 gap-x-8 gap-y-4 mb-8 max-lg:mb-6">
-                  {[
-                    ["Jednostka glowna", "39 skrytek + ekran"],
-                    ["Jednostka rozszerzajaca", "40 skrytek"],
-                    ["Ekran", '21.5" dotykowy'],
-                    ["Integracja", "API / Middleware"],
-                  ].map(([label, value]) => (
+                  {specs.map(([label, value]) => (
                     <div key={label} className="flex flex-col gap-1">
                       <span
                         className="text-[0.68rem] font-medium uppercase tracking-widest"
@@ -297,25 +343,20 @@ export default function ProductShowcase() {
                       color: "#0086b0",
                       fontSize: "clamp(1rem, 1.2vw, 1.2rem)",
                     }}>
-                    Hardware
+                    {hardwareLabel}
                   </span>
                   <span
                     className="text-right uppercase tracking-widest font-medium text-[#2a2a2a]/60"
                     style={{ fontSize: "0.68rem" }}>
-                    Minimum
+                    {hardwareMinLabel}
                   </span>
                   <span
                     className="text-right uppercase tracking-widest font-medium text-[#2a2a2a]/60"
                     style={{ fontSize: "0.68rem" }}>
-                    Maximum
+                    {hardwareMaxLabel}
                   </span>
                 </div>
-                {[
-                  ["Liczba skrytek", "39 szt", "159 szt"],
-                  ["Szerokosc", "1 m", "4 m"],
-                  ["Wysokosc", "2.2 m", "2.2 m"],
-                  ["Glebokosc", "0.5 m", "0.5 m"],
-                ].map(([label, min, max], i, arr) => (
+                {hardwareRows.map(([label, min, max], i, arr) => (
                   <div
                     key={label}
                     className={`grid grid-cols-[1.5fr_1fr_1fr] items-center gap-x-6 py-3 ${

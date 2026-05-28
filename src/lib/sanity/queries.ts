@@ -67,6 +67,16 @@ export const HOME_PAGE_QUERY = /* groq */ `
       title ${localized},
       description ${localized}
     },
+    productStepsLabel ${localized},
+    productSpecsHeadline ${localized},
+    productHardwareLabel ${localized},
+    productHardwareMinLabel ${localized},
+    productHardwareMaxLabel ${localized},
+    productHardwareRows[]{
+      label ${localized},
+      min,
+      max
+    },
 
     realizationsEyebrow ${localized},
     realizationsHeadline ${localized},

@@ -166,10 +166,21 @@ async function run() {
     logoText: "retailo.",
     metaTitle: "Retailo",
     navigation: [
-      { _key: "n1", href: "#rozwiazanie", label: t("Rozwiązanie") },
-      { _key: "n2", href: "#system", label: t("System") },
-      { _key: "n3", href: "#wdrozenia", label: t("Wdrożenia") },
-      { _key: "n4", href: "#kontakt", label: t("Kontakt") },
+      {
+        _key: "n1",
+        href: "#rozwiazanie",
+        label: t({ pl: "Rozwiązanie", en: "Solution" }),
+      },
+      {
+        _key: "n2",
+        href: "#realizacje",
+        label: t({ pl: "Realizacje", en: "Realizations" }),
+      },
+      {
+        _key: "n3",
+        href: "#kontakt",
+        label: t({ pl: "Kontakt", en: "Contact" }),
+      },
     ],
     ctaLabel: t("Zapytaj o ofertę"),
     ctaHref: "#kontakt",
@@ -247,45 +258,108 @@ async function run() {
       },
     ],
 
-    productEyebrow: t("Nasze rozwiązanie"),
+    productEyebrow: t({ pl: "Nasze rozwiązanie", en: "Our solution" }),
     productHeadline: t("PickUpWall"),
+    productStepsLabel: t({
+      pl: "Wdrozenie krok po kroku",
+      en: "Step by step rollout",
+    }),
     productFeatures: [
       {
         ...k("f1"),
-        title: t("Modularność"),
-        description: tt(
-          "Wielkość i liczba skrytek dostosowana do potrzeb i specyfiki branży klienta",
-        ),
+        title: t({ pl: "Integracja", en: "Integration" }),
+        description: tt({
+          pl: "Gwarantujemy elastyczność w integracji — w sposobie komunikacji, jak i zakresie przesyłanych danych.",
+          en: "We guarantee flexibility in integration — both in the communication method and in the scope of data exchanged.",
+        }),
       },
       {
         ...k("f2"),
-        title: t("Skalowalność"),
-        description: tt("Możliwość instalowania dodatkowych modułów"),
+        title: t("RODO"),
+        description: tt({
+          pl: "Zagwarantujemy zgodność z zasadami przetwarzania danych osobowych.",
+          en: "We ensure full compliance with personal data processing regulations (GDPR).",
+        }),
       },
       {
         ...k("f3"),
-        title: t("Personalizacja"),
-        description: tt(
-          "Dedykowane grafiki i kolor obudowy. Opcjonalny ekran Digital Signage",
-        ),
+        title: t({ pl: "Instalacja", en: "Installation" }),
+        description: tt({
+          pl: "Instalacja i konfiguracja systemu z klientem, upewnienie się czy zakres jest adekwatny do oczekiwań.",
+          en: "On-site installation and configuration alongside the client, validating that scope meets expectations.",
+        }),
       },
       {
         ...k("f4"),
-        title: t("Uniwersalność"),
-        description: tt(
-          "Wymiary modułów w zgodzie ze standardami zabudów meblowych w retailu",
-        ),
+        title: t({ pl: "Wsparcie", en: "Support" }),
+        description: tt({
+          pl: "Dedykowane pakiety serwisowe i rozwój systemu zapewniające trwałość i stabilność rozwiązania.",
+          en: "Tailored service packages and ongoing system evolution to ensure long-term reliability and stability.",
+        }),
       },
     ],
     productBrandLabel: t("retailo."),
     productBrandName: t("PickUpWall"),
+    productSpecsHeadline: t({
+      pl: "Specyfikacja techniczna",
+      en: "Technical specification",
+    }),
     productSpecs: [
-      { ...k("s1"), label: t("Typ"), value: t("Automat paczkowy") },
-      { ...k("s2"), label: t("Skrytki"), value: t("Modularna konfiguracja") },
-      { ...k("s3"), label: t("Ekran"), value: t('21.5" dotykowy') },
-      { ...k("s4"), label: t("Odbiór"), value: t("< 15 sekund") },
-      { ...k("s5"), label: t("Integracja"), value: t("API / Middleware") },
-      { ...k("s6"), label: t("Serwis"), value: t("24/7 monitoring") },
+      {
+        ...k("s1"),
+        label: t({ pl: "Jednostka główna", en: "Main unit" }),
+        value: t({
+          pl: "39 skrytek + ekran",
+          en: "39 lockers + screen",
+        }),
+      },
+      {
+        ...k("s2"),
+        label: t({
+          pl: "Jednostka rozszerzająca",
+          en: "Extension unit",
+        }),
+        value: t({ pl: "40 skrytek", en: "40 lockers" }),
+      },
+      {
+        ...k("s3"),
+        label: t({ pl: "Ekran", en: "Display" }),
+        value: t({ pl: '21.5" dotykowy', en: '21.5" touchscreen' }),
+      },
+      {
+        ...k("s4"),
+        label: t({ pl: "Integracja", en: "Integration" }),
+        value: t("API / Middleware"),
+      },
+    ],
+    productHardwareLabel: t("Hardware"),
+    productHardwareMinLabel: t({ pl: "Minimum", en: "Minimum" }),
+    productHardwareMaxLabel: t({ pl: "Maximum", en: "Maximum" }),
+    productHardwareRows: [
+      {
+        ...k("hw1"),
+        label: t({ pl: "Liczba skrytek", en: "Locker count" }),
+        min: "39 szt",
+        max: "159 szt",
+      },
+      {
+        ...k("hw2"),
+        label: t({ pl: "Szerokość", en: "Width" }),
+        min: "1 m",
+        max: "4 m",
+      },
+      {
+        ...k("hw3"),
+        label: t({ pl: "Wysokość", en: "Height" }),
+        min: "2.2 m",
+        max: "2.2 m",
+      },
+      {
+        ...k("hw4"),
+        label: t({ pl: "Głębokość", en: "Depth" }),
+        min: "0.5 m",
+        max: "0.5 m",
+      },
     ],
     productBenefitsHeadline: t("Korzyści wdrożenia"),
     productBenefits: [
@@ -319,12 +393,19 @@ async function run() {
       },
     ],
 
-    realizationsEyebrow: t("Realizacje"),
-    realizationsHeadline: t("PickUpWall w akcji."),
-    realizationsIntro: tt(
-      "Wybrane wdrożenia PickUpWall w punktach sprzedaży, galeriach i biurowcach w Polsce i za granicą.",
-    ),
-    realizationsCtaLabel: t("Zobacz wszystkie realizacje"),
+    realizationsEyebrow: t({ pl: "Realizacje", en: "Realizations" }),
+    realizationsHeadline: t({
+      pl: "Współpracujemy z największymi markami.",
+      en: "We partner with the biggest brands.",
+    }),
+    realizationsIntro: tt({
+      pl: "PickUpWall wdrażany w salonach kosmetycznych, fashion i elektroniki.",
+      en: "PickUpWall deployed in cosmetics, fashion and electronics stores.",
+    }),
+    realizationsCtaLabel: t({
+      pl: "Zobacz wszystkie realizacje",
+      en: "See all realizations",
+    }),
     realizationsCtaHref: "/realizacje",
     realizationsSystemEyebrow: t("System obsługi zamówień"),
     realizationsSystemHeadline: t("PickUpWall"),

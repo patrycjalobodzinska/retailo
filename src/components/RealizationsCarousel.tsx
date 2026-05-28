@@ -4,7 +4,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
-import type { Realization } from "@/lib/sanity/fetch";
+import type { HomePage, Realization } from "@/lib/sanity/fetch";
+import { useLang } from "@/lib/i18n/LanguageProvider";
 
 // Mobile: cards take most of the viewport with a small side peek.
 // Desktop overridden via responsive Tailwind classes below.
@@ -18,6 +19,7 @@ type RealizationsCarouselProps = {
   excludeSlug?: string;
   variant?: "light" | "dark";
   items?: Realization[];
+  data?: HomePage;
 };
 
 export default function RealizationsCarousel({
@@ -25,8 +27,19 @@ export default function RealizationsCarousel({
   excludeSlug,
   variant = "light",
   items: itemsProp,
+  data,
 }: RealizationsCarouselProps = {}) {
   const router = useRouter();
+  const { t } = useLang();
+  const eyebrow = t(data?.realizationsEyebrow ?? null) || "Realizacje";
+  const headlinePrefix =
+    t(data?.realizationsHeadline ?? null) ||
+    "Wspolpracujemy z najwiekszymi markami.";
+  const intro =
+    t(data?.realizationsIntro ?? null) ||
+    "PickUpWall wdrazany w salonach kosmetycznych, fashion i elektroniki.";
+  const ctaLabel =
+    t(data?.realizationsCtaLabel ?? null) || "Zobacz wszystkie realizacje";
   const items = (
     excludeSlug
       ? (itemsProp ?? []).filter((r) => r.slug !== excludeSlug)
@@ -102,7 +115,7 @@ export default function RealizationsCarousel({
         <p
           className="m-0 mb-2 uppercase tracking-[0.3em] font-semibold text-[#7a7a7a]"
           style={{ fontSize: "0.62rem" }}>
-          Realizacje
+          {eyebrow}
         </p>
         <h2
           className="m-0 font-bold tracking-tight text-[#0f0f0f]"
@@ -111,7 +124,6 @@ export default function RealizationsCarousel({
             lineHeight: 1.15,
             letterSpacing: "-0.02em",
           }}>
-          Wspolpracujemy z{" "}
           <span
             className="font-extrabold"
             style={{
@@ -121,9 +133,8 @@ export default function RealizationsCarousel({
               WebkitTextFillColor: "transparent",
               backgroundClip: "text",
             }}>
-            najwiekszymi markami
+            {headlinePrefix}
           </span>
-          .
         </h2>
         <p
           className="m-0 mt-2.5 mx-auto font-light text-[#5a5a5a] leading-relaxed"
@@ -131,7 +142,7 @@ export default function RealizationsCarousel({
             fontSize: "clamp(0.82rem, 0.9vw, 0.92rem)",
             maxWidth: "480px",
           }}>
-          PickUpWall wdrazany w salonach kosmetycznych, fashion i elektroniki.
+          {intro}
         </p>
       </div>
       )}
@@ -460,7 +471,7 @@ export default function RealizationsCarousel({
             href="/realizacje"
             className="inline-flex items-center gap-2 rounded-full bg-[#0a2a2e] px-6 py-3 text-xs font-semibold uppercase tracking-[0.18em] text-white no-underline transition hover:bg-[#16404a] md:bg-transparent md:text-[#3a5a60] md:px-0 md:py-0 md:font-medium md:hover:bg-transparent md:hover:text-[#0a2a2e]"
           >
-            Zobacz wszystkie realizacje
+            {ctaLabel}
             <svg
               width="14"
               height="14"
