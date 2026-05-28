@@ -28,7 +28,7 @@ const FALLBACK_TITLE =
   "Retailo — Automatyczne systemy odbioru przesyłek PickUpWall";
 const FALLBACK_DESCRIPTION =
   "PickUpWall — automatyczne, modułowe systemy odbioru przesyłek pick-up in store dla sieci retailu. Projektujemy, produkujemy i wdrażamy w całej Europie.";
-const FALLBACK_OG_IMAGE = "/model3_retailo.png";
+const FALLBACK_OG_IMAGE = "/hero3.jpeg";
 const FALLBACK_URL = "https://retailo.pl";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -51,6 +51,11 @@ export async function generateMetadata(): Promise<Metadata> {
     metadataBase: new URL(baseUrl),
     title,
     description,
+    icons: {
+      icon: "/favicon.ico",
+      shortcut: "/favicon.ico",
+      apple: "/favicon.ico",
+    },
     openGraph: {
       type: "website",
       url: baseUrl,
