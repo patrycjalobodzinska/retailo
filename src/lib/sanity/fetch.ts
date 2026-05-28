@@ -32,6 +32,13 @@ export type SiteSettings = {
   }>;
   ctaLabel?: LocalizedField;
   ctaHref?: string;
+  footerTagline?: LocalizedField;
+  footerEmail?: string;
+  footerPhone?: string;
+  footerAddress?: LocalizedField;
+  footerCopyright?: LocalizedField;
+  footerPrivacyLabel?: LocalizedField;
+  footerTermsLabel?: LocalizedField;
 } | null;
 
 export type LocalizedItem = { title: LocalizedField; description: LocalizedField };
@@ -72,6 +79,15 @@ export type HomePage = {
   globalEyebrow?: LocalizedField;
   globalHeadline?: LocalizedField;
   globalIntro?: LocalizedField;
+  globalCountriesLeft?: LocalizedField[];
+  globalCountriesRight?: LocalizedField[];
+  globalCtaToggleLabel?: LocalizedField;
+  globalCtaTitle?: LocalizedField;
+  globalCtaSubtitle?: LocalizedField;
+  globalCtaNamePlaceholder?: LocalizedField;
+  globalCtaEmailPlaceholder?: LocalizedField;
+  globalCtaMessagePlaceholder?: LocalizedField;
+  globalCtaSubmitLabel?: LocalizedField;
 } | null;
 
 // Sanity content rarely changes mid-day; one-hour cache trades freshness

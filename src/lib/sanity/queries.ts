@@ -25,7 +25,14 @@ export const SITE_SETTINGS_QUERY = /* groq */ `
       label ${localized}
     },
     ctaLabel ${localized},
-    ctaHref
+    ctaHref,
+    footerTagline ${localized},
+    footerEmail,
+    footerPhone,
+    footerAddress ${localized},
+    footerCopyright ${localized},
+    footerPrivacyLabel ${localized},
+    footerTermsLabel ${localized}
   }
 `;
 
@@ -83,7 +90,16 @@ export const HOME_PAGE_QUERY = /* groq */ `
 
     globalEyebrow ${localized},
     globalHeadline ${localized},
-    globalIntro ${localized}
+    globalIntro ${localized},
+    globalCountriesLeft[] ${localized},
+    globalCountriesRight[] ${localized},
+    globalCtaToggleLabel ${localized},
+    globalCtaTitle ${localized},
+    globalCtaSubtitle ${localized},
+    globalCtaNamePlaceholder ${localized},
+    globalCtaEmailPlaceholder ${localized},
+    globalCtaMessagePlaceholder ${localized},
+    globalCtaSubmitLabel ${localized}
   }
 `;
 

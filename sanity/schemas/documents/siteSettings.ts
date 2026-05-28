@@ -68,6 +68,43 @@ export const siteSettings = defineType({
       type: "string",
       initialValue: "#kontakt",
     }),
+
+    /* Footer */
+    defineField({
+      name: "footerTagline",
+      title: "Footer – podtytuł pod logo",
+      type: "localizedString",
+    }),
+    defineField({
+      name: "footerEmail",
+      title: "Footer – e-mail kontaktowy",
+      type: "string",
+    }),
+    defineField({
+      name: "footerPhone",
+      title: "Footer – telefon kontaktowy",
+      type: "string",
+    }),
+    defineField({
+      name: "footerAddress",
+      title: "Footer – adres",
+      type: "localizedString",
+    }),
+    defineField({
+      name: "footerCopyright",
+      title: "Footer – copyright",
+      type: "localizedString",
+    }),
+    defineField({
+      name: "footerPrivacyLabel",
+      title: "Footer – etykieta linku „Polityka prywatnosci”",
+      type: "localizedString",
+    }),
+    defineField({
+      name: "footerTermsLabel",
+      title: "Footer – etykieta linku „Regulamin”",
+      type: "localizedString",
+    }),
   ],
   preview: {
     prepare: () => ({ title: "Ustawienia strony" }),

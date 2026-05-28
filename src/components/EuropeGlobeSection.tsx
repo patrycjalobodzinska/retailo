@@ -4,6 +4,8 @@ import { useEffect, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { useLang } from "@/lib/i18n/LanguageProvider";
+import type { HomePage, SiteSettings } from "@/lib/sanity/fetch";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -11,22 +13,24 @@ const EuropeGlobeInner = dynamic(() => import("./EuropeGlobeInner"), {
   ssr: false,
 });
 
-const LEFT_COUNTRIES = [
-  { name: "Polska", flag: "🇵🇱" },
-  { name: "Niemcy", flag: "🇩🇪" },
-  { name: "Francja", flag: "🇫🇷" },
-  { name: "Hiszpania", flag: "🇪🇸" },
-  { name: "Wlochy", flag: "🇮🇹" },
-  { name: "Wielka Brytania", flag: "🇬🇧" },
+// Flagi nie podlegają tłumaczeniu — zawsze takie same na pozycjach 0..5.
+const LEFT_FLAGS = ["🇵🇱", "🇩🇪", "🇫🇷", "🇪🇸", "🇮🇹", "🇬🇧"];
+const RIGHT_FLAGS = ["🇨🇿", "🇸🇰", "🇦🇹", "🇷🇴", "🇸🇪", "🇳🇱"];
+const LEFT_COUNTRIES_FALLBACK = [
+  "Polska",
+  "Niemcy",
+  "Francja",
+  "Hiszpania",
+  "Wlochy",
+  "Wielka Brytania",
 ];
-
-const RIGHT_COUNTRIES = [
-  { name: "Czechy", flag: "🇨🇿" },
-  { name: "Slowacja", flag: "🇸🇰" },
-  { name: "Austria", flag: "🇦🇹" },
-  { name: "Rumunia", flag: "🇷🇴" },
-  { name: "Szwecja", flag: "🇸🇪" },
-  { name: "Holandia", flag: "🇳🇱" },
+const RIGHT_COUNTRIES_FALLBACK = [
+  "Czechy",
+  "Slowacja",
+  "Austria",
+  "Rumunia",
+  "Szwecja",
+  "Holandia",
 ];
 
 const SECTION_SCROLL_VH = 130;
@@ -36,7 +40,55 @@ const COUNTRY_SCROLL_PROGRESS = 0.18;
 const COUNTRY_STAGGER_SEC = 0.12;
 const COUNTRY_ITEM_DURATION = 0.78;
 
-export default function EuropeGlobeSection() {
+export default function EuropeGlobeSection({
+  data,
+  settings,
+}: { data?: HomePage; settings?: SiteSettings } = {}) {
+  const { t } = useLang();
+  const eyebrow = t(data?.globalEyebrow ?? null) || "Wdrozenia w calej Europie";
+  const headline = t(data?.globalHeadline ?? null) || "GLOBAL";
+  const intro = t(data?.globalIntro ?? null) || "";
+  const ctaToggleLabel =
+    t(data?.globalCtaToggleLabel ?? null) || "Porozmawiajmy";
+  const ctaTitle = t(data?.globalCtaTitle ?? null) || "Napisz do nas";
+  const ctaSubtitle =
+    t(data?.globalCtaSubtitle ?? null) || "Odezwiemy się w ciągu 24h.";
+  const ctaName =
+    t(data?.globalCtaNamePlaceholder ?? null) || "Imię i nazwisko";
+  const ctaEmail = t(data?.globalCtaEmailPlaceholder ?? null) || "E-mail";
+  const ctaMessage =
+    t(data?.globalCtaMessagePlaceholder ?? null) || "Wiadomość...";
+  const ctaSubmit = t(data?.globalCtaSubmitLabel ?? null) || "Wyślij";
+  const footerTagline =
+    t(settings?.footerTagline ?? null) || "Automaty paczkowe";
+  const footerEmail = settings?.footerEmail || "info@retailo.pl";
+  const footerPhone = settings?.footerPhone || "+48 123 456 789";
+  const footerAddress =
+    t(settings?.footerAddress ?? null) ||
+    "ul. Przykładowa 10, 00-001 Warszawa";
+  const footerCopyright =
+    t(settings?.footerCopyright ?? null) || "© 2026 retailo";
+  const footerPrivacyLabel =
+    t(settings?.footerPrivacyLabel ?? null) || "Polityka prywatności";
+  const footerTermsLabel =
+    t(settings?.footerTermsLabel ?? null) || "Regulamin";
+
+  const leftCountries = (data?.globalCountriesLeft ?? []).map((f, i) => ({
+    flag: LEFT_FLAGS[i] ?? "🏳",
+    name: t(f) || LEFT_COUNTRIES_FALLBACK[i] || "",
+  }));
+  const rightCountries = (data?.globalCountriesRight ?? []).map((f, i) => ({
+    flag: RIGHT_FLAGS[i] ?? "🏳",
+    name: t(f) || RIGHT_COUNTRIES_FALLBACK[i] || "",
+  }));
+  const leftCountriesList = LEFT_COUNTRIES_FALLBACK.map((name, i) => ({
+    flag: LEFT_FLAGS[i] ?? "🏳",
+    name,
+  }));
+  const rightCountriesList = RIGHT_COUNTRIES_FALLBACK.map((name, i) => ({
+    flag: RIGHT_FLAGS[i] ?? "🏳",
+    name,
+  }));
   const wrapRef = useRef<HTMLDivElement>(null);
   const sectionRef = useRef<HTMLDivElement>(null);
   const introRef = useRef<HTMLDivElement>(null);
@@ -48,6 +100,11 @@ export default function EuropeGlobeSection() {
   const ctaRef = useRef<HTMLDivElement>(null);
   const [mobileCtaOpen, setMobileCtaOpen] = useState(false);
   const [size, setSize] = useState(760);
+  // Globus jest ciężki (MapLibre + 488KB geojson) — ładujemy go dopiero
+  // gdy sekcja jest blisko viewportu. Rooot margin 800px = trigger
+  // wcześniej, żeby przy zwykłej szybkości scrolla globus zdążył się
+  // zainicjalizować.
+  const [globeReady, setGlobeReady] = useState(false);
 
   useEffect(() => {
     const update = () =>
@@ -56,6 +113,25 @@ export default function EuropeGlobeSection() {
     window.addEventListener("resize", update);
     return () => window.removeEventListener("resize", update);
   }, []);
+
+  useEffect(() => {
+    if (globeReady) return;
+    const el = wrapRef.current;
+    if (!el) return;
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) {
+            setGlobeReady(true);
+            io.disconnect();
+          }
+        }
+      },
+      { rootMargin: "800px" },
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, [globeReady]);
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -78,41 +154,41 @@ export default function EuropeGlobeSection() {
         window.matchMedia("(max-width: 1023px)").matches;
       const leftItems = Array.from(leftRef.current?.children || []);
       const rightItems = Array.from(rightRef.current?.children || []);
+
       if (isMobile) {
         gsap.set([...leftItems, ...rightItems], { x: 0, opacity: 1 });
       } else {
         gsap.set(leftItems, { x: -22, opacity: 0 });
         gsap.set(rightItems, { x: 22, opacity: 0 });
-      }
 
-      const maxLen = Math.max(leftItems.length, rightItems.length);
-      const countryTl = gsap.timeline({ paused: true });
-      for (let i = 0; i < maxLen; i++) {
-        const t = i * COUNTRY_STAGGER_SEC;
-        if (leftItems[i]) {
-          countryTl.to(
-            leftItems[i],
-            { x: 0, opacity: 1, duration: COUNTRY_ITEM_DURATION, ease: "power3.out" },
-            t,
-          );
-        }
-        if (rightItems[i]) {
-          countryTl.to(
-            rightItems[i],
-            { x: 0, opacity: 1, duration: COUNTRY_ITEM_DURATION, ease: "power3.out" },
-            t + 0.05,
-          );
-        }
+        // Reveal po wejściu sekcji w viewport.
+        const badgesIo = new IntersectionObserver(
+          (entries) => {
+            for (const entry of entries) {
+              if (entry.isIntersecting) {
+                gsap.to(leftItems, {
+                  x: 0,
+                  opacity: 1,
+                  duration: COUNTRY_ITEM_DURATION,
+                  ease: "power3.out",
+                  stagger: COUNTRY_STAGGER_SEC,
+                });
+                gsap.to(rightItems, {
+                  x: 0,
+                  opacity: 1,
+                  duration: COUNTRY_ITEM_DURATION,
+                  ease: "power3.out",
+                  stagger: COUNTRY_STAGGER_SEC,
+                  delay: 0.05,
+                });
+                badgesIo.disconnect();
+              }
+            }
+          },
+          { threshold: 0.25 },
+        );
+        if (sectionRef.current) badgesIo.observe(sectionRef.current);
       }
-
-      ScrollTrigger.create({
-        trigger: wrapRef.current,
-        start: `${Math.round(COUNTRY_SCROLL_PROGRESS * 100)}% top`,
-        end: "bottom bottom",
-        invalidateOnRefresh: true,
-        onEnter: () => countryTl.timeScale(1).play(),
-        onEnterBack: () => countryTl.timeScale(1).play(),
-      });
 
       gsap.set(footerRef.current, { autoAlpha: 0, yPercent: 100 });
       gsap.set(ctaRef.current, { autoAlpha: 0, y: 40 });
@@ -168,7 +244,7 @@ export default function EuropeGlobeSection() {
           <p
             className="flex items-center gap-4 text-white/80 tracking-wide m-3 max-md:gap-2 px-6 max-md:flex-wrap max-md:justify-center"
             style={{ fontSize: "clamp(1.1rem, 1.8vw, 1.5rem)" }}>
-            Wdrozenia w calej Europie
+            {eyebrow}
             <span
               className="block w-[60px] h-px"
               style={{ background: "rgba(89,191,200,0.3)" }}
@@ -193,21 +269,21 @@ export default function EuropeGlobeSection() {
             backgroundClip: "text",
             WebkitTextFillColor: "transparent",
           }}>
-          GLOBAL
+          {headline}
         </div>
 
         {/* Mapa 3D (kolorowe kontynenty + neonowe piny) zamiast globusa. */}
         <div
           ref={globeWrapRef}
           className="absolute left-1/2 top-[36vh] z-[3] -translate-x-1/2 md:top-[30vh]">
-          <EuropeGlobeInner width={size} height={size} />
+          {globeReady && <EuropeGlobeInner width={size} height={size} />}
         </div>
 
         {/* Left countries */}
         <div
           ref={leftRef}
           className="absolute z-[4] left-[4vw] top-[34%] -translate-y-1/2 flex flex-col gap-4 max-lg:gap-2 max-lg:left-[3vw] max-lg:top-[52%]">
-          {LEFT_COUNTRIES.map((c) => (
+          {leftCountriesList.map((c) => (
             <div
               key={c.name}
               className="flex items-center gap-2.5 px-4 py-2 bg-white/5 backdrop-blur-lg border border-[#59bfc8]/20 rounded-xl opacity-0 max-lg:px-2.5 max-lg:py-1.5 max-lg:gap-1.5">
@@ -223,7 +299,7 @@ export default function EuropeGlobeSection() {
         <div
           ref={rightRef}
           className="absolute z-[4] right-[4vw] top-[34%] -translate-y-1/2 flex flex-col gap-4 max-lg:gap-2 max-lg:right-[3vw] max-lg:top-[52%]">
-          {RIGHT_COUNTRIES.map((c) => (
+          {rightCountriesList.map((c) => (
             <div
               key={c.name}
               className="flex items-center gap-2.5 px-4 py-2 bg-white/5 backdrop-blur-lg border border-[#59bfc8]/20 rounded-xl opacity-0 max-lg:px-2.5 max-lg:py-1.5 max-lg:gap-1.5">
@@ -250,7 +326,7 @@ export default function EuropeGlobeSection() {
                 WebkitBackdropFilter: "blur(20px)",
               }}>
               <span className="min-w-0 flex-1 rounded-full bg-white px-3.5 py-2 text-center text-sm font-semibold leading-snug tracking-tight text-gray-900">
-                Porozmawiajmy
+                {ctaToggleLabel}
               </span>
               <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white text-gray-900 shadow-sm transition group-hover:opacity-90">
                 <svg
@@ -284,10 +360,10 @@ export default function EuropeGlobeSection() {
             <div className="mb-2 flex items-start justify-between gap-2">
               <div>
                 <h3 className="m-0 text-sm font-semibold tracking-tight text-white">
-                  Napisz do nas
+                  {ctaTitle}
                 </h3>
                 <p className="mt-0.5 m-0 text-[11px] text-white/55">
-                  Odezwiemy się w ciągu 24h.
+                  {ctaSubtitle}
                 </p>
               </div>
               <button
@@ -307,7 +383,7 @@ export default function EuropeGlobeSection() {
                   type="text"
                   autoComplete="name"
                   className="rounded-lg border border-white/15 bg-white/10 px-2.5 py-1.5 text-xs font-normal text-white placeholder:text-white/35 outline-none ring-[#59bfc8]/40 transition focus:border-[#59bfc8]/50 focus:ring-2"
-                  placeholder="Imię i nazwisko"
+                  placeholder={ctaName}
                 />
                 <input
                   name="email"
@@ -315,19 +391,19 @@ export default function EuropeGlobeSection() {
                   autoComplete="email"
                   required
                   className="rounded-lg border border-white/15 bg-white/10 px-2.5 py-1.5 text-xs font-normal text-white placeholder:text-white/35 outline-none ring-[#59bfc8]/40 transition focus:border-[#59bfc8]/50 focus:ring-2"
-                  placeholder="E-mail"
+                  placeholder={ctaEmail}
                 />
               </div>
               <textarea
                 name="message"
                 rows={2}
                 className="resize-none rounded-lg border border-white/15 bg-white/10 px-2.5 py-1.5 text-xs font-normal text-white placeholder:text-white/35 outline-none ring-[#59bfc8]/40 transition focus:border-[#59bfc8]/50 focus:ring-2"
-                placeholder="Wiadomość..."
+                placeholder={ctaMessage}
               />
               <button
                 type="submit"
                 className="mt-0.5 flex items-center justify-center gap-1.5 rounded-full bg-white py-1.5 text-xs font-semibold text-gray-900 transition hover:bg-white/95">
-                Wyślij
+                {ctaSubmit}
                 <svg
                   width="12"
                   height="12"
@@ -374,39 +450,37 @@ export default function EuropeGlobeSection() {
                       className="md:!h-[26px]"
                     />
                     <p className="text-white/45 text-[11px] m-0 mt-0.5 md:text-xs">
-                      Automaty paczkowe
+                      {footerTagline}
                     </p>
                   </div>
                   <div className="flex flex-wrap items-center gap-x-5 gap-y-1 text-xs text-white/75 md:text-sm md:gap-x-8">
                     <a
-                      href="mailto:info@retailo.pl"
+                      href={`mailto:${footerEmail}`}
                       className="no-underline hover:text-white transition-colors">
-                      info@retailo.pl
+                      {footerEmail}
                     </a>
                     <span className="text-white/35 hidden sm:inline">|</span>
                     <a
-                      href="tel:+48123456789"
+                      href={`tel:${footerPhone.replace(/\s+/g, "")}`}
                       className="no-underline hover:text-white transition-colors">
-                      +48 123 456 789
+                      {footerPhone}
                     </a>
                     <span className="text-white/35 hidden md:inline">|</span>
-                    <span className="text-white/60">
-                      ul. Przykladowa 10, 00-001 Warszawa
-                    </span>
+                    <span className="text-white/60">{footerAddress}</span>
                   </div>
                 </div>
                 <div className="mt-2.5 flex flex-wrap items-center justify-between gap-x-4 gap-y-1 border-t border-white/5 pt-2.5 text-[11px] text-white/30">
-                  <p className="m-0">&copy; 2026 retailo</p>
+                  <p className="m-0">{footerCopyright}</p>
                   <div className="flex gap-4">
                     <a
                       href="#"
                       className="no-underline hover:text-white/55 transition-colors">
-                      Polityka prywatnosci
+                      {footerPrivacyLabel}
                     </a>
                     <a
                       href="#"
                       className="no-underline hover:text-white/55 transition-colors">
-                      Regulamin
+                      {footerTermsLabel}
                     </a>
                   </div>
                 </div>

@@ -17,6 +17,7 @@ export default function HeroConcept({ data }: { data?: HeroData } = {}) {
   const { t } = useLang();
   const subtitle = t(data?.heroSubtitle ?? null) || "PickUpWall";
   const description =
+    t(data?.heroDescription ?? null) ||
     "Automatyczne, modulowe systemy odbioru przesylek typu pick-up in store dla sieci retailu. Projektujemy, produkujemy i wdrazamy rozwiazania dopasowane do specyfiki marki — od jednostki glownej z dotykowym ekranem po skalowalna konfiguracje skrytek i bezdotykowy odbior ponizej 15 sekund.";
 
   const heroRef = useRef<HTMLElement>(null);

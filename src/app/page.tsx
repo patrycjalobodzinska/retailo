@@ -4,8 +4,10 @@ import HeroConcept from "@/components/HeroConcept";
 import {
   getHomePage,
   getRealizationsList,
+  getSiteSettings,
   type HomePage,
   type Realization,
+  type SiteSettings,
 } from "@/lib/sanity/fetch";
 
 // Below-the-fold sections — heavy GSAP / ScrollTrigger / WebGL work that
@@ -53,10 +55,20 @@ async function safeGetRealizations(): Promise<Realization[]> {
   }
 }
 
+async function safeGetSiteSettings(): Promise<SiteSettings> {
+  try {
+    return await getSiteSettings();
+  } catch (e) {
+    console.error("[Home] SiteSettings fetch failed:", e);
+    return null;
+  }
+}
+
 export default async function Home() {
-  const [home, realizations] = await Promise.all([
+  const [home, realizations, settings] = await Promise.all([
     safeGetHomePage(),
     safeGetRealizations(),
+    safeGetSiteSettings(),
   ]);
 
   return (
@@ -70,7 +82,7 @@ export default async function Home() {
       <div id="realizacje">
         <RealizationsCarousel items={realizations} />
       </div>
-      <EuropeGlobeSection />
+      <EuropeGlobeSection data={home} settings={settings} />
     </>
   );
 }

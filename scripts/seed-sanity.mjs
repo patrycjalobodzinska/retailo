@@ -173,6 +173,19 @@ async function run() {
     ],
     ctaLabel: t("Zapytaj o ofertę"),
     ctaHref: "#kontakt",
+    footerTagline: t({ pl: "Automaty paczkowe", en: "Parcel lockers" }),
+    footerEmail: "info@retailo.pl",
+    footerPhone: "+48 123 456 789",
+    footerAddress: t({
+      pl: "ul. Przykładowa 10, 00-001 Warszawa",
+      en: "Przykladowa 10, 00-001 Warsaw, Poland",
+    }),
+    footerCopyright: t({ pl: "© 2026 retailo", en: "© 2026 retailo" }),
+    footerPrivacyLabel: t({
+      pl: "Polityka prywatności",
+      en: "Privacy policy",
+    }),
+    footerTermsLabel: t({ pl: "Regulamin", en: "Terms of service" }),
   });
 
   console.log("→ Seedowanie strony głównej…");
@@ -375,11 +388,46 @@ async function run() {
       },
     ],
 
-    globalEyebrow: t("Globalnie"),
+    globalEyebrow: t({
+      pl: "Wdrożenia w całej Europie",
+      en: "Deployments across Europe",
+    }),
     globalHeadline: t("GLOBAL"),
     globalIntro: tt(
       "Wdrożenia PickUpWall w wielu krajach. Skontaktuj się — pokażemy najbliższe.",
     ),
+    globalCountriesLeft: [
+      t({ pl: "Polska", en: "Poland" }),
+      t({ pl: "Niemcy", en: "Germany" }),
+      t({ pl: "Francja", en: "France" }),
+      t({ pl: "Hiszpania", en: "Spain" }),
+      t({ pl: "Włochy", en: "Italy" }),
+      t({ pl: "Wielka Brytania", en: "United Kingdom" }),
+    ],
+    globalCountriesRight: [
+      t({ pl: "Czechy", en: "Czech Republic" }),
+      t({ pl: "Słowacja", en: "Slovakia" }),
+      t({ pl: "Austria", en: "Austria" }),
+      t({ pl: "Rumunia", en: "Romania" }),
+      t({ pl: "Szwecja", en: "Sweden" }),
+      t({ pl: "Holandia", en: "Netherlands" }),
+    ],
+    globalCtaToggleLabel: t({ pl: "Porozmawiajmy", en: "Let's talk" }),
+    globalCtaTitle: t({ pl: "Napisz do nas", en: "Get in touch" }),
+    globalCtaSubtitle: t({
+      pl: "Odezwiemy się w ciągu 24h.",
+      en: "We'll reply within 24h.",
+    }),
+    globalCtaNamePlaceholder: t({
+      pl: "Imię i nazwisko",
+      en: "Full name",
+    }),
+    globalCtaEmailPlaceholder: t({ pl: "E-mail", en: "Email" }),
+    globalCtaMessagePlaceholder: t({
+      pl: "Wiadomość...",
+      en: "Message...",
+    }),
+    globalCtaSubmitLabel: t({ pl: "Wyślij", en: "Send" }),
   });
 
   console.log("→ Seedowanie strony realizacji…");
