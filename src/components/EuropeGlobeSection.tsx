@@ -100,6 +100,8 @@ export default function EuropeGlobeSection({
   const ctaRef = useRef<HTMLDivElement>(null);
   const [mobileCtaOpen, setMobileCtaOpen] = useState(false);
   const [size, setSize] = useState(760);
+  // Mobile = niższy budżet GPU: tniemy pixelRatio globusa, blur i glow pinów.
+  const [lowPerf, setLowPerf] = useState(false);
   // Globus jest ciężki (MapLibre + 488KB geojson) — ładujemy go dopiero
   // gdy sekcja jest blisko viewportu. Rooot margin 800px = trigger
   // wcześniej, żeby przy zwykłej szybkości scrolla globus zdążył się
@@ -107,8 +109,10 @@ export default function EuropeGlobeSection({
   const [globeReady, setGlobeReady] = useState(false);
 
   useEffect(() => {
-    const update = () =>
+    const update = () => {
       setSize(Math.min(Math.max(window.innerWidth, window.innerHeight), 1050));
+      setLowPerf(window.matchMedia("(max-width: 1023px)").matches);
+    };
     update();
     window.addEventListener("resize", update);
     return () => window.removeEventListener("resize", update);
@@ -276,7 +280,9 @@ export default function EuropeGlobeSection({
         <div
           ref={globeWrapRef}
           className="absolute left-1/2 top-[36vh] z-[3] -translate-x-1/2 md:top-[30vh]">
-          {globeReady && <EuropeGlobeInner width={size} height={size} />}
+          {globeReady && (
+            <EuropeGlobeInner width={size} height={size} lowPerf={lowPerf} />
+          )}
         </div>
 
         {/* Left countries */}
@@ -286,7 +292,7 @@ export default function EuropeGlobeSection({
           {leftCountriesList.map((c) => (
             <div
               key={c.name}
-              className="flex items-center gap-2.5 px-4 py-2 bg-white/5 backdrop-blur-lg border border-[#59bfc8]/20 rounded-xl opacity-0 max-lg:px-2.5 max-lg:py-1.5 max-lg:gap-1.5">
+              className="flex items-center gap-2.5 px-4 py-2 bg-white/5 lg:backdrop-blur-lg max-lg:bg-white/10 border border-[#59bfc8]/20 rounded-xl opacity-0 max-lg:px-2.5 max-lg:py-1.5 max-lg:gap-1.5">
               <span className="text-xl leading-none">{c.flag}</span>
               <span className="text-white/90 font-medium text-sm tracking-wide max-lg:hidden">
                 {c.name}
@@ -302,7 +308,7 @@ export default function EuropeGlobeSection({
           {rightCountriesList.map((c) => (
             <div
               key={c.name}
-              className="flex items-center gap-2.5 px-4 py-2 bg-white/5 backdrop-blur-lg border border-[#59bfc8]/20 rounded-xl opacity-0 max-lg:px-2.5 max-lg:py-1.5 max-lg:gap-1.5">
+              className="flex items-center gap-2.5 px-4 py-2 bg-white/5 lg:backdrop-blur-lg max-lg:bg-white/10 border border-[#59bfc8]/20 rounded-xl opacity-0 max-lg:px-2.5 max-lg:py-1.5 max-lg:gap-1.5">
               <span className="text-xl leading-none">{c.flag}</span>
               <span className="text-white/90 font-medium text-sm tracking-wide max-lg:hidden">
                 {c.name}
@@ -320,11 +326,7 @@ export default function EuropeGlobeSection({
             <button
               type="button"
               onClick={() => setMobileCtaOpen(true)}
-              className="lg:hidden group flex w-full items-center gap-2 rounded-full border border-white/20 bg-black/45 p-1.5 pl-2 shadow-md transition hover:border-white/30 hover:bg-black/55"
-              style={{
-                backdropFilter: "blur(20px)",
-                WebkitBackdropFilter: "blur(20px)",
-              }}>
+              className="lg:hidden group flex w-full items-center gap-2 rounded-full border border-white/20 bg-black/80 p-1.5 pl-2 shadow-md transition hover:border-white/30 hover:bg-black/85">
               <span className="min-w-0 flex-1 rounded-full bg-white px-3.5 py-2 text-center text-sm font-semibold leading-snug tracking-tight text-gray-900">
                 {ctaToggleLabel}
               </span>
@@ -354,7 +356,7 @@ export default function EuropeGlobeSection({
           )}
 
           <div
-            className={`rounded-2xl border border-white/20 bg-black/85 px-3.5 py-3 shadow-lg backdrop-blur-2xl ${
+            className={`rounded-2xl border border-white/20 bg-black/85 px-3.5 py-3 shadow-lg lg:backdrop-blur-2xl ${
               mobileCtaOpen ? "max-lg:block" : "max-lg:hidden"
             }`}>
             <div className="mb-2 flex items-start justify-between gap-2">

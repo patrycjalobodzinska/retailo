@@ -86,9 +86,17 @@ function injectPinStyles() {
   document.head.appendChild(style);
 }
 
-function makePinElement(p: Pin): HTMLElement {
+function makePinElement(p: Pin, lowPerf: boolean): HTMLElement {
   const stemH = Math.round(34 * p.size + 14);
   const dot = Math.round(14 * p.size + 7);
+  // Na mobile: mniej warstw glow + bez nieskończonego pulsu — kompozytor
+  // nie repaintuje pinów na każdej klatce scrolla.
+  const glow = lowPerf
+    ? `0 0 4px #ffffff, 0 0 10px ${p.color}, 0 0 18px ${p.color}cc`
+    : `0 0 3px #ffffff, 0 0 7px ${p.color}, 0 0 14px ${p.color}, 0 0 26px ${p.color}, 0 0 40px ${p.color}cc`;
+  const pulse = lowPerf
+    ? ""
+    : `animation:europePinPulse 2.8s ease-in-out infinite;animation-delay:${p.delay + 0.7}s;`;
   const el = document.createElement("div");
   el.className = "europe-pin-marker";
   el.style.pointerEvents = "none";
@@ -99,9 +107,8 @@ function makePinElement(p: Pin): HTMLElement {
         <div style="width:${dot}px;height:${dot}px;border-radius:50%;
                     background:${p.color};
                     border:1.5px solid rgba(255,255,255,0.95);
-                    box-shadow:0 0 3px #ffffff, 0 0 7px ${p.color}, 0 0 14px ${p.color}, 0 0 26px ${p.color}, 0 0 40px ${p.color}cc;
-                    animation:europePinPulse 2.8s ease-in-out infinite;
-                    animation-delay:${p.delay + 0.7}s;"></div>
+                    box-shadow:${glow};
+                    ${pulse}"></div>
         <div style="width:2px;height:${stemH}px;
                     background:linear-gradient(to bottom, ${p.color} 0%, ${p.color}00 100%);"></div>
       </div>
@@ -112,11 +119,13 @@ function makePinElement(p: Pin): HTMLElement {
 interface EuropeGlobeInnerProps {
   width: number;
   height: number;
+  lowPerf?: boolean;
 }
 
 export default function EuropeGlobeInner({
   width,
   height,
+  lowPerf = false,
 }: EuropeGlobeInnerProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const wrapperRef = useRef<HTMLDivElement>(null);
@@ -134,6 +143,9 @@ export default function EuropeGlobeInner({
       bearing: 0,
       interactive: false,
       attributionControl: false,
+      // Na mobile renderujemy w pixelRatio=1 zamiast 2-3× — globus jest
+      // dekoracyjny, a koszt GPU spada ~4-9×, co usuwa scroll jank.
+      pixelRatio: lowPerf ? 1 : undefined,
     });
 
     const markers: maplibregl.Marker[] = [];
@@ -146,7 +158,7 @@ export default function EuropeGlobeInner({
       // Markery — DOM piny, anchor: 'bottom' żeby tip kreski siedział
       // dokładnie w lat/lng.
       PINS.forEach((p) => {
-        const el = makePinElement(p);
+        const el = makePinElement(p, lowPerf);
         const m = new maplibregl.Marker({ element: el, anchor: "bottom" })
           .setLngLat([p.lng, p.lat])
           .addTo(map);
