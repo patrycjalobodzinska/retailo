@@ -9,10 +9,12 @@ import type { HomePage, SiteSettings } from "@/lib/sanity/fetch";
 
 gsap.registerPlugin(ScrollTrigger);
 
-// Glob (MapLibre/WebGL) jest ciężki — ładujemy go tylko po stronie klienta.
+// Globy (WebGL) są ciężkie — ładujemy je tylko po stronie klienta.
+// Desktop: MapLibre (płaski podświetlony glob). Mobile: react-globe.gl z łukami.
 const EuropeGlobeInner = dynamic(() => import("./EuropeGlobeInner"), {
   ssr: false,
 });
+const ArcsGlobe = dynamic(() => import("./ArcsGlobe"), { ssr: false });
 
 // Flagi nie podlegają tłumaczeniu — zawsze takie same na pozycjach 0..5.
 const LEFT_FLAGS = ["🇵🇱", "🇩🇪", "🇫🇷", "🇪🇸", "🇮🇹", "🇬🇧"];
@@ -44,13 +46,7 @@ const COUNTRY_ITEM_DURATION = 0.78;
 export default function EuropeGlobeSection({
   data,
   settings,
-  globeOnMobile = false,
-}: {
-  data?: HomePage;
-  settings?: SiteSettings;
-  // Eksperymentalnie: pokaż glob (WebGL) także na mobile (test2).
-  globeOnMobile?: boolean;
-} = {}) {
+}: { data?: HomePage; settings?: SiteSettings } = {}) {
   const { t } = useLang();
   const eyebrow = t(data?.globalEyebrow ?? null) || "Wdrozenia w calej Europie";
   const headline = t(data?.globalHeadline ?? null) || "GLOBAL";
@@ -282,22 +278,19 @@ export default function EuropeGlobeSection({
           {headline}
         </div>
 
-        {/* Globus (MapLibre/WebGL). Domyślnie tylko na web; gdy globeOnMobile
-            (test2) — także na mobile, w mobilnym położeniu i lżejszym trybie
-            (pixelRatio/scale). */}
+        {/* Glob desktop — MapLibre (płaski podświetlony glob). */}
         <div
           ref={globeWrapRef}
-          className={`absolute inset-x-0 top-[34vh] bottom-[-78vh] z-[1] pointer-events-none ${
-            globeOnMobile
-              ? "max-lg:top-[40vh] max-lg:bottom-[-32vh]"
-              : "max-lg:hidden"
-          }`}>
-          {(globeOnMobile || !isMobile) && globeReady && (
-            <EuropeGlobeInner
-              lowPerf={isMobile}
-              selectedIso={data?.globalMapCountries}
-            />
+          className="absolute inset-x-0 top-[34vh] bottom-[-78vh] z-[1] pointer-events-none max-lg:hidden">
+          {!isMobile && globeReady && (
+            <EuropeGlobeInner selectedIso={data?.globalMapCountries} />
           )}
+        </div>
+
+        {/* Glob mobile — three-globe z rysującymi się łukami (Warszawa →
+            stolice Europy), wyśrodkowany kwadrat. */}
+        <div className="lg:hidden absolute inset-x-0 top-[24vh] z-[1] pointer-events-none flex justify-center px-[7vw]">
+          {isMobile && globeReady && <ArcsGlobe />}
         </div>
 
         {/* Kraje wdrożeń — lewa lista */}

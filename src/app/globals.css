@@ -13,6 +13,31 @@ html, body {
   display: none;
 }
 
+/* Custom scrollbar — tylko desktop (≥1024px), zawsze widoczny (klasyczny,
+   nie overlay). Na mobile zostaje natywny pasek. */
+@media (min-width: 1024px) {
+  html {
+    scrollbar-width: thin;
+    scrollbar-color: #59bfc8 rgba(10, 42, 46, 0.12);
+  }
+  html::-webkit-scrollbar {
+    width: 12px;
+  }
+  html::-webkit-scrollbar-track {
+    background: rgba(10, 42, 46, 0.1);
+  }
+  html::-webkit-scrollbar-thumb {
+    background: #59bfc8;
+    border-radius: 999px;
+    border: 3px solid transparent;
+    background-clip: padding-box;
+  }
+  html::-webkit-scrollbar-thumb:hover {
+    background: #0086b0;
+    background-clip: padding-box;
+  }
+}
+
 
 .rl-fade-with-reveal {
   opacity: calc(1 - var(--reveal-progress, 0) * 2);

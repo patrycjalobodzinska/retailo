@@ -25,20 +25,6 @@ export default function SmoothScroll() {
     }
     window.scrollTo(0, 0);
 
-    // Na mobile NIE inicjalizujemy Lenis — smooth scroll przez transform
-    // szarpał scroll w sekcjach (sticky/ScrollTrigger). Używamy natywnego
-    // scrolla; ScrollTrigger działa z nim normalnie (odświeżamy po load).
-    if (window.matchMedia("(max-width: 1023px)").matches) {
-      const refreshOnLoad = () => ScrollTrigger.refresh();
-      if (document.readyState === "complete") {
-        requestAnimationFrame(refreshOnLoad);
-      } else {
-        window.addEventListener("load", refreshOnLoad, { once: true });
-      }
-      document.fonts?.ready?.then(() => ScrollTrigger.refresh());
-      return () => window.removeEventListener("load", refreshOnLoad);
-    }
-
     // Lekka konfiguracja Lenis — mniej smoothingu, niezależny RAF.
     // Wcześniejsza wersja drivowała Lenis z GSAP'owego tickera +
     // wołała ScrollTrigger.update() na każdy event, co skutecznie
@@ -74,8 +60,15 @@ export default function SmoothScroll() {
     }
     document.fonts?.ready?.then(() => ScrollTrigger.refresh());
 
+    // ScrollTrigger.refresh TYLKO przy zmianie szerokości. Na mobile (iOS
+    // Safari) pasek URL chowa/pokazuje się podczas scrolla, zmieniając
+    // WYSOKOŚĆ viewportu — to wyzwalało refresh co chwilę i powodowało lag
+    // dokładnie w momencie wjazdu/zjazdu paska. Wysokość ignorujemy.
     let resizeTimer: number | undefined;
+    let lastWidth = window.innerWidth;
     const onResize = () => {
+      if (window.innerWidth === lastWidth) return;
+      lastWidth = window.innerWidth;
       if (resizeTimer) window.clearTimeout(resizeTimer);
       resizeTimer = window.setTimeout(() => {
         ScrollTrigger.refresh();
