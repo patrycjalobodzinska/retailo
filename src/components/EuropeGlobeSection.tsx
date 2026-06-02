@@ -1,13 +1,18 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import dynamic from "next/dynamic";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useLang } from "@/lib/i18n/LanguageProvider";
 import type { HomePage, SiteSettings } from "@/lib/sanity/fetch";
-import { STATIC_GLOBE } from "@/lib/staticGlobeData";
 
 gsap.registerPlugin(ScrollTrigger);
+
+// Glob (MapLibre/WebGL) jest ciężki — ładujemy go tylko po stronie klienta.
+const EuropeGlobeInner = dynamic(() => import("./EuropeGlobeInner"), {
+  ssr: false,
+});
 
 // Flagi nie podlegają tłumaczeniu — zawsze takie same na pozycjach 0..5.
 const LEFT_FLAGS = ["🇵🇱", "🇩🇪", "🇫🇷", "🇪🇸", "🇮🇹", "🇬🇧"];
@@ -35,61 +40,6 @@ const FOOTER_REVEAL_DURATION = 0.9;
 const COUNTRY_SCROLL_PROGRESS = 0.18;
 const COUNTRY_STAGGER_SEC = 0.12;
 const COUNTRY_ITEM_DURATION = 0.78;
-
-/**
- * Lekki, STATYCZNY glob (SVG) na mobile — zamiennik ciężkiego MapLibre/WebGL,
- * który tnie scroll i psuje się na Safari w kontenerze position:sticky.
- * Rysuje realne lądy + podświetlone kraje (projekcja ortograficzna jak na
- * desktopie), z prekompilowanych ścieżek (scripts/gen-static-globe.mjs) — bez
- * WebGL i bez pobierania 488 KB geojsona w runtime.
- */
-function StaticGlobe() {
-  const G = STATIC_GLOBE;
-  return (
-    <div
-      aria-hidden="true"
-      className="absolute inset-0 pointer-events-none">
-      <svg
-        viewBox={`0 0 ${G.size} ${G.size}`}
-        className="w-[min(320vw,1200px)] lg:w-[min(115vw,1350px)]"
-        style={{
-          position: "absolute",
-          left: "50%",
-          top: 0,
-          transform: "translateX(-50%)",
-          height: "auto",
-          filter: "drop-shadow(0 0 40px rgba(89,191,200,0.32))",
-        }}>
-        <defs>
-          <radialGradient id="sg-ocean" cx="38%" cy="30%" r="75%">
-            <stop offset="0%" stopColor="#1d5566" />
-            <stop offset="45%" stopColor="#0e3b49" />
-            <stop offset="100%" stopColor="#062029" />
-          </radialGradient>
-          <radialGradient id="sg-limb" cx="50%" cy="50%" r="50%">
-            <stop offset="58%" stopColor="rgba(0,0,0,0)" />
-            <stop offset="100%" stopColor="rgba(0,0,0,0.5)" />
-          </radialGradient>
-        </defs>
-        {/* Ocean / kula */}
-        <circle cx={G.cx} cy={G.cy} r={G.r} fill="url(#sg-ocean)" />
-        {/* Lądy */}
-        <path d={G.land} fill="#2a6072" fillOpacity={0.55} />
-        {/* Kraje wdrożeń */}
-        <path
-          d={G.highlight}
-          fill="#59bfc8"
-          fillOpacity={0.55}
-          stroke="#aef0f5"
-          strokeWidth={0.4}
-          strokeOpacity={0.7}
-        />
-        {/* Przyciemnienie brzegu (efekt kuli) */}
-        <circle cx={G.cx} cy={G.cy} r={G.r} fill="url(#sg-limb)" />
-      </svg>
-    </div>
-  );
-}
 
 export default function EuropeGlobeSection({
   data,
@@ -150,6 +100,38 @@ export default function EuropeGlobeSection({
   const footerRef = useRef<HTMLDivElement>(null);
   const ctaRef = useRef<HTMLDivElement>(null);
   const [mobileCtaOpen, setMobileCtaOpen] = useState(false);
+  // Mobile = nie renderujemy WebGL globu w ogóle (jest ukryty + ciężki).
+  const [isMobile, setIsMobile] = useState(false);
+  // Globus jest ciężki (MapLibre + geojson) — montujemy go dopiero gdy sekcja
+  // zbliża się do viewportu.
+  const [globeReady, setGlobeReady] = useState(false);
+
+  useEffect(() => {
+    const update = () =>
+      setIsMobile(window.matchMedia("(max-width: 1023px)").matches);
+    update();
+    window.addEventListener("resize", update);
+    return () => window.removeEventListener("resize", update);
+  }, []);
+
+  useEffect(() => {
+    if (globeReady) return;
+    const el = wrapRef.current;
+    if (!el) return;
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) {
+            setGlobeReady(true);
+            io.disconnect();
+          }
+        }
+      },
+      { rootMargin: "800px" },
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, [globeReady]);
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -290,13 +272,15 @@ export default function EuropeGlobeSection({
           {headline}
         </div>
 
-        {/* Globus — statyczny SVG (lekki, wektorowy) zarówno na web jak i na
-            mobile. Brak WebGL/MapLibre: zero janku przy scrollu i brak buga
-            ucinania na Safari. */}
+        {/* Globus (MapLibre/WebGL) — TYLKO na web. Na mobile w ogóle nie
+            montowany (ukryty + nie renderowany), bo WebGL w position:sticky
+            tnie scroll i psuje się na Safari. */}
         <div
           ref={globeWrapRef}
-          className="absolute inset-x-0 top-[34vh] bottom-[-78vh] z-[1] pointer-events-none max-lg:top-[40vh] max-lg:bottom-[-32vh]">
-          <StaticGlobe />
+          className="absolute inset-x-0 top-[34vh] bottom-[-78vh] z-[1] pointer-events-none max-lg:hidden">
+          {!isMobile && globeReady && (
+            <EuropeGlobeInner selectedIso={data?.globalMapCountries} />
+          )}
         </div>
 
         {/* Kraje wdrożeń — lewa lista */}
@@ -308,7 +292,7 @@ export default function EuropeGlobeSection({
               key={c.name}
               className="flex items-center gap-2.5 px-4 py-2 bg-white/5 lg:backdrop-blur-lg max-lg:bg-white/10 border border-[#59bfc8]/20 rounded-xl opacity-0 max-lg:px-2.5 max-lg:py-1.5 max-lg:gap-1.5">
               <span className="text-xl leading-none">{c.flag}</span>
-              <span className="text-white/90 font-medium text-sm tracking-wide max-lg:hidden">
+              <span className="text-white/90 font-medium text-sm tracking-wide max-lg:text-xs">
                 {c.name}
               </span>
             </div>
@@ -324,7 +308,7 @@ export default function EuropeGlobeSection({
               key={c.name}
               className="flex items-center gap-2.5 px-4 py-2 bg-white/5 lg:backdrop-blur-lg max-lg:bg-white/10 border border-[#59bfc8]/20 rounded-xl opacity-0 max-lg:px-2.5 max-lg:py-1.5 max-lg:gap-1.5">
               <span className="text-xl leading-none">{c.flag}</span>
-              <span className="text-white/90 font-medium text-sm tracking-wide max-lg:hidden">
+              <span className="text-white/90 font-medium text-sm tracking-wide max-lg:text-xs">
                 {c.name}
               </span>
             </div>
