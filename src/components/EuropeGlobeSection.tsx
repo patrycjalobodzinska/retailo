@@ -9,12 +9,12 @@ import type { HomePage, SiteSettings } from "@/lib/sanity/fetch";
 
 gsap.registerPlugin(ScrollTrigger);
 
-// Globy (WebGL) są ciężkie — ładujemy je tylko po stronie klienta.
-// Desktop: MapLibre (płaski podświetlony glob). Mobile: react-globe.gl z łukami.
+// Desktop: MapLibre (WebGL) — ładowany tylko po stronie klienta.
+// Mobile: lekki statyczny glob SVG (StaticGlobe), bez WebGL.
 const EuropeGlobeInner = dynamic(() => import("./EuropeGlobeInner"), {
   ssr: false,
 });
-const ArcsGlobe = dynamic(() => import("./ArcsGlobe"), { ssr: false });
+const StaticGlobe = dynamic(() => import("./StaticGlobe"), { ssr: false });
 
 // Flagi nie podlegają tłumaczeniu — zawsze takie same na pozycjach 0..5.
 const LEFT_FLAGS = ["🇵🇱", "🇩🇪", "🇫🇷", "🇪🇸", "🇮🇹", "🇬🇧"];
@@ -46,7 +46,14 @@ const COUNTRY_ITEM_DURATION = 0.78;
 export default function EuropeGlobeSection({
   data,
   settings,
-}: { data?: HomePage; settings?: SiteSettings } = {}) {
+  webGlobeOnMobile = false,
+}: {
+  data?: HomePage;
+  settings?: SiteSettings;
+  // test2: pokaż na mobile ten sam glob co na web (MapLibre, SCALE 1.0 — nie
+  // ucinany od góry) zamiast statycznego SVG.
+  webGlobeOnMobile?: boolean;
+} = {}) {
   const { t } = useLang();
   const eyebrow = t(data?.globalEyebrow ?? null) || "Wdrozenia w calej Europie";
   const headline = t(data?.globalHeadline ?? null) || "GLOBAL";
@@ -266,7 +273,7 @@ export default function EuropeGlobeSection({
         {/* GLOBAL text */}
         <div
           ref={bigTextRef}
-          className="absolute top-[22vh] left-0 right-0 z-0 text-center font-black leading-[0.85] pointer-events-none select-none md:top-[14vh]"
+          className="absolute top-[22vh] left-0 right-0 z-0 text-center font-black leading-[0.85] pointer-events-none select-none md:top-[14vh] max-lg:hidden"
           style={{
             fontSize: "22vw",
             letterSpacing: "-0.04em",
@@ -287,11 +294,20 @@ export default function EuropeGlobeSection({
           )}
         </div>
 
-        {/* Glob mobile — three-globe z rysującymi się łukami (Warszawa →
-            stolice Europy), wyśrodkowany kwadrat. */}
-        <div className="lg:hidden absolute inset-x-0 top-[24vh] z-[1] pointer-events-none flex justify-center px-[7vw]">
-          {isMobile && globeReady && <ArcsGlobe />}
-        </div>
+        {/* Glob mobile. Domyślnie: statyczny SVG. test2 (webGlobeOnMobile):
+            ten sam MapLibre co na web — w kontenerze mieszczącym cały glob
+            (SCALE 1.0 → nie ucina od góry). */}
+        {webGlobeOnMobile ? (
+          <div className="lg:hidden absolute inset-x-0 top-[16vh] bottom-[-20vh] z-[1] pointer-events-none">
+            {isMobile && globeReady && (
+              <EuropeGlobeInner lowPerf selectedIso={data?.globalMapCountries} />
+            )}
+          </div>
+        ) : (
+          <div className="lg:hidden absolute inset-x-0 top-[18vh] bottom-[-32vh] z-[1] pointer-events-none">
+            {isMobile && <StaticGlobe />}
+          </div>
+        )}
 
         {/* Kraje wdrożeń — lewa lista */}
         <div
@@ -302,7 +318,7 @@ export default function EuropeGlobeSection({
               key={c.name}
               className="flex items-center gap-2.5 px-4 py-2 bg-white/5 lg:backdrop-blur-lg max-lg:bg-white/10 border border-[#59bfc8]/20 rounded-xl opacity-0 max-lg:px-2.5 max-lg:py-1.5 max-lg:gap-1.5">
               <span className="text-xl leading-none">{c.flag}</span>
-              <span className="text-white/90 font-medium text-sm tracking-wide max-lg:text-xs">
+              <span className="text-white/90 font-medium text-sm tracking-wide max-lg:hidden">
                 {c.name}
               </span>
             </div>
@@ -318,7 +334,7 @@ export default function EuropeGlobeSection({
               key={c.name}
               className="flex items-center gap-2.5 px-4 py-2 bg-white/5 lg:backdrop-blur-lg max-lg:bg-white/10 border border-[#59bfc8]/20 rounded-xl opacity-0 max-lg:px-2.5 max-lg:py-1.5 max-lg:gap-1.5">
               <span className="text-xl leading-none">{c.flag}</span>
-              <span className="text-white/90 font-medium text-sm tracking-wide max-lg:text-xs">
+              <span className="text-white/90 font-medium text-sm tracking-wide max-lg:hidden">
                 {c.name}
               </span>
             </div>
@@ -329,7 +345,7 @@ export default function EuropeGlobeSection({
         <div
           ref={ctaRef}
           id="kontakt"
-          className="pointer-events-auto absolute bottom-[128px] left-[5vw] z-30 w-[min(360px,calc(100vw-32px))] max-lg:bottom-[200px] max-lg:left-1/2 max-lg:-translate-x-1/2 max-lg:w-[min(340px,calc(100vw-32px))]">
+          className="pointer-events-auto absolute bottom-[128px] left-[5vw] z-30 w-[min(360px,calc(100vw-32px))] max-lg:bottom-[165px] max-lg:left-1/2 max-lg:-translate-x-1/2 max-lg:w-[min(340px,calc(100vw-32px))]">
           {!mobileCtaOpen && (
             <button
               type="button"
