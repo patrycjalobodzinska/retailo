@@ -194,7 +194,7 @@ export default function ProductShowcase({
           {/* Phase 1 */}
           <div
             ref={phase1Ref}
-            className="relative h-[65vh] min-h-[480px] max-lg:h-auto max-lg:min-h-0 max-lg:pt-[5dvh] max-lg:pb-[1dvh]">
+            className="relative h-[65vh] min-h-[480px] max-lg:h-auto max-lg:min-h-0 max-lg:pt-[5svh] max-lg:pb-[1svh]">
             {/* Mobile-only inline image */}
             <div className="hidden max-lg:flex justify-center px-[6vw] mb-6">
               <img
@@ -273,7 +273,7 @@ export default function ProductShowcase({
           {/* Phase 2 */}
           <div
             ref={phase2Ref}
-            className="relative h-[88vh] min-h-[600px] pb-[8vh] max-lg:h-auto max-lg:min-h-0 max-lg:pt-[1dvh] max-lg:pb-[8dvh]">
+            className="relative h-[88vh] min-h-[600px] pb-[8vh] max-lg:h-auto max-lg:min-h-0 max-lg:pt-[1svh] max-lg:pb-[8svh]">
             {/* Mobile-only inline image with photo → draft wavy mask wipe on enter */}
             <div className="hidden max-lg:flex justify-center px-[6vw] mb-6">
               <div className="relative w-[68vw] max-w-[320px] aspect-square">
@@ -301,7 +301,7 @@ export default function ProductShowcase({
                 />
               </div>
             </div>
-            <div className="absolute inset-0 flex items-start justify-start pl-[6vw] pr-[4vw] pt-[22vh] pb-[4vh] pointer-events-none z-[1] max-lg:relative max-lg:inset-auto max-lg:flex-col max-lg:justify-start max-lg:gap-4 max-lg:p-[3dvh_6vw_0] max-lg:min-h-0">
+            <div className="absolute inset-0 flex items-start justify-start pl-[6vw] pr-[4vw] pt-[22vh] pb-[4vh] pointer-events-none z-[1] max-lg:relative max-lg:inset-auto max-lg:flex-col max-lg:justify-start max-lg:gap-4 max-lg:p-[3svh_6vw_0] max-lg:min-h-0">
               <div className="flex flex-col w-full max-w-[560px] pointer-events-auto max-2xl:max-w-[520px] max-xl:max-w-[470px] max-lg:max-w-full">
                 <h2
                   className="uppercase tracking-widest m-0 mb-1"

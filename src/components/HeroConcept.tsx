@@ -100,7 +100,7 @@ export default function HeroConcept({ data }: { data?: HeroData } = {}) {
   return (
     <section
       ref={heroRef}
-      className="relative w-full h-screen min-h-[720px] overflow-hidden flex items-stretch max-lg:h-auto max-lg:min-h-[100dvh] max-lg:flex-col"
+      className="relative w-full h-screen min-h-[720px] overflow-hidden flex items-stretch max-lg:h-auto max-lg:min-h-[100svh] max-lg:flex-col"
       style={{
         background:
           "linear-gradient(45deg, #ffffff 0%, #f4f2ee 35%, #e0ddd8 70%, #cbc8c2 100%)",
@@ -140,7 +140,7 @@ export default function HeroConcept({ data }: { data?: HeroData } = {}) {
         className="pointer-events-none absolute select-none m-0 font-black tracking-tighter text-[#0f0f0f] leading-[0.82] lg:hidden"
         style={{
           left: "-2vw",
-          top: "9dvh",
+          top: "9svh",
           right: "-2vw",
           fontSize: "clamp(4.5rem, 20vw, 8rem)",
           letterSpacing: "-0.06em",
@@ -154,7 +154,7 @@ export default function HeroConcept({ data }: { data?: HeroData } = {}) {
       {/* LEFT: text content */}
       <div
         ref={contentRef}
-        className="relative z-[2] flex flex-col justify-start pl-[5vw] pr-[2vw] pt-[18vh] w-[32%] 2xl:pl-[8vw] max-2xl:w-[34%] max-xl:w-[38%] max-lg:w-full max-lg:pl-[6vw] max-lg:pr-[6vw] max-lg:pt-[17dvh]"
+        className="relative z-[2] flex flex-col justify-start pl-[5vw] pr-[2vw] pt-[18vh] w-[32%] 2xl:pl-[8vw] max-2xl:w-[34%] max-xl:w-[38%] max-lg:w-full max-lg:pl-[6vw] max-lg:pr-[6vw] max-lg:pt-[17svh]"
         style={{ opacity: 0, transform: "translateY(20px)" }}>
         <img
           src="/retailologo.webp"
@@ -206,7 +206,7 @@ export default function HeroConcept({ data }: { data?: HeroData } = {}) {
           ref={imageRef}
           src="/model3_retailo.png"
           alt="PickUpWall"
-          className="relative block h-[78vh] w-auto object-contain max-lg:h-[36dvh]"
+          className="relative block h-[78vh] w-auto object-contain max-lg:h-[36svh]"
           style={{
             opacity: 0,
             transform: "translateX(-40px)",
@@ -215,7 +215,7 @@ export default function HeroConcept({ data }: { data?: HeroData } = {}) {
           }}
         />
         <p
-          className="hidden max-lg:block m-0 mt-[7dvh] px-[6vw] text-[#3a3a3a] leading-relaxed font-light"
+          className="hidden max-lg:block m-0 mt-[7svh] px-[6vw] text-[#3a3a3a] leading-relaxed font-light"
           style={{ fontSize: "0.95rem" }}>
           {description}
         </p>
@@ -227,7 +227,7 @@ export default function HeroConcept({ data }: { data?: HeroData } = {}) {
         {[
           {
             ...badgeText(0),
-            cls: "top-[18vh] right-[11vw] max-lg:top-[18dvh] max-lg:right-auto max-lg:left-[5vw]",
+            cls: "top-[18vh] right-[11vw] max-lg:top-[18svh] max-lg:right-auto max-lg:left-[5vw]",
             icon: (
               <>
                 <circle cx="12" cy="12" r="8.5" strokeWidth="1.4" />
@@ -242,7 +242,7 @@ export default function HeroConcept({ data }: { data?: HeroData } = {}) {
           },
           {
             ...badgeText(1),
-            cls: "top-[44vh] right-[4vw] max-lg:top-[30dvh] max-lg:right-[5vw]",
+            cls: "top-[44vh] right-[4vw] max-lg:top-[30svh] max-lg:right-[5vw]",
             icon: (
               <>
                 <rect
@@ -282,7 +282,7 @@ export default function HeroConcept({ data }: { data?: HeroData } = {}) {
           },
           {
             ...badgeText(2),
-            cls: "top-[58vh] left-[56vw] max-lg:top-[43dvh] max-lg:left-[5vw]",
+            cls: "top-[58vh] left-[56vw] max-lg:top-[43svh] max-lg:left-[5vw]",
             icon: (
               <>
                 <path
@@ -340,7 +340,7 @@ export default function HeroConcept({ data }: { data?: HeroData } = {}) {
       <a
         ref={cardRef}
         href="/realizacje"
-        className="absolute bottom-[5vh] left-[5vw] z-[5] flex w-[min(460px,40vw)] items-stretch overflow-hidden rounded-2xl no-underline lg:backdrop-blur-md transition-transform hover:-translate-y-0.5 2xl:left-[8vw] max-lg:relative max-lg:bottom-auto max-lg:left-auto max-lg:mt-[5dvh] max-lg:mb-[0.5dvh] max-lg:mx-[5vw] max-lg:!w-[calc(100%-10vw)]"
+        className="absolute bottom-[5vh] left-[5vw] z-[5] flex w-[min(460px,40vw)] items-stretch overflow-hidden rounded-2xl no-underline lg:backdrop-blur-md transition-transform hover:-translate-y-0.5 2xl:left-[8vw] max-lg:relative max-lg:bottom-auto max-lg:left-auto max-lg:mt-[5svh] max-lg:mb-[0.5svh] max-lg:mx-[5vw] max-lg:!w-[calc(100%-10vw)]"
         style={{
           background: "rgba(225,225,222,0.55)",
           border: "1px solid rgba(15,15,15,0.08)",

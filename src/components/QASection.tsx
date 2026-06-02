@@ -232,7 +232,7 @@ export default function QASection({ data }: { data?: QAData } = {}) {
   return (
     <section
       ref={sectionRef}
-      className="relative w-full py-[12vh] max-lg:pt-[6dvh] max-lg:pb-[6dvh] overflow-hidden"
+      className="relative w-full py-[12vh] max-lg:pt-[6svh] max-lg:pb-[6svh] overflow-hidden"
       style={{ background: BG_COLOR }}>
       {/* MOBILE: horizontal snap carousel using the desktop bento card design */}
       <div className="lg:hidden relative">

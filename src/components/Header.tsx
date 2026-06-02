@@ -260,7 +260,7 @@ export default function Header({
           </svg>
 
           {/* Top bar — eyebrow + close */}
-          <div className="relative z-[1] flex items-center justify-between px-[6vw] pt-[2dvh]">
+          <div className="relative z-[1] flex items-center justify-between px-[6vw] pt-[2svh]">
             <span
               className="font-mono uppercase tracking-[0.28em] text-[#0a2a2e]/55"
               style={{ fontSize: "0.58rem" }}>
@@ -291,7 +291,7 @@ export default function Header({
           </div>
 
           {/* Nav list — numbered items with hairline dividers */}
-          <nav className="relative z-[1] mt-[10dvh] flex flex-col px-[6vw]">
+          <nav className="relative z-[1] mt-[10svh] flex flex-col px-[6vw]">
             {navItems.map((item, i) => (
               <a
                 key={item.label}
@@ -341,7 +341,7 @@ export default function Header({
           </nav>
 
           {/* Footer area — language switcher + contact pill */}
-          <div className="relative z-[1] mt-auto flex flex-col gap-4 px-[6vw] pb-[5dvh] pt-8">
+          <div className="relative z-[1] mt-auto flex flex-col gap-4 px-[6vw] pb-[5svh] pt-8">
             <div
               className="flex items-center gap-3"
               style={{

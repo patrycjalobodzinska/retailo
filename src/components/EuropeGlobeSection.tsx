@@ -242,18 +242,18 @@ export default function EuropeGlobeSection({
   return (
     <div
       ref={wrapRef}
-      className="relative max-lg:!h-[100dvh]"
+      className="relative max-lg:!h-[100svh]"
       style={{ height: `${SECTION_SCROLL_VH}vh` }}>
       <div
         ref={sectionRef}
-        className="sticky top-0 w-full h-screen min-h-[640px] overflow-hidden max-lg:relative max-lg:top-auto max-lg:h-[100dvh] max-lg:min-h-[100dvh]"
+        className="sticky top-0 w-full h-screen min-h-[640px] overflow-hidden max-lg:relative max-lg:top-auto max-lg:h-[100svh] max-lg:min-h-[100svh]"
         style={{
           background: "linear-gradient(180deg, #154D6D 0%, #000000 100%)",
         }}>
         {/* Intro text */}
         <div
           ref={introRef}
-          className="absolute top-[16vh] max-lg:top-[12vh] left-0 right-0 z-10 flex justify-center px-[6vw]">
+          className="absolute top-[16vh] max-lg:top-[8vh] left-0 right-0 z-10 flex justify-center px-[6vw]">
           <p
             className="flex items-center gap-4 text-white/80 tracking-wide m-3 max-md:gap-2 px-6 max-md:flex-wrap max-md:justify-center"
             style={{ fontSize: "clamp(1.1rem, 1.8vw, 1.5rem)" }}>
