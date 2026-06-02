@@ -157,7 +157,7 @@ export const REALIZATION_BY_SLUG_QUERY = /* groq */ `
     location ${localized},
     year,
     lockerCount,
-    specs[]{ label, value },
+    specs[]{ label ${localized}, value ${localized} },
     masterCount,
     slaveCount,
     modules[]->{

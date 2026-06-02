@@ -238,7 +238,7 @@ type SanityRealizationRaw = {
   client?: string;
   year?: number;
   lockerCount?: number;
-  specs?: { label?: string; value?: string }[];
+  specs?: { label?: LocalizedField; value?: LocalizedField }[];
   body?: PortableTextBlock[];
   masterCount?: number;
   slaveCount?: number;
@@ -267,8 +267,8 @@ const normalize = (r: SanityRealizationRaw): Realization => ({
   client: r.client,
   year: r.year,
   specs: (r.specs ?? [])
-    .filter((s) => s?.label && s?.value)
-    .map((s) => ({ label: s.label as string, value: s.value as string })),
+    .map((s) => ({ label: pickString(s?.label), value: pickString(s?.value) }))
+    .filter((s) => s.label && s.value),
   body: r.body,
   // Konfiguracja Master/Slave do schematu na stronie detalu. Domyślnie
   // standardowy układ 1× Master + 1× Slave (79 skrytek) — tak jak każda

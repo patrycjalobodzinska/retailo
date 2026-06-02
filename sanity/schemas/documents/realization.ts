@@ -73,17 +73,32 @@ export const realization = defineType({
             {
               name: "label",
               title: "Nazwa",
-              type: "string",
+              type: "localizedString",
               validation: (rule) => rule.required(),
             },
             {
               name: "value",
               title: "Wartość",
-              type: "string",
+              type: "localizedString",
               validation: (rule) => rule.required(),
             },
           ],
-          preview: { select: { title: "label", subtitle: "value" } },
+          preview: {
+            select: {
+              label: "label.translations",
+              value: "value.translations",
+            },
+            prepare: ({ label, value }) => {
+              const first = (t: unknown) =>
+                (Array.isArray(t)
+                  ? (t as { value?: string }[]).find((x) => x?.value)?.value
+                  : "") ?? "";
+              return {
+                title: first(label) || "(pole tabeli)",
+                subtitle: first(value),
+              };
+            },
+          },
         },
       ],
     }),

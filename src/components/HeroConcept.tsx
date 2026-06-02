@@ -65,72 +65,36 @@ export default function HeroConcept({ data }: { data?: HeroData } = {}) {
   const statsWrapRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    // Na mobile animacje wejścia się przycinają — pomijamy timeline i od
-    // razu pokazujemy elementy w stanie końcowym (startują z inline
-    // opacity:0 / transform, więc trzeba je jawnie odsłonić).
-    const isDesktop = window.matchMedia("(min-width: 1024px)").matches;
-    if (!isDesktop) {
-      gsap.set([imageRef.current, contentRef.current], {
-        opacity: 1,
-        x: 0,
-        y: 0,
-      });
-      // Badge'e startują z inline opacity:0 — na mobile timeline nie odpala,
-      // więc trzeba je jawnie odsłonić, inaczej zostają niewidoczne.
-      const badges = statsWrapRef.current
-        ? Array.from(statsWrapRef.current.children)
-        : [];
-      gsap.set(badges, { opacity: 1, x: 0, y: 0 });
-      // Karta ma `transition-transform` (dla hover) — bez wyłączenia
-      // tranzycji ustawienie y:0 animowałoby wjazd z translateY(20px).
-      const card = cardRef.current;
-      if (card) {
-        card.style.transition = "none";
-        gsap.set(card, { opacity: 1, x: 0, y: 0 });
-        requestAnimationFrame(() => {
-          card.style.transition = "";
-        });
-      }
-      return;
-    }
+    // Hero: TYLKO fade-in przy pierwszym wejściu — żadnego ruchu, zoomu ani
+    // animacji scrollowych. Zerujemy ewentualne inline translate (x/y), żeby
+    // elementy nie były przesunięte, i animujemy wyłącznie opacity.
+    const badges = statsWrapRef.current
+      ? Array.from(statsWrapRef.current.children)
+      : [];
+    const targets = [
+      imageRef.current,
+      contentRef.current,
+      cardRef.current,
+      ...badges,
+    ].filter(Boolean);
 
-    const ctx = gsap.context(() => {
-      const tl = gsap.timeline({ defaults: { ease: "power3.out" } });
-      tl.fromTo(
-        imageRef.current,
-        { x: -40, opacity: 0 },
-        { x: 0, opacity: 1, duration: 1.1, ease: "power2.out", delay: 0.1 },
-      )
-        .fromTo(
-          titleRef.current,
-          { y: 30, opacity: 0 },
-          { y: 0, opacity: 0.1, duration: 0.9 },
-          "-=0.8",
-        )
-        .fromTo(
-          contentRef.current,
-          { y: 20, opacity: 0 },
-          { y: 0, opacity: 1, duration: 0.8 },
-          "-=0.6",
-        )
-        .fromTo(
-          cardRef.current,
-          { y: 20, opacity: 0 },
-          { y: 0, opacity: 1, duration: 0.7 },
-          "-=0.55",
-        )
-        .fromTo(
-          statsWrapRef.current?.children
-            ? Array.from(statsWrapRef.current.children)
-            : [],
-          { y: 20, opacity: 0 },
-          { y: 0, opacity: 1, duration: 0.7, stagger: 0.12 },
-          "-=0.5",
-        );
-    }, heroRef);
-    return () => ctx.revert();
-    // Re-run on language change — przełączenie języka re-renderuje hero;
-    // bez tego ctx.revert() mógł zostawić kartę na opacity:0.
+    // Karta ma transition-transform (hover) — wyłączamy na czas resetu
+    // transformacji, żeby się nie animowała.
+    const card = cardRef.current;
+    if (card) card.style.transition = "none";
+
+    gsap.set(targets, { x: 0, y: 0 });
+    gsap.fromTo(
+      targets,
+      { opacity: 0 },
+      { opacity: 1, duration: 0.7, ease: "power2.out", stagger: 0.05 },
+    );
+
+    if (card)
+      requestAnimationFrame(() => {
+        card.style.transition = "";
+      });
+    // Re-run przy zmianie języka (hero się re-renderuje).
   }, [lang]);
 
   return (
@@ -333,7 +297,7 @@ export default function HeroConcept({ data }: { data?: HeroData } = {}) {
         ].map((b) => (
           <div
             key={b.label}
-            className={`absolute z-[4] flex flex-col items-start gap-2 rounded-2xl px-4 py-3 text-left backdrop-blur-md ${b.cls}`}
+            className={`absolute z-[4] flex flex-col items-start gap-2 rounded-2xl px-4 py-3 text-left backdrop-blur-md min-w-[120px] max-lg:min-w-[84px] max-lg:gap-1 max-lg:px-2 max-lg:py-1.5 max-lg:rounded-lg ${b.cls}`}
             style={{
               background: "rgba(255,255,255,0.4)",
               border: "1px solid rgba(15,15,15,0.08)",
@@ -341,35 +305,29 @@ export default function HeroConcept({ data }: { data?: HeroData } = {}) {
                 "0 1px 2px rgba(15,15,15,0.04), 0 14px 32px rgba(15,15,15,0.10)",
               opacity: 0,
               transform: "translateY(20px)",
-              minWidth: "120px",
             }}>
             <span
-              className="flex h-9 w-9 items-center justify-center rounded-full"
+              className="flex h-9 w-9 items-center justify-center rounded-full max-lg:h-6 max-lg:w-6"
               style={{
                 background: "rgba(255,255,255,0.55)",
                 border: "1px solid rgba(15,15,15,0.06)",
               }}>
               <svg
-                width="17"
-                height="17"
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="#0f0f0f"
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                aria-hidden="true">
+                aria-hidden="true"
+                className="h-[17px] w-[17px] max-lg:h-3 max-lg:w-3">
                 {b.icon}
               </svg>
             </span>
             <div className="flex flex-col items-start">
-              <span
-                className="font-medium text-[#0f0f0f] tracking-tight"
-                style={{ fontSize: "0.92rem", lineHeight: 1.1 }}>
+              <span className="font-medium text-[#0f0f0f] tracking-tight text-[0.92rem] leading-[1.1] max-lg:text-[0.72rem]">
                 {b.value}
               </span>
-              <span
-                className="mt-0.5 uppercase tracking-[0.18em] font-medium text-[#7a7a7a]"
-                style={{ fontSize: "0.55rem" }}>
+              <span className="mt-0.5 uppercase tracking-[0.18em] font-medium text-[#7a7a7a] text-[0.55rem] max-lg:text-[0.46rem] max-lg:mt-0">
                 {b.label}
               </span>
             </div>
