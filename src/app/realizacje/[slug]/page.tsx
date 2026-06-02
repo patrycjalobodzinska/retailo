@@ -73,13 +73,19 @@ export default async function RealizacjaDetailPage({ params }: PageProps) {
             className="absolute inset-x-0 top-0 h-[40vh] z-0 overflow-hidden pointer-events-none lg:h-[380px]"
             style={{
               background:
-                "linear-gradient(180deg, #c0dbe2 0%, #d6e4e9 60%, #ffffff 100%)",
+                "linear-gradient(180deg, #c0dbe2 0%, #d6e4e9 50%, #ffffff 85%)",
             }}>
             <div
               className="absolute inset-0"
               style={{
                 background:
                   "radial-gradient(ellipse 70% 70% at 5% 100%, rgba(0,134,176,0.22) 0%, rgba(0,134,176,0) 60%), radial-gradient(ellipse 60% 65% at 95% -5%, rgba(126,213,230,0.35) 0%, rgba(126,213,230,0) 60%)",
+                // Wygaszamy kolorowe plamy do przezroczystości przed dolną
+                // krawędzią — bez tego cyjan urywał się ostro na bieli (odcięcie).
+                WebkitMaskImage:
+                  "linear-gradient(180deg, #000 45%, transparent 85%)",
+                maskImage:
+                  "linear-gradient(180deg, #000 45%, transparent 85%)",
               }}
             />
             <svg
@@ -192,9 +198,7 @@ export default async function RealizacjaDetailPage({ params }: PageProps) {
                       style={{ fontSize: "0.74rem", color: "#0086b0" }}>
                       {label}
                     </dt>
-                    <dd
-                      className="m-0 text-[#0a2a2e] font-semibold"
-                      style={{ fontSize: "1.05rem" }}>
+                    <dd className="m-0 text-[#0a2a2e] font-semibold text-[0.85rem] lg:text-[1.05rem]">
                       {value}
                     </dd>
                   </div>

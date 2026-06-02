@@ -44,7 +44,13 @@ const COUNTRY_ITEM_DURATION = 0.78;
 export default function EuropeGlobeSection({
   data,
   settings,
-}: { data?: HomePage; settings?: SiteSettings } = {}) {
+  globeOnMobile = false,
+}: {
+  data?: HomePage;
+  settings?: SiteSettings;
+  // Eksperymentalnie: pokaż glob (WebGL) także na mobile (test2).
+  globeOnMobile?: boolean;
+} = {}) {
   const { t } = useLang();
   const eyebrow = t(data?.globalEyebrow ?? null) || "Wdrozenia w calej Europie";
   const headline = t(data?.globalHeadline ?? null) || "GLOBAL";
@@ -276,14 +282,21 @@ export default function EuropeGlobeSection({
           {headline}
         </div>
 
-        {/* Globus (MapLibre/WebGL) — TYLKO na web. Na mobile w ogóle nie
-            montowany (ukryty + nie renderowany), bo WebGL w position:sticky
-            tnie scroll i psuje się na Safari. */}
+        {/* Globus (MapLibre/WebGL). Domyślnie tylko na web; gdy globeOnMobile
+            (test2) — także na mobile, w mobilnym położeniu i lżejszym trybie
+            (pixelRatio/scale). */}
         <div
           ref={globeWrapRef}
-          className="absolute inset-x-0 top-[34vh] bottom-[-78vh] z-[1] pointer-events-none max-lg:hidden">
-          {!isMobile && globeReady && (
-            <EuropeGlobeInner selectedIso={data?.globalMapCountries} />
+          className={`absolute inset-x-0 top-[34vh] bottom-[-78vh] z-[1] pointer-events-none ${
+            globeOnMobile
+              ? "max-lg:top-[40vh] max-lg:bottom-[-32vh]"
+              : "max-lg:hidden"
+          }`}>
+          {(globeOnMobile || !isMobile) && globeReady && (
+            <EuropeGlobeInner
+              lowPerf={isMobile}
+              selectedIso={data?.globalMapCountries}
+            />
           )}
         </div>
 
@@ -323,7 +336,7 @@ export default function EuropeGlobeSection({
         <div
           ref={ctaRef}
           id="kontakt"
-          className="pointer-events-auto absolute bottom-[128px] left-[5vw] z-30 w-[min(360px,calc(100vw-32px))] max-lg:bottom-[120px] max-lg:left-1/2 max-lg:-translate-x-1/2 max-lg:w-[min(240px,calc(100vw-48px))]">
+          className="pointer-events-auto absolute bottom-[128px] left-[5vw] z-30 w-[min(360px,calc(100vw-32px))] max-lg:bottom-[200px] max-lg:left-1/2 max-lg:-translate-x-1/2 max-lg:w-[min(340px,calc(100vw-32px))]">
           {!mobileCtaOpen && (
             <button
               type="button"
@@ -379,14 +392,14 @@ export default function EuropeGlobeSection({
               </button>
             </div>
             <form
-              className="flex flex-col gap-1.5"
+              className="flex flex-col gap-2"
               onSubmit={(e) => e.preventDefault()}>
-              <div className="grid grid-cols-2 gap-1.5">
+              <div className="grid grid-cols-2 gap-2">
                 <input
                   name="name"
                   type="text"
                   autoComplete="name"
-                  className="rounded-lg border border-white/15 bg-white/10 px-2.5 py-1.5 text-xs font-normal text-white placeholder:text-white/35 outline-none ring-[#59bfc8]/40 transition focus:border-[#59bfc8]/50 focus:ring-2"
+                  className="rounded-lg border border-white/15 bg-white/10 px-3 py-2.5 text-sm font-normal text-white placeholder:text-white/35 outline-none ring-[#59bfc8]/40 transition focus:border-[#59bfc8]/50 focus:ring-2"
                   placeholder={ctaName}
                 />
                 <input
@@ -394,19 +407,19 @@ export default function EuropeGlobeSection({
                   type="email"
                   autoComplete="email"
                   required
-                  className="rounded-lg border border-white/15 bg-white/10 px-2.5 py-1.5 text-xs font-normal text-white placeholder:text-white/35 outline-none ring-[#59bfc8]/40 transition focus:border-[#59bfc8]/50 focus:ring-2"
+                  className="rounded-lg border border-white/15 bg-white/10 px-3 py-2.5 text-sm font-normal text-white placeholder:text-white/35 outline-none ring-[#59bfc8]/40 transition focus:border-[#59bfc8]/50 focus:ring-2"
                   placeholder={ctaEmail}
                 />
               </div>
               <textarea
                 name="message"
                 rows={2}
-                className="resize-none rounded-lg border border-white/15 bg-white/10 px-2.5 py-1.5 text-xs font-normal text-white placeholder:text-white/35 outline-none ring-[#59bfc8]/40 transition focus:border-[#59bfc8]/50 focus:ring-2"
+                className="resize-none rounded-lg border border-white/15 bg-white/10 px-3 py-2.5 text-sm font-normal text-white placeholder:text-white/35 outline-none ring-[#59bfc8]/40 transition focus:border-[#59bfc8]/50 focus:ring-2"
                 placeholder={ctaMessage}
               />
               <button
                 type="submit"
-                className="mt-0.5 self-end flex items-center justify-center gap-1.5 rounded-full bg-white px-5 py-1.5 text-xs font-semibold text-gray-900 transition hover:bg-white/95">
+                className="mt-0.5 self-end flex items-center justify-center gap-1.5 rounded-full bg-white px-5 py-2 text-sm font-semibold text-gray-900 transition hover:bg-white/95">
                 {ctaSubmit}
                 <svg
                   width="12"

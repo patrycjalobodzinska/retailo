@@ -39,17 +39,20 @@ export default function LockerWallDiagram({
   );
   // Proporcja całej ściany (szer:wys) = suma proporcji modułów (wspólna wys.).
   const sumRatio = ratios.reduce((a, b) => a + b, 0) || 1;
+  // Pojedynczy moduł jest wąski (wysoki/cienki) → przy bazowej wysokości
+  // wychodzi mały i „ściśnięty”. Dajemy mu większą wysokość, żeby się rozciągnął.
+  const wallH = modules.length === 1 ? 560 : MAX_WALL_H;
 
   return (
     <div>
-      {/* Cała ściana: szerokość docelowa = MAX_WALL_H·proporcja (KONKRETNA, nie
+      {/* Cała ściana: szerokość docelowa = wallH·proporcja (KONKRETNA, nie
           w-full — inaczej w karcie lg:w-fit zwija się do zera, bo moduły mają
           flex-basis 0). maxWidth:100% przycina do dostępnego miejsca, więc na
           mobile wypełnia szerokość, a aspect-ratio sam obniża wysokość. */}
       <div
         className="mx-auto"
         style={{
-          width: `calc(${MAX_WALL_H}px * ${sumRatio})`,
+          width: `calc(${wallH}px * ${sumRatio})`,
           maxWidth: "100%",
         }}>
         <div

@@ -50,7 +50,7 @@ export default async function Test2() {
       <QASection data={home} />
       <ProductShowcase />
       <RealizationsCarousel items={realizations} />
-      {/* <EuropeGlobeSection /> */}
+      <EuropeGlobeSection data={home ?? undefined} globeOnMobile />
     </>
   );
 }
