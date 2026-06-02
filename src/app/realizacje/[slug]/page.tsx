@@ -4,6 +4,10 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ContactCtaForm from "@/components/ContactCtaForm";
 import RealizationsCarousel from "@/components/RealizationsCarousel";
+import LockerWallDiagram, {
+  RealizationModuleLegend,
+} from "@/components/LockerWallDiagram";
+import RealizationGallery from "@/components/RealizationGallery";
 import {
   getRealizationBySlug,
   getRealizationsList,
@@ -43,12 +47,12 @@ export default async function RealizacjaDetailPage({ params }: PageProps) {
   const config = r.config;
 
   const META_ROWS: Array<[string, string]> = [
-    ["Klient", r.client ?? "—"],
     ["Lokalizacja", r.location],
     ["Rok wdrozenia", r.year ? String(r.year) : "—"],
     ["Liczba skrytek", config?.lockers ? String(config.lockers) : "—"],
     ["Wymiary jednostki", "1970 × 1025 × 50 mm"],
-    ["Czas wdrozenia", r.integrationTime ?? "—"],
+    // Własne pola tabeli z Sanity (per realizacja).
+    ...(r.specs ?? []).map((s) => [s.label, s.value] as [string, string]),
   ];
 
   return (
@@ -58,146 +62,241 @@ export default async function RealizacjaDetailPage({ params }: PageProps) {
         <Header />
       </div>
 
-      <main className="relative z-[1] w-full text-[#0a2a2e]">
-        {/* Hero — shorter (50vh) image, fades in over the gradient. */}
-        <section className="relative w-full h-[50vh] min-h-[380px] overflow-hidden">
-          <img
-            src={r.image}
-            alt={r.title}
-            className="realization-image-in absolute inset-0 w-full h-full object-cover"
-            style={{ objectPosition: "center" }}
-          />
+      <main className="relative z-[1] w-full bg-white text-[#0a2a2e]">
+        {/* Hero — gradient + napis „realizacje" jako KRÓTKA warstwa-tło
+            (absolute). Tekst i zdjęcie są w normalnym flow, więc zdjęcie nachodzi
+            tylko na tło (gradient/biel), nie na treść następnej sekcji. */}
+        <section className="relative w-full lg:min-h-[100vh]">
+          {/* Tło: gradient + dekoracje + duży napis */}
           <div
-            className="realization-image-in absolute inset-0 pointer-events-none"
+            aria-hidden="true"
+            className="absolute inset-x-0 top-0 h-[40vh] z-0 overflow-hidden pointer-events-none lg:h-[380px]"
             style={{
               background:
-                "linear-gradient(180deg, rgba(15,21,24,0.20) 0%, rgba(15,21,24,0.10) 40%, rgba(15,21,24,0.85) 100%)",
-            }}
-          />
-          <div className="realization-block-in realization-block-in-1 absolute bottom-[6vh] left-[6vw] right-[6vw] max-w-[1100px] z-10">
-            <Link
-              href="/realizacje"
-              className="inline-flex items-center gap-2 text-white/75 no-underline hover:text-white transition-colors mb-5"
+                "linear-gradient(180deg, #c0dbe2 0%, #d6e4e9 60%, #ffffff 100%)",
+            }}>
+            <div
+              className="absolute inset-0"
               style={{
-                fontSize: "0.78rem",
-                letterSpacing: "0.18em",
-                textTransform: "uppercase",
-              }}>
-              <span aria-hidden="true">&larr;</span>
-              Realizacje
-            </Link>
+                background:
+                  "radial-gradient(ellipse 70% 70% at 5% 100%, rgba(0,134,176,0.22) 0%, rgba(0,134,176,0) 60%), radial-gradient(ellipse 60% 65% at 95% -5%, rgba(126,213,230,0.35) 0%, rgba(126,213,230,0) 60%)",
+              }}
+            />
+            <svg
+              className="absolute max-md:hidden"
+              style={{ bottom: "12%", right: "5vw", opacity: 0.5 }}
+              width="120"
+              height="80"
+              viewBox="0 0 120 80">
+              {Array.from({ length: 6 }).map((_, row) =>
+                Array.from({ length: 9 }).map((_, col) => (
+                  <circle
+                    key={`${row}-${col}`}
+                    cx={col * 14 + 4}
+                    cy={row * 14 + 4}
+                    r="1.4"
+                    fill="#0086b0"
+                  />
+                )),
+              )}
+            </svg>
             <p
-              className="m-0 mb-2 uppercase tracking-[0.22em] font-semibold text-[#7ed5e6]"
-              style={{ fontSize: "clamp(0.72rem, 0.85vw, 0.85rem)" }}>
-              {r.location}
-            </p>
-            <h1
-              className="m-0 font-bold tracking-tight text-white"
+              className="absolute m-0 font-black select-none"
               style={{
-                fontSize: "clamp(2rem, 5vw, 4.5rem)",
-                lineHeight: 1.02,
-                letterSpacing: "-0.02em",
-                textShadow: "0 4px 24px rgba(0,0,0,0.4)",
+                bottom: "6%",
+                left: "-1vw",
+                fontSize: "clamp(3rem, 12vw, 13rem)",
+                lineHeight: 1.05,
+                letterSpacing: "-0.05em",
+                color: "rgba(255,255,255,0.34)",
               }}>
-              {r.title}
-            </h1>
+              realizacje.
+            </p>
           </div>
-        </section>
 
-        {/* Body — meta + narrative */}
-        <section className="realization-block-in realization-block-in-2 px-[6vw] py-[10vh] max-w-[1200px] mx-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-[1fr_2fr] gap-12">
-            <aside className="flex flex-col gap-5">
+          {/* Treść — normalny flow: tekst | zdjęcie (zdjęcie wychodzi pod
+              gradient na białe tło, ale nie nachodzi na sekcję niżej). */}
+          <div className="realization-block-in realization-block-in-1 relative z-[1] flex flex-col lg:grid lg:grid-cols-2 gap-10 items-start px-[6vw] pt-[120px] pb-[8vh] max-w-[1500px] mx-auto max-lg:pt-[64px] max-lg:gap-6 max-lg:pb-[4vh]">
+            {/* Tekst górny: tytuł + opis. Na mobile pierwszy w kolejności,
+                na desktopie lewa kolumna / wiersz 1. */}
+            <div className="lg:col-start-1 lg:row-start-1">
+              {/* Blok tytułu rezerwuje wysokość warstwy-tła (gradient), więc
+                  tabela poniżej zawsze ląduje na białym, nigdy na gradiencie. */}
+              <div className="lg:min-h-[260px]">
+                <Link
+                  href="/realizacje"
+                className="inline-flex items-center gap-2 text-[#3a5a60] no-underline hover:text-[#0a2a2e] transition-colors mt-6 mb-2"
+                style={{
+                  fontSize: "0.78rem",
+                  letterSpacing: "0.18em",
+                  textTransform: "uppercase",
+                }}>
+                <span aria-hidden="true">&larr;</span>
+                Realizacje
+              </Link>
+              {r.client && r.client !== "—" && (
+                <p
+                  className="m-0 mb-2 font-bold uppercase tracking-[0.14em] text-[#0a2a2e]"
+                  style={{ fontSize: "clamp(1rem, 1.4vw, 1.35rem)" }}>
+                  {r.client}
+                </p>
+              )}
               <p
-                className="m-0 uppercase tracking-[0.22em] font-semibold text-[#0086b0]"
-                style={{ fontSize: "0.72rem" }}>
+                className="m-0 mb-2 uppercase tracking-[0.22em] font-semibold text-[#0086b0]"
+                style={{ fontSize: "clamp(0.72rem, 0.85vw, 0.85rem)" }}>
+                {r.location}
+              </p>
+              <h1
+                className="m-0 font-bold tracking-tight text-[#0a2a2e]"
+                style={{
+                  fontSize: "clamp(2rem, 5vw, 4.5rem)",
+                  lineHeight: 1.02,
+                  letterSpacing: "-0.02em",
+                }}>
+                {r.title}
+              </h1>
+              </div>
+              {/* Krótki opis nad tabelą */}
+              {r.description && (
+                <p
+                  className="m-0 mt-10 text-[#3a5a60] leading-relaxed max-w-[560px] max-lg:mt-6"
+                  style={{ fontSize: "clamp(0.95rem, 1.1vw, 1.05rem)" }}>
+                  {r.description}
+                </p>
+              )}
+            </div>
+
+            {/* Zdjęcie — na mobile NAD danymi wdrożenia (wiersz 2 w kolejności
+                flow); na desktopie prawa kolumna na całą wysokość. */}
+            <div className="lg:col-start-2 lg:row-start-1 lg:row-span-2">
+              <img
+                src={r.image}
+                alt={r.title}
+                className="realization-image-in block h-auto w-full max-w-[780px] max-h-[660px] object-contain lg:ml-auto max-lg:mx-auto max-lg:max-w-[560px]"
+              />
+            </div>
+
+            {/* Dane wdrożenia — na mobile pod zdjęciem; na desktopie lewa
+                kolumna / wiersz 2 (pod tytułem, na białym tle). */}
+            <div className="lg:col-start-1 lg:row-start-2">
+              <p
+                className="m-0 mb-3 uppercase tracking-[0.22em] font-semibold text-[#0086b0]"
+                style={{ fontSize: "0.85rem" }}>
                 Dane wdrozenia
               </p>
-              <dl className="m-0 grid grid-cols-1 gap-4">
+              <dl className="m-0 grid grid-cols-2 gap-x-8 gap-y-5 max-w-[560px]">
                 {META_ROWS.map(([label, value]) => (
-                  <div
-                    key={label}
-                    className="flex flex-col gap-1 pb-3 border-b border-[#0a2a2e]/15">
+                  <div key={label} className="flex flex-col gap-1">
                     <dt
-                      className="m-0 uppercase tracking-widest text-[#3a5a60]"
-                      style={{ fontSize: "0.7rem" }}>
+                      className="m-0 font-medium uppercase tracking-widest"
+                      style={{ fontSize: "0.74rem", color: "#0086b0" }}>
                       {label}
                     </dt>
                     <dd
                       className="m-0 text-[#0a2a2e] font-semibold"
-                      style={{ fontSize: "0.95rem" }}>
+                      style={{ fontSize: "1.05rem" }}>
                       {value}
                     </dd>
                   </div>
                 ))}
               </dl>
-            </aside>
+            </div>
+          </div>
+        </section>
 
-            <div className="flex flex-col gap-10">
-              <div>
-                <h2
-                  className="m-0 mb-4 font-bold tracking-tight text-[#0a2a2e]"
-                  style={{
-                    fontSize: "clamp(1.4rem, 2.4vw, 2rem)",
-                    lineHeight: 1.1,
-                    letterSpacing: "-0.01em",
-                  }}>
-                  O wdrozeniu
-                </h2>
-                <p
-                  className="m-0 text-[#3a5a60] leading-relaxed"
-                  style={{ fontSize: "clamp(0.95rem, 1.1vw, 1.05rem)" }}>
-                  {r.description}
-                </p>
-                {config?.notes && (
-                  <p
-                    className="m-0 mt-4 text-[#3a5a60] leading-relaxed"
-                    style={{ fontSize: "clamp(0.95rem, 1.1vw, 1.05rem)" }}>
-                    {config.notes}
-                  </p>
-                )}
-                <p
-                  className="m-0 mt-4 text-[#3a5a60] leading-relaxed"
-                  style={{ fontSize: "clamp(0.95rem, 1.1vw, 1.05rem)" }}>
-                  PickUpWall jest rozwiazaniem modularnym. Instalacja sklada sie
-                  z{" "}
-                  <strong className="text-[#0a2a2e]">jednostki glownej</strong>{" "}
-                  z ekranem dotykowym oraz dowolnej liczby{" "}
-                  <strong className="text-[#0a2a2e]">
-                    jednostek rozszerzajacych
-                  </strong>{" "}
-                  laczonych w jeden ciag — konfiguracja jest dobierana do
-                  spodziewanego wolumenu zamowien i dostepnej przestrzeni w
-                  punkcie obslugi. Pojedyncza jednostka ma wymiary{" "}
-                  <strong className="text-[#0a2a2e]">197 × 102.5 × 5 cm</strong>
-                  . Realizujemy rowniez wersje niestandardowe pod konkretna
-                  zabudowe lub identyfikacje wizualna marki.
-                </p>
-              </div>
-
-              {/* Config schema — visual layout of cabinet units side by side. */}
-              {config?.masterCount !== undefined && (
+        {/* Konfiguracja wdrożenia — tylko gdy wybrano modele w Sanity */}
+        {r.modules && r.modules.length > 0 && (
+          <section className="relative realization-block-in realization-block-in-2 px-[6vw] pt-[2vh] pb-[12vh] max-w-[1500px] mx-auto">
+          {/* Dekoracyjne tło sekcji */}
+          <div
+            aria-hidden="true"
+            className="absolute inset-0 -z-10 overflow-hidden pointer-events-none">
+            <div
+              className="absolute"
+              style={{
+                top: "8%",
+                left: "-8%",
+                width: "46%",
+                height: "62%",
+                background:
+                  "radial-gradient(ellipse at center, rgba(0,134,176,0.10) 0%, rgba(0,134,176,0) 70%)",
+                filter: "blur(12px)",
+              }}
+            />
+            <div
+              className="absolute"
+              style={{
+                bottom: "4%",
+                right: "-6%",
+                width: "44%",
+                height: "58%",
+                background:
+                  "radial-gradient(ellipse at center, rgba(126,213,230,0.18) 0%, rgba(126,213,230,0) 70%)",
+                filter: "blur(12px)",
+              }}
+            />
+            <svg
+              className="absolute max-md:hidden"
+              style={{ top: "14%", right: "5%", opacity: 0.16 }}
+              width="170"
+              height="130"
+              viewBox="0 0 170 130">
+              {Array.from({ length: 9 }).map((_, row) =>
+                Array.from({ length: 12 }).map((_, col) => (
+                  <circle
+                    key={`${row}-${col}`}
+                    cx={col * 14 + 4}
+                    cy={row * 14 + 4}
+                    r="1.3"
+                    fill="#0086b0"
+                  />
+                )),
+              )}
+            </svg>
+          </div>
+          <div className="relative flex flex-col gap-10">
+              {/* Konfiguracja: ściana złożona z modeli (Sanity) — z fallbackiem
+                  do prostego schematu Master/Slave gdy modele nie wybrane. */}
+              {r.modules?.length ? (
                 <div className="realization-block-in realization-block-in-3">
                   <p
-                    className="m-0 mb-2 uppercase tracking-[0.22em] font-semibold text-[#0086b0]"
-                    style={{ fontSize: "0.72rem" }}>
+                    className="m-0 mb-6 uppercase tracking-[0.18em] font-semibold text-[#0086b0]"
+                    style={{ fontSize: "clamp(1rem, 1.5vw, 1.35rem)" }}>
                     Konfiguracja wdrozenia
                   </p>
+                  <div className="flex flex-col lg:flex-row lg:items-start lg:justify-center gap-8 lg:gap-14">
+                    {/* Schemat po lewej */}
+                    <div className="rounded-2xl bg-white/70 backdrop-blur-sm p-6 md:p-8 border border-[#0a2a2e]/10 lg:w-fit lg:max-w-full lg:shrink-0 max-lg:-mx-[6vw] max-lg:rounded-none max-lg:border-x-0 max-lg:px-3 max-lg:py-5">
+                      <LockerWallDiagram modules={r.modules} showLegend={false} />
+                    </div>
+                    {/* Opis + legenda po prawej, wyrównane do góry */}
+                    <div className="flex flex-col gap-6 lg:max-w-[360px] lg:pt-1">
+                      <p
+                        className="m-0 lg:mt-6 text-[#3a5a60] leading-relaxed"
+                        style={{ fontSize: "0.95rem" }}>
+                        Schematyczny widok od frontu — {r.modules.length}{" "}
+                        {r.modules.length === 1
+                          ? "modul"
+                          : r.modules.length < 5
+                            ? "moduly polaczone w ciag"
+                            : "modulow polaczonych w ciag"}
+                        .
+                      </p>
+                      <RealizationModuleLegend modules={r.modules} />
+                    </div>
+                  </div>
+                </div>
+              ) : config?.masterCount !== undefined ? (
+                <div className="realization-block-in realization-block-in-3">
                   <p
-                    className="m-0 mb-4 text-[#3a5a60] leading-relaxed"
-                    style={{ fontSize: "0.92rem" }}>
-                    Schematyczny widok od frontu —{" "}
-                    {config.masterCount + (config.slaveCount ?? 0)}{" "}
-                    {(() => {
-                      const n = config.masterCount + (config.slaveCount ?? 0);
-                      if (n === 1) return "jednostka";
-                      if (n < 5) return "jednostki polaczone w ciag";
-                      return "jednostek polaczonych w ciag";
-                    })()}
-                    .
+                    className="m-0 mb-6 uppercase tracking-[0.18em] font-semibold text-[#0086b0]"
+                    style={{ fontSize: "clamp(1rem, 1.5vw, 1.35rem)" }}>
+                    Konfiguracja wdrozenia
                   </p>
-                  <div className="rounded-2xl bg-white/70 backdrop-blur-sm p-6 md:p-8 border border-[#0a2a2e]/10">
-                    <div className="flex items-end justify-center mb-6">
+                  <div className="flex flex-col lg:flex-row lg:items-start lg:justify-center gap-8 lg:gap-14">
+                    {/* Schemat po lewej */}
+                    <div className="rounded-2xl bg-white/70 backdrop-blur-sm p-6 md:p-8 border border-[#0a2a2e]/10 lg:w-fit lg:max-w-full lg:shrink-0 max-lg:-mx-[6vw] max-lg:rounded-none max-lg:border-x-0 max-lg:px-3 max-lg:py-5">
+                      <div className="flex items-end justify-center">
                       {(() => {
                         const total =
                           (config.masterCount ?? 0) + (config.slaveCount ?? 0);
@@ -227,57 +326,84 @@ export default async function RealizacjaDetailPage({ params }: PageProps) {
                           place("slave");
                         return nodes;
                       })()}
-                    </div>
-                    <div className="flex flex-wrap gap-x-6 gap-y-3 text-xs uppercase tracking-wider text-[#3a5a60]">
-                      <div className="flex items-center gap-2">
-                        <span
-                          className="block"
-                          style={{
-                            width: 12,
-                            height: 12,
-                            background: "#0086b0",
-                            borderRadius: 2,
-                          }}
-                        />
-                        Jednostka glowna · 39 skrytek + ekran
                       </div>
-                      <div className="flex items-center gap-2">
-                        <span
-                          className="block"
-                          style={{
-                            width: 12,
-                            height: 12,
-                            background: "#7ed5e6",
-                            borderRadius: 2,
-                          }}
-                        />
-                        Jednostka rozszerzajaca · 40 skrytek
+                    </div>
+                    {/* Opis + legenda po prawej, wyrównane do góry */}
+                    <div className="flex flex-col gap-6 lg:max-w-[360px] lg:pt-1">
+                      <p
+                        className="m-0 lg:mt-6 text-[#3a5a60] leading-relaxed"
+                        style={{ fontSize: "0.95rem" }}>
+                        Schematyczny widok od frontu —{" "}
+                        {config.masterCount + (config.slaveCount ?? 0)}{" "}
+                        {(() => {
+                          const n =
+                            config.masterCount + (config.slaveCount ?? 0);
+                          if (n === 1) return "jednostka";
+                          if (n < 5) return "jednostki polaczone w ciag";
+                          return "jednostek polaczonych w ciag";
+                        })()}
+                        .
+                      </p>
+                      <div className="flex flex-col gap-3 text-xs uppercase tracking-wider text-[#3a5a60]">
+                        <div className="flex items-center gap-2.5">
+                          <span
+                            className="block shrink-0"
+                            style={{
+                              width: 14,
+                              height: 14,
+                              background: "#0086b0",
+                              borderRadius: 3,
+                            }}
+                          />
+                          Master — 39 skrytek + ekran
+                        </div>
+                        <div className="flex items-center gap-2.5">
+                          <span
+                            className="block shrink-0"
+                            style={{
+                              width: 14,
+                              height: 14,
+                              background: "#7ed5e6",
+                              borderRadius: 3,
+                            }}
+                          />
+                          Slave - 40 skrytek
+                        </div>
                       </div>
                     </div>
                   </div>
                 </div>
-              )}
-
-              {/* Gallery */}
-              <div className="realization-block-in realization-block-in-4 grid grid-cols-1 md:grid-cols-2 gap-3">
-                <img
-                  src="/realizacja-pickupwall.jpg"
-                  alt={`${r.title} — widok 1`}
-                  className="w-full aspect-[4/5] object-cover rounded-lg border border-[#0a2a2e]/10"
-                />
-                <img
-                  src="/realizacja-pickupwall-2.jpg"
-                  alt={`${r.title} — widok 2`}
-                  className="w-full aspect-[4/5] object-cover rounded-lg border border-[#0a2a2e]/10"
-                />
-              </div>
-            </div>
+              ) : null}
           </div>
         </section>
+        )}
+
+        {/* Galeria — klik = duży podgląd ze strzałkami */}
+        {r.gallery && r.gallery.length > 0 && (
+          <section className="realization-block-in px-[6vw] pb-[12vh] max-w-[1500px] mx-auto">
+            <div className="mb-6">
+              <p
+                className="m-0 mb-2 uppercase tracking-[0.22em] font-semibold text-[#0086b0]"
+                style={{ fontSize: "0.72rem" }}>
+                Galeria
+              </p>
+              <h2
+                className="m-0 font-bold tracking-tight text-[#0a2a2e]"
+                style={{
+                  fontSize: "clamp(1.4rem, 2.4vw, 2rem)",
+                  lineHeight: 1.1,
+                  letterSpacing: "-0.01em",
+                }}>
+                Zdjecia z wdrozenia.
+              </h2>
+            </div>
+            <RealizationGallery images={r.gallery} title={r.title} />
+          </section>
+        )}
 
         {/* Carousel: all other realizations */}
         <section className="realization-block-in realization-block-in-5 border-t border-[#0a2a2e]/10 pt-[6vh] pb-[2vh] max-lg:pt-[4vh]">
-          <div className="max-w-[1200px] mx-auto px-[6vw] mb-2">
+          <div className="max-w-[1500px] mx-auto px-[6vw] mb-2">
             <p
               className="m-0 mb-3 uppercase tracking-[0.22em] font-semibold text-[#0086b0]"
               style={{ fontSize: "0.72rem" }}>

@@ -18,7 +18,7 @@ type HeroData = {
 // Clone głównego Hero ze strony głównej — punkt wyjścia do dalszych
 // modyfikacji wariantu koncepcyjnego.
 export default function HeroConcept({ data }: { data?: HeroData } = {}) {
-  const { t } = useLang();
+  const { t, lang } = useLang();
   const subtitle = t(data?.heroSubtitle ?? null) || "PickUpWall";
   const description =
     t(data?.heroDescription ?? null) ||
@@ -75,6 +75,12 @@ export default function HeroConcept({ data }: { data?: HeroData } = {}) {
         x: 0,
         y: 0,
       });
+      // Badge'e startują z inline opacity:0 — na mobile timeline nie odpala,
+      // więc trzeba je jawnie odsłonić, inaczej zostają niewidoczne.
+      const badges = statsWrapRef.current
+        ? Array.from(statsWrapRef.current.children)
+        : [];
+      gsap.set(badges, { opacity: 1, x: 0, y: 0 });
       // Karta ma `transition-transform` (dla hover) — bez wyłączenia
       // tranzycji ustawienie y:0 animowałoby wjazd z translateY(20px).
       const card = cardRef.current;
@@ -123,7 +129,9 @@ export default function HeroConcept({ data }: { data?: HeroData } = {}) {
         );
     }, heroRef);
     return () => ctx.revert();
-  }, []);
+    // Re-run on language change — przełączenie języka re-renderuje hero;
+    // bez tego ctx.revert() mógł zostawić kartę na opacity:0.
+  }, [lang]);
 
   return (
     <section
@@ -182,7 +190,7 @@ export default function HeroConcept({ data }: { data?: HeroData } = {}) {
       {/* LEFT: text content */}
       <div
         ref={contentRef}
-        className="relative z-[2] flex flex-col justify-start pl-[5vw] pr-[2vw] pt-[18vh] w-[32%] max-2xl:w-[34%] max-xl:w-[38%] max-lg:w-full max-lg:pl-[6vw] max-lg:pr-[6vw] max-lg:pt-[17dvh]"
+        className="relative z-[2] flex flex-col justify-start pl-[5vw] pr-[2vw] pt-[18vh] w-[32%] 2xl:pl-[8vw] max-2xl:w-[34%] max-xl:w-[38%] max-lg:w-full max-lg:pl-[6vw] max-lg:pr-[6vw] max-lg:pt-[17dvh]"
         style={{ opacity: 0, transform: "translateY(20px)" }}>
         <img
           src="/retailologo.webp"
@@ -243,7 +251,7 @@ export default function HeroConcept({ data }: { data?: HeroData } = {}) {
           }}
         />
         <p
-          className="hidden max-lg:block m-0 mt-5 px-[6vw] text-[#3a3a3a] leading-relaxed font-light"
+          className="hidden max-lg:block m-0 mt-[7dvh] px-[6vw] text-[#3a3a3a] leading-relaxed font-light"
           style={{ fontSize: "0.95rem" }}>
           {description}
         </p>
@@ -251,11 +259,11 @@ export default function HeroConcept({ data }: { data?: HeroData } = {}) {
 
       {/* 3 osobne pływające badge'e z backdrop-blur, rozrzucone wokół
           i nachodzące na zdjęcie produktu */}
-      <div ref={statsWrapRef} className="contents max-lg:hidden">
+      <div ref={statsWrapRef} className="contents">
         {[
           {
             ...badgeText(0),
-            cls: "top-[18vh] right-[11vw]",
+            cls: "top-[18vh] right-[11vw] max-lg:top-[18dvh] max-lg:right-auto max-lg:left-[5vw]",
             icon: (
               <>
                 <circle cx="12" cy="12" r="8.5" strokeWidth="1.4" />
@@ -270,7 +278,7 @@ export default function HeroConcept({ data }: { data?: HeroData } = {}) {
           },
           {
             ...badgeText(1),
-            cls: "top-[44vh] right-[4vw]",
+            cls: "top-[44vh] right-[4vw] max-lg:top-[30dvh] max-lg:right-[5vw]",
             icon: (
               <>
                 <rect
@@ -310,7 +318,7 @@ export default function HeroConcept({ data }: { data?: HeroData } = {}) {
           },
           {
             ...badgeText(2),
-            cls: "top-[58vh] left-[46vw]",
+            cls: "top-[58vh] left-[56vw] max-lg:top-[43dvh] max-lg:left-[5vw]",
             icon: (
               <>
                 <path
@@ -373,8 +381,8 @@ export default function HeroConcept({ data }: { data?: HeroData } = {}) {
           szarawe tło z backdrop-blur */}
       <a
         ref={cardRef}
-        href="#realizacje"
-        className="absolute bottom-[5vh] left-[5vw] z-[5] flex w-[min(460px,40vw)] items-stretch overflow-hidden rounded-2xl no-underline backdrop-blur-md transition-transform hover:-translate-y-0.5 max-lg:relative max-lg:bottom-auto max-lg:left-auto max-lg:mt-[1dvh] max-lg:mb-[2dvh] max-lg:mx-[5vw] max-lg:!w-[calc(100%-10vw)]"
+        href="/realizacje"
+        className="absolute bottom-[5vh] left-[5vw] z-[5] flex w-[min(460px,40vw)] items-stretch overflow-hidden rounded-2xl no-underline backdrop-blur-md transition-transform hover:-translate-y-0.5 2xl:left-[8vw] max-lg:relative max-lg:bottom-auto max-lg:left-auto max-lg:mt-[5dvh] max-lg:mb-[0.5dvh] max-lg:mx-[5vw] max-lg:!w-[calc(100%-10vw)]"
         style={{
           background: "rgba(225,225,222,0.55)",
           border: "1px solid rgba(15,15,15,0.08)",

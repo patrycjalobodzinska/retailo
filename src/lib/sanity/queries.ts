@@ -113,6 +113,7 @@ export const HOME_PAGE_QUERY = /* groq */ `
     globalIntro ${localized},
     globalCountriesLeft[] ${localized},
     globalCountriesRight[] ${localized},
+    globalMapCountries,
     globalCtaToggleLabel ${localized},
     globalCtaTitle ${localized},
     globalCtaSubtitle ${localized},
@@ -133,14 +134,17 @@ export const REALIZATIONS_PAGE_QUERY = /* groq */ `
 `;
 
 export const REALIZATIONS_LIST_QUERY = /* groq */ `
-  *[_type == "realization"] | order(publishedAt desc, _createdAt desc) {
+  *[_type == "realization"] | order(featured desc, _createdAt desc) {
     _id,
     "slug": slug.current,
     title ${localized},
-    category ${localized},
     summary ${localized},
+    client,
+    location ${localized},
+    lockerCount,
     coverImage,
-    year
+    year,
+    featured
   }
 `;
 
@@ -149,22 +153,29 @@ export const REALIZATION_BY_SLUG_QUERY = /* groq */ `
     _id,
     "slug": slug.current,
     title ${localized},
-    category ${localized},
     client,
     location ${localized},
     year,
     lockerCount,
-    integration ${localized},
-    rolloutTime ${localized},
+    specs[]{ label, value },
+    masterCount,
+    slaveCount,
+    modules[]->{
+      "id": _id,
+      title,
+      accent,
+      lockers,
+      matrix
+    },
     summary ${localized},
-    story ${localized},
+    body,
     coverImage,
     gallery
   }
 `;
 
 export const NEXT_REALIZATIONS_QUERY = /* groq */ `
-  *[_type == "realization" && slug.current != $slug] | order(publishedAt desc) [0...3] {
+  *[_type == "realization" && slug.current != $slug] | order(_createdAt desc) [0...3] {
     _id,
     "slug": slug.current,
     title ${localized},

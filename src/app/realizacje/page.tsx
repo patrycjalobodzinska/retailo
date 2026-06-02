@@ -24,6 +24,9 @@ async function safeFetch(): Promise<Realization[]> {
 
 export default async function RealizacjePage() {
   const REALIZATIONS = await safeFetch();
+  // Promowane (z Sanity) wyświetlają się jako większe karty na górze listy.
+  const featured = REALIZATIONS.filter((r) => r.featured);
+  const rest = REALIZATIONS.filter((r) => !r.featured);
   return (
     <>
       <Header />
@@ -226,16 +229,18 @@ export default async function RealizacjePage() {
           {/* Inner constrained container — karty mają max-width, ale tło
               powyżej rozciąga się na pełną szerokość ekranu. */}
           <div className="relative max-w-[1300px] mx-auto px-[6vw]">
-            {/* Featured: first two realizations — wider 2-column hero strip */}
-            <div className="relative grid grid-cols-1 md:grid-cols-2 gap-5 mb-5">
-              {REALIZATIONS.slice(0, 2).map((r) => (
-                <RealizationCard key={r.slug} r={r} featured />
-              ))}
-            </div>
+            {/* Promowane — szersza siatka 2-kolumnowa z większymi kartami */}
+            {featured.length > 0 && (
+              <div className="relative grid grid-cols-1 md:grid-cols-2 gap-5 mb-5">
+                {featured.map((r) => (
+                  <RealizationCard key={r.slug} r={r} featured />
+                ))}
+              </div>
+            )}
 
-            {/* Remaining realizations — single denser 3-column grid */}
+            {/* Pozostałe realizacje — gęstsza siatka 3-kolumnowa */}
             <div className="relative grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-              {REALIZATIONS.slice(2).map((r) => (
+              {rest.map((r) => (
                 <RealizationCard key={r.slug} r={r} />
               ))}
             </div>
@@ -276,11 +281,10 @@ function RealizationCard({
           />
           {brand && (
             <span
-              className="absolute top-3 left-3 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full uppercase tracking-[0.18em] font-bold text-[#0a2a2e]"
+              className="absolute top-3 left-3 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full uppercase tracking-[0.16em] font-bold text-[#0a2a2e]"
               style={{
                 fontSize: "0.58rem",
                 background: "rgba(255,255,255,0.92)",
-                border: "1px solid rgba(10,42,46,0.06)",
                 boxShadow: "0 4px 14px rgba(15,21,24,0.18)",
               }}>
               <span

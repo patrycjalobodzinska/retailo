@@ -1,4 +1,5 @@
 import { defineField, defineType } from "sanity";
+import { MapCountriesInput } from "../../components/MapCountriesInput";
 
 export const homePage = defineType({
   name: "homePage",
@@ -509,6 +510,16 @@ export const homePage = defineType({
       type: "array",
       group: "global",
       of: [{ type: "localizedString" }],
+    }),
+    defineField({
+      name: "globalMapCountries",
+      title: "Kraje podświetlane na mapie (kody ISO)",
+      description:
+        "Steruje podświetleniem krajów na globie. Wybierz z listy Europy lub dodaj kod ISO ręcznie (spoza Europy). Jeśli puste — używana jest domyślna lista.",
+      type: "array",
+      group: "global",
+      of: [{ type: "string" }],
+      components: { input: MapCountriesInput },
     }),
     defineField({
       name: "globalCtaToggleLabel",

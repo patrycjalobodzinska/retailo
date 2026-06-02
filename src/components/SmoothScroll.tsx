@@ -17,6 +17,9 @@ declare global {
 export default function SmoothScroll() {
   const pathname = usePathname();
   useEffect(() => {
+    // Na /admin (Sanity Studio) nie inicjalizujemy Lenis — przejmowałby
+    // scroll i psuł UI Studia.
+    if (pathname?.startsWith("/admin")) return;
     if ("scrollRestoration" in history) {
       history.scrollRestoration = "manual";
     }
@@ -77,6 +80,7 @@ export default function SmoothScroll() {
   }, []);
 
   useEffect(() => {
+    if (pathname?.startsWith("/admin")) return;
     const lenis = window.__lenis;
     if (lenis) lenis.scrollTo(0, { immediate: true });
     else window.scrollTo(0, 0);

@@ -1,10 +1,9 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Sanity studio imports `useEffectEvent` from React. The hook IS in
-  // React 19.2+ (verified locally), but webpack's static CJS-to-ESM
-  // analysis chokes on react's nested require chain and reports the
-  // export as missing. Forcing Next.js to transpile sanity through its
-  // own pipeline makes the import resolve correctly.
+  // Sanity v5 używa `useEffectEvent` (React 19.2). W warstwie App Routera
+  // Next podstawia paczkom swojego wkompilowanego Reacta — dopiero Next 16
+  // wendoruje React 19.2 z tym hookiem (linia 15.5 go nie miała). Transpilacja
+  // sanity przez pipeline Next dodatkowo wygładza rozwiązywanie importów.
   transpilePackages: ["sanity", "@sanity/ui", "@sanity/vision"],
   images: {
     remotePatterns: [

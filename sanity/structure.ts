@@ -31,6 +31,7 @@ export const structure: StructureResolver = (S) =>
             .title("Strona realizacji"),
         ),
       S.documentTypeListItem("realization").title("Realizacje"),
+      S.documentTypeListItem("lockerModule").title("Modele"),
       S.divider(),
       S.listItem()
         .title("Ustawienia strony")

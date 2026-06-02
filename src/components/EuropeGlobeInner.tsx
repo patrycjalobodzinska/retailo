@@ -4,141 +4,99 @@ import { useEffect, useRef } from "react";
 import maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 
-type Pin = {
-  lat: number;
-  lng: number;
-  color: string;
-  size: number;
-  delay: number;
-};
-
-const PINS: Pin[] = [
-  { lat: 52.23, lng: 21.01, color: "#b6fff0", size: 0.9, delay: 0.0 }, // Warszawa
-  { lat: 52.52, lng: 13.41, color: "#4dffd2", size: 0.55, delay: 0.25 }, // Berlin
-  { lat: 50.08, lng: 14.44, color: "#4dffd2", size: 0.55, delay: 0.4 }, // Praga
-  { lat: 48.86, lng: 2.35, color: "#4dffd2", size: 0.55, delay: 0.55 }, // Paryż
-  { lat: 51.51, lng: -0.13, color: "#4dffd2", size: 0.55, delay: 0.7 }, // Londyn
-  { lat: 41.9, lng: 12.5, color: "#4dffd2", size: 0.55, delay: 0.85 }, // Rzym
-  { lat: 40.42, lng: -3.7, color: "#4dffd2", size: 0.55, delay: 1.0 }, // Madryt
-  { lat: 44.43, lng: 26.1, color: "#4dffd2", size: 0.55, delay: 1.15 }, // Bukareszt
-  { lat: 59.33, lng: 18.07, color: "#4dffd2", size: 0.55, delay: 1.3 }, // Sztokholm
+// Domyślna lista krajów podświetlanych na globie (ISO_A2 z geojsona) — używana
+// gdy w Sanity (homePage.globalMapCountries) nic nie wybrano.
+const DEFAULT_SELECTED_ISO = [
+  "PL",
+  "DE",
+  "FR",
+  "ES",
+  "IT",
+  "GB",
+  "CZ",
+  "SK",
+  "AT",
+  "RO",
+  "SE",
+  "NL",
 ];
 
-const MAP_STYLE = {
-  version: 8 as const,
-  glyphs: "https://demotiles.maplibre.org/font/{fontstack}/{range}.pbf",
-  // Globus od pierwszej klatki — bez krótkiego błysku 2D prostokąta.
-  projection: { type: "globe" as const },
-  sources: {
-    countries: {
-      type: "geojson" as const,
-      data: "/countries.geojson",
-    },
-  },
-  layers: [
-    {
-      id: "bg",
-      type: "background" as const,
-      paint: { "background-color": "#06222e" },
-    },
-    {
-      id: "land-fill",
-      type: "fill" as const,
-      source: "countries",
-      paint: {
-        "fill-color": "#2d829c",
-        "fill-opacity": 0.92,
-      },
-    },
-    {
-      id: "land-stroke",
-      type: "line" as const,
-      source: "countries",
-      paint: {
-        "line-color": "#7ed5e6",
-        "line-opacity": 0.45,
-        "line-width": 0.5,
-      },
-    },
+// Basemapa jak w mapcn — hostowany styl wektorowy Carto "dark-matter".
+// Globus i atmosferę dokładamy po załadowaniu stylu (setProjection/setSky),
+// bo hostowany styl nie zawiera tych pól.
+const MAP_STYLE = "https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json";
+
+// Atmosfera/„kosmos" wokół globu — tony dopasowane do cyjanu sekcji (#59bfc8).
+const SKY: maplibregl.SkySpecification = {
+  "sky-color": "#0a2c3a",
+  "horizon-color": "#1f5e72",
+  "fog-color": "#06222e",
+  "sky-horizon-blend": 0.6,
+  "horizon-fog-blend": 0.5,
+  "fog-ground-blend": 0.4,
+  "atmosphere-blend": [
+    "interpolate",
+    ["linear"],
+    ["zoom"],
+    0,
+    0.9,
+    6,
+    0.3,
+    10,
+    0,
   ],
 };
 
-function injectPinStyles() {
-  if (typeof document === "undefined") return;
-  if (document.getElementById("europe-pin-styles")) return;
-  const style = document.createElement("style");
-  style.id = "europe-pin-styles";
-  style.textContent = `
-    @keyframes europePinPulse {
-      0%, 100% { transform: scale(1); }
-      50%      { transform: scale(1.06); }
-    }
-    @keyframes europePinGrow {
-      0%   { transform: scaleY(0); opacity: 0; }
-      60%  { opacity: 1; }
-      100% { transform: scaleY(1); opacity: 1; }
-    }
-    /* MapLibre default marker styling clash: zerujemy translation defaults
-       żeby anchor:'bottom' działał czysto z naszym DOM-em. */
-    .europe-pin-marker {
-      pointer-events: none;
-    }`;
-  document.head.appendChild(style);
-}
-
-function makePinElement(p: Pin, lowPerf: boolean): HTMLElement {
-  const stemH = Math.round(34 * p.size + 14);
-  const dot = Math.round(14 * p.size + 7);
-  // Na mobile: mniej warstw glow + bez nieskończonego pulsu — kompozytor
-  // nie repaintuje pinów na każdej klatce scrolla.
-  const glow = lowPerf
-    ? `0 0 4px #ffffff, 0 0 10px ${p.color}, 0 0 18px ${p.color}cc`
-    : `0 0 3px #ffffff, 0 0 7px ${p.color}, 0 0 14px ${p.color}, 0 0 26px ${p.color}, 0 0 40px ${p.color}cc`;
-  const pulse = lowPerf
-    ? ""
-    : `animation:europePinPulse 2.8s ease-in-out infinite;animation-delay:${p.delay + 0.7}s;`;
-  const el = document.createElement("div");
-  el.className = "europe-pin-marker";
-  el.style.pointerEvents = "none";
-  el.innerHTML = `
-    <div style="transform-origin:bottom center;opacity:0;
-                animation:europePinGrow 0.7s cubic-bezier(0.34,1.56,0.64,1) ${p.delay}s both;">
-      <div style="display:flex;flex-direction:column;align-items:center;">
-        <div style="width:${dot}px;height:${dot}px;border-radius:50%;
-                    background:${p.color};
-                    border:1.5px solid rgba(255,255,255,0.95);
-                    box-shadow:${glow};
-                    ${pulse}"></div>
-        <div style="width:2px;height:${stemH}px;
-                    background:linear-gradient(to bottom, ${p.color} 0%, ${p.color}00 100%);"></div>
-      </div>
-    </div>`;
-  return el;
-}
-
 interface EuropeGlobeInnerProps {
-  width: number;
-  height: number;
   lowPerf?: boolean;
+  // Kody ISO_A2 do podświetlenia (z Sanity). Puste/brak → lista domyślna.
+  selectedIso?: string[];
 }
 
 export default function EuropeGlobeInner({
-  width,
-  height,
   lowPerf = false,
+  selectedIso,
 }: EuropeGlobeInnerProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const wrapperRef = useRef<HTMLDivElement>(null);
+  // Stabilny string do zależności efektu — re-init mapy przy zmianie listy.
+  const isoKey = (selectedIso ?? []).join(",");
 
   useEffect(() => {
-    injectPinStyles();
-    if (!containerRef.current) return;
+    const container = containerRef.current;
+    if (!container) return;
+
+    const SELECTED_ISO =
+      selectedIso && selectedIso.length
+        ? selectedIso.map((c) => c.toUpperCase())
+        : DEFAULT_SELECTED_ISO;
+
+    // Dobieramy zoom względem rozmiaru kontenera. Średnica globu w px ≈
+    // (512·2^zoom)/π, więc zoom = log2(scale·minDim·π/512).
+    // scale = jak duży glob względem krótszego boku kontenera:
+    //   ≤ 1 → cały glob mieści się w kadrze (nie ucina od góry/dołu);
+    //   > 1 → glob większy niż kadr, krawędzie chowają się poza kontenerem.
+    // Mobile: większy glob (dekoracyjny, może wychodzić poza ekran).
+    // Desktop: ≤ 1, żeby górna krawędź globu NIE była ucinana — kontener jest
+    // przesunięty w dół (patrz top w EuropeGlobeSection), więc glob ląduje
+    // niżej, a dół i tak wystaje pod viewport.
+    // Desktop: SCALE=1 → średnica globu = wysokość canvasu, więc górna krawędź
+    // globu pokrywa się z górą canvasu (NIE ucina się od góry). Rozmiar i
+    // pozycję steruje wtedy wysoki, zsunięty w dół kontener (patrz
+    // EuropeGlobeSection) — dół globu wystaje pod viewport (ukryty).
+    const SCALE = lowPerf ? 2.2 : 1.0;
+    const fitZoom = () => {
+      const rect = container.getBoundingClientRect();
+      const minDim = Math.min(rect.width, rect.height) || 600;
+      const z = Math.log2((SCALE * minDim * Math.PI) / 512);
+      return Math.max(0.4, Math.min(z, 4.5));
+    };
 
     const map = new maplibregl.Map({
-      container: containerRef.current,
-      style: MAP_STYLE as unknown as maplibregl.StyleSpecification,
-      center: [14, 28],
-      zoom: 3.0,
+      container,
+      style: MAP_STYLE,
+      center: [14, 30],
+      zoom: fitZoom(),
       pitch: 0,
       bearing: 0,
       interactive: false,
@@ -148,47 +106,96 @@ export default function EuropeGlobeInner({
       pixelRatio: lowPerf ? 1 : undefined,
     });
 
-    const markers: maplibregl.Marker[] = [];
+    // Projekcja globu + atmosfera + podświetlenie krajów — po wczytaniu stylu.
+    map.on("style.load", () => {
+      map.setProjection({ type: "globe" });
+      map.setSky(SKY);
+
+      // Usuwamy wszystkie etykiety (nazwy krajów/miast = symbol layers).
+      for (const l of map.getStyle().layers ?? []) {
+        if (l.type === "symbol") {
+          try {
+            map.removeLayer(l.id);
+          } catch {
+            /* noop */
+          }
+        }
+      }
+
+      // Kraje wdrożeń: dokładamy fill + obrys z geojsona.
+      const layers = map.getStyle().layers ?? [];
+      const firstSymbol = layers.find((l) => l.type === "symbol")?.id;
+      const filter = [
+        "in",
+        ["get", "ISO_A2"],
+        ["literal", SELECTED_ISO],
+      ] as unknown as maplibregl.FilterSpecification;
+
+      map.addSource("selected-countries", {
+        type: "geojson",
+        data: "/countries.geojson",
+      });
+      map.addLayer(
+        {
+          id: "selected-fill",
+          type: "fill",
+          source: "selected-countries",
+          filter,
+          paint: { "fill-color": "#59bfc8", "fill-opacity": 0.5 },
+        },
+        firstSymbol,
+      );
+      map.addLayer(
+        {
+          id: "selected-line",
+          type: "line",
+          source: "selected-countries",
+          filter,
+          paint: {
+            "line-color": "#aef0f5",
+            "line-width": 0.8,
+            "line-opacity": 0.85,
+          },
+        },
+        firstSymbol,
+      );
+    });
 
     map.on("load", () => {
       // Pokaż globus dopiero po załadowaniu — bez błysku pustego
       // prostokąta przy szybkim scrollu w dół.
       if (wrapperRef.current) wrapperRef.current.style.opacity = "1";
-
-      // Markery — DOM piny, anchor: 'bottom' żeby tip kreski siedział
-      // dokładnie w lat/lng.
-      PINS.forEach((p) => {
-        const el = makePinElement(p, lowPerf);
-        const m = new maplibregl.Marker({ element: el, anchor: "bottom" })
-          .setLngLat([p.lng, p.lat])
-          .addTo(map);
-        markers.push(m);
-      });
     });
 
+    // Przy zmianie rozmiaru kontenera utrzymujemy cały glob w kadrze.
+    const ro = new ResizeObserver(() => {
+      map.resize();
+      map.setZoom(fitZoom());
+    });
+    ro.observe(container);
+
     return () => {
-      markers.forEach((m) => m.remove());
+      ro.disconnect();
       map.remove();
     };
+    // lowPerf w zależnościach: przy przekroczeniu progu mobile/desktop (resize)
+    // SCALE i pixelRatio się zmieniają, więc mapę trzeba zainicjalizować na
+    // nowo. Ciągły resize w obrębie jednego progu obsługuje ResizeObserver.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [isoKey, lowPerf]);
 
   return (
     <div
       ref={wrapperRef}
       style={{
-        width,
-        height,
-        position: "relative",
+        position: "absolute",
+        inset: 0,
         // Dekoracyjny — żeby map nie blokował scrolla na mobile.
         pointerEvents: "none",
         opacity: 0,
         transition: "opacity 0.5s ease-out",
       }}>
-      <div
-        ref={containerRef}
-        style={{ width: "100%", height: "100%" }}
-      />
+      <div ref={containerRef} style={{ width: "100%", height: "100%" }} />
     </div>
   );
 }

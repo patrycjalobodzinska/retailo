@@ -99,7 +99,6 @@ export default function EuropeGlobeSection({
   const footerRef = useRef<HTMLDivElement>(null);
   const ctaRef = useRef<HTMLDivElement>(null);
   const [mobileCtaOpen, setMobileCtaOpen] = useState(false);
-  const [size, setSize] = useState(760);
   // Mobile = niższy budżet GPU: tniemy pixelRatio globusa, blur i glow pinów.
   const [lowPerf, setLowPerf] = useState(false);
   // Globus jest ciężki (MapLibre + 488KB geojson) — ładujemy go dopiero
@@ -110,7 +109,6 @@ export default function EuropeGlobeSection({
 
   useEffect(() => {
     const update = () => {
-      setSize(Math.min(Math.max(window.innerWidth, window.innerHeight), 1050));
       setLowPerf(window.matchMedia("(max-width: 1023px)").matches);
     };
     update();
@@ -139,7 +137,7 @@ export default function EuropeGlobeSection({
 
   useEffect(() => {
     const ctx = gsap.context(() => {
-      gsap.set(globeWrapRef.current, { xPercent: -50, y: 0 });
+      gsap.set(globeWrapRef.current, { xPercent: 0, y: 0 });
 
       gsap.to(introRef.current, {
         y: "-30vh",
@@ -276,16 +274,20 @@ export default function EuropeGlobeSection({
           {headline}
         </div>
 
-        {/* Mapa 3D (kolorowe kontynenty + neonowe piny) zamiast globusa. */}
+        {/* Globus mapcn (MapLibre) — powiększony, przesunięty w dół; przed
+            napisem GLOBAL (napis za globem), ale za eyebrow/formularzem/stopką. */}
         <div
           ref={globeWrapRef}
-          className="absolute left-1/2 top-[36vh] z-[3] -translate-x-1/2 md:top-[30vh]">
+          className="absolute inset-x-0 top-[34vh] bottom-[-78vh] z-[1] pointer-events-none max-lg:top-[40vh] max-lg:bottom-[-32vh]">
           {globeReady && (
-            <EuropeGlobeInner width={size} height={size} lowPerf={lowPerf} />
+            <EuropeGlobeInner
+              lowPerf={lowPerf}
+              selectedIso={data?.globalMapCountries}
+            />
           )}
         </div>
 
-        {/* Left countries */}
+        {/* Kraje wdrożeń — lewa lista */}
         <div
           ref={leftRef}
           className="absolute z-[4] left-[4vw] top-[34%] -translate-y-1/2 flex flex-col gap-4 max-lg:gap-2 max-lg:left-[3vw] max-lg:top-[52%]">
@@ -301,7 +303,7 @@ export default function EuropeGlobeSection({
           ))}
         </div>
 
-        {/* Right countries */}
+        {/* Kraje wdrożeń — prawa lista */}
         <div
           ref={rightRef}
           className="absolute z-[4] right-[4vw] top-[34%] -translate-y-1/2 flex flex-col gap-4 max-lg:gap-2 max-lg:right-[3vw] max-lg:top-[52%]">
@@ -321,7 +323,7 @@ export default function EuropeGlobeSection({
         <div
           ref={ctaRef}
           id="kontakt"
-          className="pointer-events-auto absolute bottom-[150px] left-[5vw] z-30 w-[min(360px,calc(100vw-32px))] max-lg:bottom-[140px] max-lg:left-1/2 max-lg:-translate-x-1/2 max-lg:w-[min(240px,calc(100vw-48px))]">
+          className="pointer-events-auto absolute bottom-[128px] left-[5vw] z-30 w-[min(360px,calc(100vw-32px))] max-lg:bottom-[120px] max-lg:left-1/2 max-lg:-translate-x-1/2 max-lg:w-[min(240px,calc(100vw-48px))]">
           {!mobileCtaOpen && (
             <button
               type="button"
@@ -404,7 +406,7 @@ export default function EuropeGlobeSection({
               />
               <button
                 type="submit"
-                className="mt-0.5 flex items-center justify-center gap-1.5 rounded-full bg-white py-1.5 text-xs font-semibold text-gray-900 transition hover:bg-white/95">
+                className="mt-0.5 self-end flex items-center justify-center gap-1.5 rounded-full bg-white px-5 py-1.5 text-xs font-semibold text-gray-900 transition hover:bg-white/95">
                 {ctaSubmit}
                 <svg
                   width="12"

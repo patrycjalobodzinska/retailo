@@ -43,9 +43,11 @@ export default function Header({
           };
         })
       : NAV_ITEMS_FALLBACK;
-  // Homepage (i test2 = klon homepage) uses the dark-pill variant nad
-  // jasnym hero; każda inna trasa używa light variant nad ciemnym tłem.
+  // Nawigacja: na podstronach logo prowadzi do "/"; na home scroll do góry.
   const isSubpage = pathname !== "/" && pathname !== "/test2";
+  // Styl: ciemne pigułki na JASNYM tle (home, test2, realizacje — jasny gradient),
+  // jasne pigułki na CIEMNYM tle (pozostałe trasy).
+  const onDark = isSubpage && !pathname.startsWith("/realizacje");
 
   const [open, setOpen] = useState(false);
 
@@ -105,10 +107,10 @@ export default function Header({
           className="inline-flex items-center no-underline"
           aria-label="retailo. — strona glowna"
           style={{
-            background: isSubpage
+            background: onDark
               ? "rgba(255,255,255,0.85)"
               : "rgba(42,56,64,0.5)",
-            border: isSubpage
+            border: onDark
               ? "1px solid rgba(10,42,46,0.08)"
               : "1px solid rgba(255,255,255,0.12)",
             padding: "8px 16px",
@@ -117,7 +119,7 @@ export default function Header({
             WebkitBackdropFilter: "blur(14px)",
           }}>
           <img
-            src={isSubpage ? "/retailologo.webp" : "/retailologo_light.webp"}
+            src={onDark ? "/retailologo.webp" : "/retailologo_light.webp"}
             alt="retailo."
             style={{ height: 22, width: "auto", display: "block" }}
           />
@@ -128,10 +130,10 @@ export default function Header({
           className="hidden md:flex items-center"
           style={{
             gap: 4,
-            background: isSubpage
+            background: onDark
               ? "rgba(255,255,255,0.85)"
               : "rgba(42,56,64,0.5)",
-            border: isSubpage
+            border: onDark
               ? "1px solid rgba(10,42,46,0.08)"
               : "1px solid rgba(255,255,255,0.12)",
             borderRadius: 999,
@@ -145,7 +147,7 @@ export default function Header({
               href={`#${item.target}`}
               onClick={(e) => handleNavClick(e, item)}
               className={`text-[14px] font-semibold no-underline tracking-wide px-4 py-2 rounded-full transition-colors cursor-pointer ${
-                isSubpage
+                onDark
                   ? "text-[#0a2a2e] hover:bg-[#0a2a2e]/8"
                   : "text-white hover:bg-white/10"
               }`}>
@@ -155,7 +157,7 @@ export default function Header({
           <div
             className="ml-2 pl-2"
             style={{
-              borderLeft: isSubpage
+              borderLeft: onDark
                 ? "1px solid rgba(10,42,46,0.12)"
                 : "1px solid rgba(255,255,255,0.12)",
             }}>
@@ -170,10 +172,10 @@ export default function Header({
           onClick={() => setOpen((o) => !o)}
           className="md:hidden flex flex-col gap-1.5 cursor-pointer w-12 h-12 justify-center items-center"
           style={{
-            background: isSubpage
+            background: onDark
               ? "rgba(255,255,255,0.92)"
               : "rgba(42,56,64,0.7)",
-            border: isSubpage
+            border: onDark
               ? "1px solid rgba(10,42,46,0.08)"
               : "1px solid rgba(255,255,255,0.12)",
             borderRadius: 999,
@@ -181,7 +183,7 @@ export default function Header({
             WebkitBackdropFilter: "blur(14px)",
           }}>
           {(() => {
-            const bar = isSubpage ? "block bg-[#0a2a2e]" : "block bg-white";
+            const bar = onDark ? "block bg-[#0a2a2e]" : "block bg-white";
             return (
               <>
                 <span

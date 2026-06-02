@@ -8,6 +8,7 @@ import { siteSettings } from "./documents/siteSettings";
 import { homePage } from "./documents/homePage";
 import { realization } from "./documents/realization";
 import { realizationsPage } from "./documents/realizationsPage";
+import { lockerModule } from "./documents/lockerModule";
 
 export const schemaTypes: SchemaTypeDefinition[] = [
   // helpers
@@ -20,4 +21,5 @@ export const schemaTypes: SchemaTypeDefinition[] = [
   homePage,
   realizationsPage,
   realization,
+  lockerModule,
 ];

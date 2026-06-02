@@ -13,7 +13,7 @@ const apiVersion =
 export default defineConfig({
   name: "retailo",
   title: "Retailo CMS",
-  basePath: "/studio",
+  basePath: "/admin",
   projectId,
   dataset,
   apiVersion,

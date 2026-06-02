@@ -109,7 +109,10 @@ export default function RealizationsCarousel({
   };
 
   return (
-    <section className="relative w-full overflow-hidden bg-white pt-12 pb-8 md:pt-14 md:pb-28">
+    <section
+      className={`relative w-full overflow-hidden bg-white pb-8 md:pt-14 md:pb-28 ${
+        showHeader ? "pt-12" : "pt-3"
+      }`}>
       {showHeader && (
       <div className="relative z-10 mx-auto max-w-[1100px] px-6 mb-4 md:mb-10 text-center">
         <p
@@ -189,7 +192,6 @@ export default function RealizationsCarousel({
                 item.client && item.client !== "—" ? item.client : null;
               const hasBadges =
                 !!item.config?.lockers ||
-                !!item.integrationTime ||
                 (item.tags && item.tags.length > 0);
 
               if (variant === "dark") {
@@ -219,11 +221,10 @@ export default function RealizationsCarousel({
                     />
                     {brand && (
                       <span
-                        className="absolute top-4 left-4 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full uppercase tracking-[0.18em] font-bold text-[#0a2a2e]"
+                        className="absolute top-4 left-4 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full uppercase tracking-[0.16em] font-bold text-[#0a2a2e]"
                         style={{
                           fontSize: "0.62rem",
                           background: "rgba(255,255,255,0.92)",
-                          border: "1px solid rgba(10,42,46,0.06)",
                           boxShadow: "0 4px 14px rgba(15,21,24,0.18)",
                         }}
                       >
@@ -293,18 +294,6 @@ export default function RealizationsCarousel({
                               {item.config.lockers} skrytek
                             </span>
                           )}
-                          {item.integrationTime && (
-                            <span
-                              className="inline-flex items-center px-2 py-0.5 rounded-full uppercase tracking-[0.12em] font-semibold text-white/85"
-                              style={{
-                                fontSize: "0.58rem",
-                                background: "rgba(255,255,255,0.08)",
-                                border: "1px solid rgba(255,255,255,0.10)",
-                              }}
-                            >
-                              {item.integrationTime}
-                            </span>
-                          )}
                           {item.tags?.slice(0, 2).map((tag) => (
                             <span
                               key={tag}
@@ -356,21 +345,16 @@ export default function RealizationsCarousel({
                       />
                       {brand && (
                         <span
-                          className="absolute top-3 left-3 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full uppercase tracking-[0.18em] font-bold text-[#0a2a2e]"
+                          className="absolute top-3 left-3 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full uppercase tracking-[0.16em] font-bold text-[#0a2a2e]"
                           style={{
                             fontSize: "0.58rem",
                             background: "rgba(255,255,255,0.92)",
-                            border: "1px solid rgba(10,42,46,0.06)",
                             boxShadow: "0 4px 14px rgba(15,21,24,0.18)",
                           }}
                         >
                           <span
                             className="block rounded-full"
-                            style={{
-                              width: 5,
-                              height: 5,
-                              background: "#0086b0",
-                            }}
+                            style={{ width: 5, height: 5, background: "#0086b0" }}
                           />
                           {brand}
                         </span>

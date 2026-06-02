@@ -165,7 +165,7 @@ export default function ProductShowcase({
             entering phase 2 (Specyfikacja techniczna). */}
         <div className="pointer-events-none absolute inset-0 z-[5] max-lg:hidden">
           <div className="sticky top-0 h-screen w-full">
-            <div ref={imageWrapRef} className="absolute right-[5vw] top-1/2 -translate-y-1/2 w-[480px] aspect-square max-2xl:!w-[420px] max-xl:!w-[360px] max-xl:!right-[3vw]">
+            <div ref={imageWrapRef} className="absolute right-[5vw] top-1/2 -translate-y-1/2 w-[480px] aspect-square 2xl:right-[8vw] max-2xl:!w-[420px] max-xl:!w-[360px] max-xl:!right-[3vw]">
               <img
                 ref={sketchRef}
                 src="/pickupwall-sketch.png"
@@ -208,7 +208,7 @@ export default function ProductShowcase({
               />
             </div>
             <div className="absolute inset-0 z-[3] pointer-events-none max-lg:relative max-lg:inset-auto">
-              <div className="absolute top-[8vh] left-[5vw] max-w-[420px] max-lg:relative max-lg:top-auto max-lg:left-auto max-lg:px-[6vw] max-lg:mb-5 max-lg:max-w-none pointer-events-none">
+              <div className="absolute top-[8vh] left-[5vw] max-w-[380px] 2xl:left-[8vw] max-lg:relative max-lg:top-auto max-lg:left-auto max-lg:px-[6vw] max-lg:mb-5 max-lg:max-w-none pointer-events-none">
                 <p
                   className="text-[#2a2a2a]/80 font-light m-0 mb-2 leading-tight max-lg:text-[1.05rem] max-lg:mb-2"
                   style={{ fontSize: "clamp(1.2rem, 2vw, 1.8rem)" }}>
@@ -221,7 +221,7 @@ export default function ProductShowcase({
               </div>
               <ol
                 ref={featuresRef}
-                className="absolute top-[24vh] left-[5vw] m-0 p-0 list-none flex flex-col gap-5 max-w-[440px] pointer-events-auto max-lg:relative max-lg:top-auto max-lg:bottom-auto max-lg:left-auto max-lg:px-[6vw] max-lg:max-w-none max-lg:gap-3">
+                className="absolute top-[24vh] left-[5vw] m-0 p-0 list-none flex flex-col gap-5 max-w-[400px] 2xl:left-[8vw] pointer-events-auto max-lg:relative max-lg:top-auto max-lg:bottom-auto max-lg:left-auto max-lg:px-[6vw] max-lg:max-w-none max-lg:gap-3">
                 <li className="m-0 p-0">
                   <p
                     className="m-0 mb-4 uppercase tracking-[0.22em] font-bold max-lg:mb-3"
@@ -302,7 +302,7 @@ export default function ProductShowcase({
               </div>
             </div>
             <div className="absolute inset-0 flex items-start justify-start pl-[6vw] pr-[4vw] pt-[22vh] pb-[4vh] pointer-events-none z-[1] max-lg:relative max-lg:inset-auto max-lg:flex-col max-lg:justify-start max-lg:gap-4 max-lg:p-[3dvh_6vw_0] max-lg:min-h-0">
-              <div className="flex flex-col w-full max-w-[680px] pointer-events-auto max-2xl:max-w-[600px] max-xl:max-w-[520px] max-lg:max-w-full">
+              <div className="flex flex-col w-full max-w-[560px] pointer-events-auto max-2xl:max-w-[520px] max-xl:max-w-[470px] max-lg:max-w-full">
                 <h2
                   className="uppercase tracking-widest m-0 mb-1"
                   style={{
