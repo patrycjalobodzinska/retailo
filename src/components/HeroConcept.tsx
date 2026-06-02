@@ -297,7 +297,7 @@ export default function HeroConcept({ data }: { data?: HeroData } = {}) {
         ].map((b) => (
           <div
             key={b.label}
-            className={`absolute z-[4] flex flex-col items-start gap-2 rounded-2xl px-4 py-3 text-left backdrop-blur-md min-w-[120px] max-lg:min-w-[84px] max-lg:gap-1 max-lg:px-2 max-lg:py-1.5 max-lg:rounded-lg ${b.cls}`}
+            className={`absolute z-[4] flex flex-col items-start gap-2 rounded-2xl px-4 py-3 text-left lg:backdrop-blur-md min-w-[120px] max-lg:min-w-[84px] max-lg:gap-1 max-lg:px-2 max-lg:py-1.5 max-lg:rounded-lg ${b.cls}`}
             style={{
               background: "rgba(255,255,255,0.4)",
               border: "1px solid rgba(15,15,15,0.08)",
@@ -340,7 +340,7 @@ export default function HeroConcept({ data }: { data?: HeroData } = {}) {
       <a
         ref={cardRef}
         href="/realizacje"
-        className="absolute bottom-[5vh] left-[5vw] z-[5] flex w-[min(460px,40vw)] items-stretch overflow-hidden rounded-2xl no-underline backdrop-blur-md transition-transform hover:-translate-y-0.5 2xl:left-[8vw] max-lg:relative max-lg:bottom-auto max-lg:left-auto max-lg:mt-[5dvh] max-lg:mb-[0.5dvh] max-lg:mx-[5vw] max-lg:!w-[calc(100%-10vw)]"
+        className="absolute bottom-[5vh] left-[5vw] z-[5] flex w-[min(460px,40vw)] items-stretch overflow-hidden rounded-2xl no-underline lg:backdrop-blur-md transition-transform hover:-translate-y-0.5 2xl:left-[8vw] max-lg:relative max-lg:bottom-auto max-lg:left-auto max-lg:mt-[5dvh] max-lg:mb-[0.5dvh] max-lg:mx-[5vw] max-lg:!w-[calc(100%-10vw)]"
         style={{
           background: "rgba(225,225,222,0.55)",
           border: "1px solid rgba(15,15,15,0.08)",

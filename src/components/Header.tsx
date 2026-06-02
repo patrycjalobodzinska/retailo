@@ -51,6 +51,19 @@ export default function Header({
 
   const [open, setOpen] = useState(false);
 
+  // Na mobile wyłączamy backdrop-blur pigułek headera — fixed element z
+  // backdrop-filter repaintuje rozmycie na KAŻDEJ klatce scrolla, co szarpie
+  // płynny scroll (zwłaszcza przy ciągłym przeciąganiu palcem).
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    const update = () =>
+      setIsMobile(window.matchMedia("(max-width: 1023px)").matches);
+    update();
+    window.addEventListener("resize", update);
+    return () => window.removeEventListener("resize", update);
+  }, []);
+  const pillBlur = isMobile ? "none" : "blur(14px)";
+
   useEffect(() => {
     if (open) {
       document.body.style.overflow = "hidden";
@@ -115,8 +128,8 @@ export default function Header({
               : "1px solid rgba(255,255,255,0.12)",
             padding: "8px 16px",
             borderRadius: 999,
-            backdropFilter: "blur(14px)",
-            WebkitBackdropFilter: "blur(14px)",
+            backdropFilter: pillBlur,
+            WebkitBackdropFilter: pillBlur,
           }}>
           <img
             src={onDark ? "/retailologo.webp" : "/retailologo_light.webp"}
@@ -138,8 +151,8 @@ export default function Header({
               : "1px solid rgba(255,255,255,0.12)",
             borderRadius: 999,
             padding: "6px 8px",
-            backdropFilter: "blur(14px)",
-            WebkitBackdropFilter: "blur(14px)",
+            backdropFilter: pillBlur,
+            WebkitBackdropFilter: pillBlur,
           }}>
           {navItems.map((item) => (
             <a
@@ -179,8 +192,8 @@ export default function Header({
               ? "1px solid rgba(10,42,46,0.08)"
               : "1px solid rgba(255,255,255,0.12)",
             borderRadius: 999,
-            backdropFilter: "blur(14px)",
-            WebkitBackdropFilter: "blur(14px)",
+            backdropFilter: pillBlur,
+            WebkitBackdropFilter: pillBlur,
           }}>
           {(() => {
             const bar = onDark ? "block bg-[#0a2a2e]" : "block bg-white";
