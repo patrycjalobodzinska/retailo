@@ -120,7 +120,16 @@ export const HOME_PAGE_QUERY = /* groq */ `
     globalCtaNamePlaceholder ${localized},
     globalCtaEmailPlaceholder ${localized},
     globalCtaMessagePlaceholder ${localized},
-    globalCtaSubmitLabel ${localized}
+    globalCtaSubmitLabel ${localized},
+
+    modelsVisible,
+    modelsHeadline ${localized},
+    models[]{
+      name ${localized},
+      description ${localized},
+      featured,
+      "image": image.asset->url
+    }
   }
 `;
 

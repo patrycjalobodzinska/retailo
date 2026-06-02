@@ -150,6 +150,15 @@ export type HomePage = {
   globalCtaEmailPlaceholder?: LocalizedField;
   globalCtaMessagePlaceholder?: LocalizedField;
   globalCtaSubmitLabel?: LocalizedField;
+
+  modelsVisible?: boolean;
+  modelsHeadline?: LocalizedField;
+  models?: Array<{
+    name?: LocalizedField;
+    description?: LocalizedField;
+    image?: string;
+    featured?: boolean;
+  }>;
 } | null;
 
 // Sanity content rarely changes mid-day; one-hour cache trades freshness

@@ -18,6 +18,7 @@ const QASection = nextDynamic(() => import("@/components/QASection"));
 const ProductShowcase = nextDynamic(
   () => import("@/components/ProductShowcase"),
 );
+const ModelsSection = nextDynamic(() => import("@/components/ModelsSection"));
 const RealizationsCarousel = nextDynamic(
   () => import("@/components/RealizationsCarousel"),
 );
@@ -79,6 +80,7 @@ export default async function Home() {
         <QASection data={home} />
       </div>
       <ProductShowcase data={home} />
+      {home?.modelsVisible !== false && <ModelsSection data={home} />}
       <div id="realizacje">
         <RealizationsCarousel items={realizations} data={home} />
       </div>

@@ -1,42 +1,61 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useLang } from "@/lib/i18n/LanguageProvider";
+import type { HomePage } from "@/lib/sanity/fetch";
 
 const SIDE_TONE = "rgb(212, 214, 216)";
 const SIDE_TONE_BG = "rgba(212, 214, 216, 0.42)";
 const CENTER_TONE = "rgb(172, 170, 165)";
 const CENTER_TONE_BG = "rgba(172, 170, 165, 0.48)";
 
-const MODELS = [
+// Fallback gdy w Sanity nie wprowadzono modeli (homePage.models puste).
+const FALLBACK_MODELS = [
   {
     img: "/model2_retailo.png",
     name: "PickUpWall M",
     desc: "Standardowa konfiguracja dwujednostkowa do sklepow retail.",
-    cardBg: SIDE_TONE_BG,
-    circleColor: SIDE_TONE,
     featured: false,
   },
   {
     img: "/model3_retailo.png",
     name: "PickUpWall L",
     desc: "Rozszerzona konfiguracja dla wysokich wolumenow zamowien.",
-    cardBg: CENTER_TONE_BG,
-    circleColor: CENTER_TONE,
     featured: true,
   },
   {
     img: "/model4_retailo.png",
     name: "PickUpWall XL",
     desc: "Pelnowymiarowa sciana odbioru w przestrzeniach o duzym ruchu.",
-    cardBg: SIDE_TONE_BG,
-    circleColor: SIDE_TONE,
     featured: false,
   },
 ];
 
-export default function ModelsSection() {
+export default function ModelsSection({ data }: { data?: HomePage } = {}) {
+  const { t } = useLang();
   const scrollerRef = useRef<HTMLDivElement>(null);
   const [activeIdx, setActiveIdx] = useState(0);
+
+  const headline =
+    t(data?.modelsHeadline ?? null) || "Poznaj modele PickUpWall";
+
+  // Modele z Sanity (z tłumaczeniami); fallback do listy wbudowanej. Tony
+  // (tło karty / koło) wynikają z „featured”, nie z CMS.
+  const sanityModels = (data?.models ?? [])
+    .map((m) => ({
+      img: m.image || "",
+      name: t(m.name ?? null),
+      desc: t(m.description ?? null),
+      featured: !!m.featured,
+    }))
+    .filter((m) => m.name);
+  const MODELS = (sanityModels.length ? sanityModels : FALLBACK_MODELS).map(
+    (m) => ({
+      ...m,
+      cardBg: m.featured ? CENTER_TONE_BG : SIDE_TONE_BG,
+      circleColor: m.featured ? CENTER_TONE : SIDE_TONE,
+    }),
+  );
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -90,7 +109,7 @@ export default function ModelsSection() {
             fontSize: "clamp(1.4rem, 2.6vw, 2.4rem)",
             letterSpacing: "0.14em",
           }}>
-          Poznaj modele PickUpWall
+          {headline}
         </h2>
 
         {/* Desktop grid */}

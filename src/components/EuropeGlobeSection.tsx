@@ -137,21 +137,25 @@ export default function EuropeGlobeSection({
     const ctx = gsap.context(() => {
       gsap.set(globeWrapRef.current, { xPercent: 0, y: 0 });
 
-      gsap.to(introRef.current, {
-        y: "-30vh",
-        opacity: 0,
-        ease: "none",
-        scrollTrigger: {
-          trigger: wrapRef.current,
-          start: "top top",
-          end: "25% top",
-          scrub: true,
-        },
-      });
-
       const isMobile =
         typeof window !== "undefined" &&
         window.matchMedia("(max-width: 1023px)").matches;
+
+      // Parallax (scrub) tylko na desktopie — na mobile scrub ScrollTrigger
+      // przy Lenis + sticky szarpał scrollem.
+      if (!isMobile) {
+        gsap.to(introRef.current, {
+          y: "-30vh",
+          opacity: 0,
+          ease: "none",
+          scrollTrigger: {
+            trigger: wrapRef.current,
+            start: "top top",
+            end: "25% top",
+            scrub: true,
+          },
+        });
+      }
       const leftItems = Array.from(leftRef.current?.children || []);
       const rightItems = Array.from(rightRef.current?.children || []);
 
@@ -233,7 +237,7 @@ export default function EuropeGlobeSection({
       style={{ height: `${SECTION_SCROLL_VH}vh` }}>
       <div
         ref={sectionRef}
-        className="sticky top-0 w-full h-screen min-h-[640px] overflow-hidden max-lg:h-[100dvh] max-lg:min-h-[100dvh]"
+        className="sticky top-0 w-full h-screen min-h-[640px] overflow-hidden max-lg:relative max-lg:top-auto max-lg:h-[100dvh] max-lg:min-h-[100dvh]"
         style={{
           background: "linear-gradient(180deg, #154D6D 0%, #000000 100%)",
         }}>
