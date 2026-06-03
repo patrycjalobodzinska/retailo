@@ -311,7 +311,7 @@ export default function EuropeGlobeSection({
         {/* Kraje wdrożeń — lewa lista */}
         <div
           ref={leftRef}
-          className="absolute z-[4] left-[4vw] top-[34%] -translate-y-1/2 flex flex-col gap-4 max-lg:gap-2 max-lg:left-[3vw] max-lg:top-[52%] [@media(min-width:1024px)_and_(max-height:850px)]:top-[26%] [@media(min-width:1024px)_and_(max-height:850px)]:gap-2">
+          className="absolute z-[4] left-[4vw] top-[34%] -translate-y-1/2 flex flex-col gap-4 max-lg:gap-2 max-lg:left-[3vw] max-lg:top-[52%] [@media(min-width:1024px)_and_(max-height:850px)]:top-[26%] [@media(min-width:1024px)_and_(max-height:850px)]:gap-2 [@media(max-width:1023px)_and_(max-height:740px)]:!top-[45%]">
           {leftCountriesList.map((c) => (
             <div
               key={c.name}
@@ -327,7 +327,7 @@ export default function EuropeGlobeSection({
         {/* Kraje wdrożeń — prawa lista */}
         <div
           ref={rightRef}
-          className="absolute z-[4] right-[4vw] top-[34%] -translate-y-1/2 flex flex-col gap-4 max-lg:gap-2 max-lg:right-[3vw] max-lg:top-[52%] [@media(min-width:1024px)_and_(max-height:850px)]:top-[26%] [@media(min-width:1024px)_and_(max-height:850px)]:gap-2">
+          className="absolute z-[4] right-[4vw] top-[34%] -translate-y-1/2 flex flex-col gap-4 max-lg:gap-2 max-lg:right-[3vw] max-lg:top-[52%] [@media(min-width:1024px)_and_(max-height:850px)]:top-[26%] [@media(min-width:1024px)_and_(max-height:850px)]:gap-2 [@media(max-width:1023px)_and_(max-height:740px)]:!top-[45%]">
           {rightCountriesList.map((c) => (
             <div
               key={c.name}
@@ -383,7 +383,11 @@ export default function EuropeGlobeSection({
 
           <div
             className={`rounded-2xl border border-white/20 bg-black/85 px-3.5 py-3 shadow-lg lg:backdrop-blur-2xl ${
-              mobileCtaOpen ? "max-lg:block" : "max-lg:hidden"
+              mobileCtaOpen
+                ? // display:none → block restartuje animację, więc formularz
+                  // wjeżdża z dołu z lekkim skalowaniem przy każdym otwarciu.
+                  "max-lg:block max-lg:origin-bottom max-lg:animate-[cta-pop_0.35s_cubic-bezier(0.22,1,0.36,1)_both]"
+                : "max-lg:hidden"
             }`}>
             <div className="mb-2 flex items-start justify-between gap-2">
               <div>

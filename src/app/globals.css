@@ -583,3 +583,10 @@ html, body {
 .realization-block-in-3 { animation-delay: 1.0s; }
 .realization-block-in-4 { animation-delay: 1.15s; }
 .realization-block-in-5 { animation-delay: 1.30s; }
+
+/* Mobilny formularz kontaktowy (globe section) — otwarcie po kliknięciu
+   pigułki „Porozmawiajmy": wjazd z dołu + lekkie skalowanie. */
+@keyframes cta-pop {
+  from { opacity: 0; transform: translateY(14px) scale(0.96); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}

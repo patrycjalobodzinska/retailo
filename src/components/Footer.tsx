@@ -8,7 +8,7 @@ export default function Footer() {
       style={{ background: "rgba(0,0,0,0.85)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)" }}
     >
       <div className="border-t border-white/10">
-        <div className="flex items-center justify-between px-[5vw] py-12">
+        <div className="flex items-center justify-between gap-8 px-[5vw] py-12 max-md:flex-col max-md:items-start max-md:py-9">
           <div>
             <img
               src="/retailologo_light.webp"
@@ -17,7 +17,7 @@ export default function Footer() {
             />
             <p className="text-white/50 text-sm m-0">Automatyczne systemy odbioru przesylek</p>
           </div>
-          <div className="flex gap-12">
+          <div className="flex flex-wrap gap-x-12 gap-y-6">
             <div>
               <p className="text-white/40 text-xs uppercase tracking-widest m-0 mb-3">Kontakt</p>
               <p className="text-white/80 text-sm m-0 mb-1">info@retailo.pl</p>
@@ -30,9 +30,9 @@ export default function Footer() {
             </div>
           </div>
         </div>
-        <div className="flex items-center justify-between px-[5vw] py-4 border-t border-white/5">
+        <div className="flex items-center justify-between gap-x-6 gap-y-2 px-[5vw] py-4 border-t border-white/5 max-md:flex-col max-md:items-start">
           <p className="text-white/30 text-xs m-0">&copy; 2026 retailo. Wszelkie prawa zastrzezone.</p>
-          <div className="flex gap-6">
+          <div className="flex flex-wrap gap-x-6 gap-y-2">
             <Link href="/polityka-prywatnosci" className="text-white/30 text-xs no-underline hover:text-white/60 transition-colors">Polityka prywatnosci</Link>
             <CookieSettingsLink className="cursor-pointer border-0 bg-transparent p-0 text-white/30 text-xs hover:text-white/60 transition-colors" />
           </div>
