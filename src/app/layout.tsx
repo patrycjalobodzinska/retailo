@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Roboto, Raleway } from "next/font/google";
 import "./globals.css";
 import SmoothScroll from "@/components/SmoothScroll";
+import CookieConsent from "@/components/CookieConsent";
 import { LanguageProvider } from "@/lib/i18n/LanguageProvider";
 import { IntlBridge } from "@/lib/i18n/IntlBridge";
 import {
@@ -90,10 +91,12 @@ export default async function RootLayout({
   // its infrastructure 404. Fall back to the safe defaults instead.
   let languages: Awaited<ReturnType<typeof getLanguages>> = [];
   let defaultLang = "pl";
+  let settings: Awaited<ReturnType<typeof getSiteSettings>> = null;
   try {
-    [languages, defaultLang] = await Promise.all([
+    [languages, defaultLang, settings] = await Promise.all([
       getLanguages(),
       getDefaultLanguage(),
+      getSiteSettings(),
     ]);
   } catch (e) {
     console.error("[RootLayout] Sanity fetch failed, using fallback:", e);
@@ -143,6 +146,7 @@ export default async function RootLayout({
           <IntlBridge>
             <SmoothScroll />
             {children}
+            <CookieConsent settings={settings} />
           </IntlBridge>
         </LanguageProvider>
       </body>

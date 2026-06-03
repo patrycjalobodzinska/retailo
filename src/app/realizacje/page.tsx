@@ -266,7 +266,7 @@ function RealizationCard({
     <Link
       href={`/realizacje/${r.slug}`}
       className={`relative block rounded-2xl no-underline ${
-        featured ? "aspect-[16/14]" : "aspect-[4/5]"
+        featured ? "aspect-[4/5] lg:aspect-[16/14]" : "aspect-[4/5]"
       }`}
       style={{
         background: "rgba(172, 170, 165, 0.48)",

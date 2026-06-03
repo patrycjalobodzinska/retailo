@@ -3,6 +3,7 @@ import { createImageUrlBuilder } from "@sanity/image-url";
 import {
   HOME_PAGE_QUERY,
   LANGUAGES_QUERY,
+  LEGAL_PAGE_QUERY,
   NEXT_REALIZATIONS_QUERY,
   REALIZATIONS_LIST_QUERY,
   REALIZATIONS_PAGE_QUERY,
@@ -85,6 +86,34 @@ export type SiteSettings = {
   footerCopyright?: LocalizedField;
   footerPrivacyLabel?: LocalizedField;
   footerTermsLabel?: LocalizedField;
+  cookieTitle?: LocalizedField;
+  cookieText?: LocalizedField;
+  cookieAcceptLabel?: LocalizedField;
+  cookieRejectLabel?: LocalizedField;
+  cookieCustomizeLabel?: LocalizedField;
+  cookieSaveLabel?: LocalizedField;
+  cookieSettingsTitle?: LocalizedField;
+  cookieNecessaryTitle?: LocalizedField;
+  cookieNecessaryDesc?: LocalizedField;
+  cookieAnalyticsTitle?: LocalizedField;
+  cookieAnalyticsDesc?: LocalizedField;
+  cookieSettingsLinkLabel?: LocalizedField;
+} | null;
+
+/** Rich text per język — taki sam kształt translations jak LocalizedField,
+    ale wartością jest Portable Text. */
+export type LocalizedBlocks = {
+  translations?: Array<{
+    language?: { code?: string } | null;
+    value?: PortableTextBlock[] | null;
+  }> | null;
+} | null;
+
+export type LegalPage = {
+  slug?: string;
+  title?: LocalizedField;
+  effectiveDate?: LocalizedField;
+  body?: LocalizedBlocks;
 } | null;
 
 export type LocalizedItem = { title: LocalizedField; description: LocalizedField };
@@ -187,6 +216,10 @@ export async function getHomePage(): Promise<HomePage> {
 
 export async function getRealizationsPage() {
   return sanityClient.fetch(REALIZATIONS_PAGE_QUERY, {}, fetchOpts);
+}
+
+export async function getLegalPage(slug: string): Promise<LegalPage> {
+  return sanityClient.fetch<LegalPage>(LEGAL_PAGE_QUERY, { slug }, fetchOpts);
 }
 
 // Płaski typ Realization używany przez RealizationsCarousel, listę

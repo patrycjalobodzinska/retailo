@@ -127,6 +127,67 @@ export const siteSettings = defineType({
       title: "Footer – etykieta linku „Regulamin”",
       type: "localizedString",
     }),
+    // ── Baner cookies ────────────────────────────────────────────────
+    defineField({
+      name: "cookieTitle",
+      title: "Cookies – tytuł banera",
+      type: "localizedString",
+    }),
+    defineField({
+      name: "cookieText",
+      title: "Cookies – treść banera",
+      type: "localizedText",
+    }),
+    defineField({
+      name: "cookieAcceptLabel",
+      title: "Cookies – przycisk „Akceptuję wszystkie”",
+      type: "localizedString",
+    }),
+    defineField({
+      name: "cookieRejectLabel",
+      title: "Cookies – przycisk „Odrzucam”",
+      type: "localizedString",
+    }),
+    defineField({
+      name: "cookieCustomizeLabel",
+      title: "Cookies – przycisk „Dostosuj”",
+      type: "localizedString",
+    }),
+    defineField({
+      name: "cookieSaveLabel",
+      title: "Cookies – przycisk „Zapisz wybór”",
+      type: "localizedString",
+    }),
+    defineField({
+      name: "cookieSettingsTitle",
+      title: "Cookies – tytuł panelu ustawień",
+      type: "localizedString",
+    }),
+    defineField({
+      name: "cookieNecessaryTitle",
+      title: "Cookies – kategoria niezbędne (tytuł)",
+      type: "localizedString",
+    }),
+    defineField({
+      name: "cookieNecessaryDesc",
+      title: "Cookies – kategoria niezbędne (opis)",
+      type: "localizedText",
+    }),
+    defineField({
+      name: "cookieAnalyticsTitle",
+      title: "Cookies – kategoria analityczne (tytuł)",
+      type: "localizedString",
+    }),
+    defineField({
+      name: "cookieAnalyticsDesc",
+      title: "Cookies – kategoria analityczne (opis)",
+      type: "localizedText",
+    }),
+    defineField({
+      name: "cookieSettingsLinkLabel",
+      title: "Cookies – etykieta linku „Ustawienia cookies” (stopka)",
+      type: "localizedString",
+    }),
   ],
   preview: {
     prepare: () => ({ title: "Ustawienia strony" }),

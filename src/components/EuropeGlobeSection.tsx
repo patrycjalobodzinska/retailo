@@ -5,6 +5,7 @@ import dynamic from "next/dynamic";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useLang } from "@/lib/i18n/LanguageProvider";
+import { CookieSettingsLink } from "@/components/CookieConsent";
 import type { HomePage, SiteSettings } from "@/lib/sanity/fetch";
 
 gsap.registerPlugin(ScrollTrigger);
@@ -80,8 +81,6 @@ export default function EuropeGlobeSection({
     t(settings?.footerCopyright ?? null) || "© 2026 retailo";
   const footerPrivacyLabel =
     t(settings?.footerPrivacyLabel ?? null) || "Polityka prywatności";
-  const footerTermsLabel =
-    t(settings?.footerTermsLabel ?? null) || "Regulamin";
 
   const leftCountries = (data?.globalCountriesLeft ?? []).map((f, i) => ({
     flag: LEFT_FLAGS[i] ?? "🏳",
@@ -288,7 +287,7 @@ export default function EuropeGlobeSection({
         {/* Glob desktop — MapLibre (płaski podświetlony glob). */}
         <div
           ref={globeWrapRef}
-          className="absolute inset-x-0 top-[34vh] bottom-[-78vh] z-[1] pointer-events-none max-lg:hidden">
+          className="absolute inset-x-0 top-[26vh] bottom-[-70vh] z-[1] pointer-events-none max-lg:hidden">
           {!isMobile && globeReady && (
             <EuropeGlobeInner selectedIso={data?.globalMapCountries} />
           )}
@@ -312,7 +311,7 @@ export default function EuropeGlobeSection({
         {/* Kraje wdrożeń — lewa lista */}
         <div
           ref={leftRef}
-          className="absolute z-[4] left-[4vw] top-[34%] -translate-y-1/2 flex flex-col gap-4 max-lg:gap-2 max-lg:left-[3vw] max-lg:top-[52%]">
+          className="absolute z-[4] left-[4vw] top-[34%] -translate-y-1/2 flex flex-col gap-4 max-lg:gap-2 max-lg:left-[3vw] max-lg:top-[52%] [@media(min-width:1024px)_and_(max-height:850px)]:top-[26%] [@media(min-width:1024px)_and_(max-height:850px)]:gap-2">
           {leftCountriesList.map((c) => (
             <div
               key={c.name}
@@ -328,7 +327,7 @@ export default function EuropeGlobeSection({
         {/* Kraje wdrożeń — prawa lista */}
         <div
           ref={rightRef}
-          className="absolute z-[4] right-[4vw] top-[34%] -translate-y-1/2 flex flex-col gap-4 max-lg:gap-2 max-lg:right-[3vw] max-lg:top-[52%]">
+          className="absolute z-[4] right-[4vw] top-[34%] -translate-y-1/2 flex flex-col gap-4 max-lg:gap-2 max-lg:right-[3vw] max-lg:top-[52%] [@media(min-width:1024px)_and_(max-height:850px)]:top-[26%] [@media(min-width:1024px)_and_(max-height:850px)]:gap-2">
           {rightCountriesList.map((c) => (
             <div
               key={c.name}
@@ -341,11 +340,14 @@ export default function EuropeGlobeSection({
           ))}
         </div>
 
-        {/* CTA formularz */}
+        {/* CTA formularz. Pozycjonowanie (left/translate) trzyma zewnętrzny
+            div — GSAP animuje tylko wewnętrzny wrapper, żeby inline'owy
+            transform nie nadpisywał -translate-x-1/2 (form uciekał poza
+            ekran po resize do mobile). */}
         <div
-          ref={ctaRef}
           id="kontakt"
-          className="pointer-events-auto absolute bottom-[128px] left-[5vw] z-30 w-[min(360px,calc(100vw-32px))] max-lg:bottom-[165px] max-lg:left-1/2 max-lg:-translate-x-1/2 max-lg:w-[min(340px,calc(100vw-32px))]">
+          className="pointer-events-auto absolute bottom-[128px] left-[5vw] z-30 w-[min(360px,calc(100vw-32px))] max-lg:bottom-[165px] max-lg:left-1/2 max-lg:-translate-x-1/2 max-lg:w-[min(340px,calc(100vw-32px))] [@media(min-width:1024px)_and_(max-height:850px)]:scale-[0.95] [@media(min-width:1024px)_and_(max-height:850px)]:origin-bottom-left [@media(min-width:1024px)_and_(max-height:720px)]:!scale-[0.85]">
+          <div ref={ctaRef}>
           {!mobileCtaOpen && (
             <button
               type="button"
@@ -447,6 +449,7 @@ export default function EuropeGlobeSection({
               </button>
             </form>
           </div>
+          </div>
         </div>
 
         {/* Stopka */}
@@ -499,15 +502,14 @@ export default function EuropeGlobeSection({
                   <p className="m-0">{footerCopyright}</p>
                   <div className="flex gap-4">
                     <a
-                      href="#"
+                      href="/polityka-prywatnosci"
                       className="no-underline hover:text-white/55 transition-colors">
                       {footerPrivacyLabel}
                     </a>
-                    <a
-                      href="#"
-                      className="no-underline hover:text-white/55 transition-colors">
-                      {footerTermsLabel}
-                    </a>
+                    <CookieSettingsLink
+                      label={t(settings?.cookieSettingsLinkLabel ?? null)}
+                      className="border-0 bg-transparent p-0 text-[11px] text-white/30 hover:text-white/55 transition-colors"
+                    />
                   </div>
                 </div>
               </div>

@@ -45,9 +45,12 @@ export default function Header({
       : NAV_ITEMS_FALLBACK;
   // Nawigacja: na podstronach logo prowadzi do "/"; na home scroll do góry.
   const isSubpage = pathname !== "/" && pathname !== "/test2";
-  // Styl: ciemne pigułki na JASNYM tle (home, test2, realizacje — jasny gradient),
-  // jasne pigułki na CIEMNYM tle (pozostałe trasy).
-  const onDark = isSubpage && !pathname.startsWith("/realizacje");
+  // Styl: ciemne pigułki na JASNYM tle (home, test2, realizacje, polityka
+  // prywatności — jasny gradient), jasne pigułki na CIEMNYM tle (pozostałe).
+  const onDark =
+    isSubpage &&
+    !pathname.startsWith("/realizacje") &&
+    !pathname.startsWith("/polityka-prywatnosci");
 
   const [open, setOpen] = useState(false);
 
@@ -81,6 +84,12 @@ export default function Header({
   ) => {
     e.preventDefault();
     setOpen(false);
+    // Na podstronach kotwice nie istnieją — przenosimy na stronę główną
+    // z hashem (przeglądarka sama doscrolluje do sekcji po załadowaniu).
+    if (isSubpage) {
+      window.location.href = `/#${item.target}`;
+      return;
+    }
     const el = document.getElementById(item.target);
     if (!el) return;
     const elTop = el.getBoundingClientRect().top + window.scrollY;

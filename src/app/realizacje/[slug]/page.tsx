@@ -8,6 +8,8 @@ import LockerWallDiagram, {
   RealizationModuleLegend,
 } from "@/components/LockerWallDiagram";
 import RealizationGallery from "@/components/RealizationGallery";
+import { PortableText } from "next-sanity";
+import { BODY_COMPONENTS } from "@/components/portableTextComponents";
 import {
   getRealizationBySlug,
   getRealizationsList,
@@ -170,6 +172,41 @@ export default async function RealizacjaDetailPage({ params }: PageProps) {
                   {r.description}
                 </p>
               )}
+              {/* CTA — wypełnia lewą kolumnę pod opisem (po przeniesieniu
+                  tabeli danych do sekcji konfiguracji). */}
+              <div className="mt-8 flex flex-wrap items-center gap-3 max-lg:mt-6">
+                <Link
+                  href="/#kontakt"
+                  className="inline-flex items-center gap-2 rounded-full bg-[#0a2a2e] px-5 py-2.5 text-sm font-semibold text-white no-underline transition hover:bg-[#0086b0]">
+                  Porozmawiajmy o podobnym wdrozeniu
+                  <span aria-hidden="true">&rarr;</span>
+                </Link>
+                <Link
+                  href="/realizacje"
+                  className="inline-flex items-center rounded-full border border-[#0a2a2e]/15 px-5 py-2.5 text-sm font-semibold text-[#0a2a2e] no-underline transition hover:border-[#0086b0] hover:text-[#0086b0]">
+                  Inne realizacje
+                </Link>
+              </div>
+              {/* Dekoracyjny dot-grid — wypełnia resztę lewej kolumny. */}
+              <svg
+                aria-hidden="true"
+                className="mt-12 max-lg:hidden"
+                style={{ opacity: 0.3 }}
+                width="190"
+                height="106"
+                viewBox="0 0 190 106">
+                {Array.from({ length: 7 }).map((_, row) =>
+                  Array.from({ length: 13 }).map((_, col) => (
+                    <circle
+                      key={`${row}-${col}`}
+                      cx={col * 14 + 4}
+                      cy={row * 14 + 4}
+                      r="1.3"
+                      fill="#0086b0"
+                    />
+                  )),
+                )}
+              </svg>
             </div>
 
             {/* Zdjęcie — na mobile NAD danymi wdrożenia (wiersz 2 w kolejności
@@ -182,8 +219,10 @@ export default async function RealizacjaDetailPage({ params }: PageProps) {
               />
             </div>
 
-            {/* Dane wdrożenia — na mobile pod zdjęciem; na desktopie lewa
-                kolumna / wiersz 2 (pod tytułem, na białym tle). */}
+            {/* Dane wdrożenia — w hero tylko gdy realizacja nie ma sekcji
+                „Konfiguracja wdrożenia" (z modułami tabela przenosi się tam,
+                obok schematu). */}
+            {!r.modules?.length && (
             <div className="lg:col-start-1 lg:row-start-2">
               <p
                 className="m-0 mb-3 uppercase tracking-[0.22em] font-semibold text-[#0086b0]"
@@ -205,6 +244,7 @@ export default async function RealizacjaDetailPage({ params }: PageProps) {
                 ))}
               </dl>
             </div>
+            )}
           </div>
         </section>
 
@@ -269,24 +309,43 @@ export default async function RealizacjaDetailPage({ params }: PageProps) {
                     Konfiguracja wdrozenia
                   </p>
                   <div className="flex flex-col lg:flex-row lg:items-start lg:justify-center gap-8 lg:gap-14">
-                    {/* Schemat po lewej */}
-                    <div className="rounded-2xl bg-white/70 backdrop-blur-sm p-6 md:p-8 border border-[#0a2a2e]/10 lg:w-fit lg:max-w-full lg:shrink-0 max-lg:-mx-[6vw] max-lg:rounded-none max-lg:border-x-0 max-lg:px-3 max-lg:py-5">
-                      <LockerWallDiagram modules={r.modules} showLegend={false} />
+                    {/* Schemat po lewej, pod nim opis + legenda */}
+                    <div className="flex flex-col gap-5 lg:w-fit lg:max-w-full lg:shrink-0">
+                      <div className="rounded-2xl bg-white/70 backdrop-blur-sm p-6 md:p-8 border border-[#0a2a2e]/10 max-lg:-mx-[6vw] max-lg:rounded-none max-lg:border-x-0 max-lg:px-3 max-lg:py-5">
+                        <LockerWallDiagram modules={r.modules} showLegend={false} />
+                      </div>
                     </div>
-                    {/* Opis + legenda po prawej, wyrównane do góry */}
-                    <div className="flex flex-col gap-6 lg:max-w-[360px] lg:pt-1">
-                      <p
-                        className="m-0 lg:mt-6 text-[#3a5a60] leading-relaxed"
-                        style={{ fontSize: "0.95rem" }}>
-                        Schematyczny widok od frontu — {r.modules.length}{" "}
-                        {r.modules.length === 1
-                          ? "modul"
-                          : r.modules.length < 5
-                            ? "moduly polaczone w ciag"
-                            : "modulow polaczonych w ciag"}
-                        .
-                      </p>
-                      <RealizationModuleLegend modules={r.modules} />
+                    {/* Dane wdrożenia po prawej (przeniesione z hero) — karta
+                        w stylu schematu obok, pola rozdzielone subtelnymi
+                        liniami. */}
+                    <div className="w-full lg:max-w-[440px] lg:pt-1">
+                      <div className="rounded-2xl bg-white/70 backdrop-blur-sm border border-[#0a2a2e]/10 p-6 md:p-7">
+                        <p
+                          className="m-0 mb-5 uppercase tracking-[0.22em] font-semibold text-[#0086b0]"
+                          style={{ fontSize: "0.85rem" }}>
+                          Dane wdrozenia
+                        </p>
+                        <dl className="m-0 grid grid-cols-2 gap-x-8 gap-y-4">
+                          {META_ROWS.map(([label, value]) => (
+                            <div
+                              key={label}
+                              className="flex flex-col gap-1 border-b border-[#0a2a2e]/[0.07] pb-3 last:border-b-0 [&:nth-last-child(2):nth-child(odd)]:border-b-0">
+                              <dt
+                                className="m-0 font-medium uppercase tracking-widest"
+                                style={{ fontSize: "0.74rem", color: "#0086b0" }}>
+                                {label}
+                              </dt>
+                              <dd className="m-0 text-[#0a2a2e] font-semibold text-[0.85rem] lg:text-[1.05rem]">
+                                {value}
+                              </dd>
+                            </div>
+                          ))}
+                        </dl>
+                      </div>
+                      {/* Legenda modeli — pod tabelą danych */}
+                      <div className="mt-5">
+                        <RealizationModuleLegend modules={r.modules} horizontal />
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -380,6 +439,13 @@ export default async function RealizacjaDetailPage({ params }: PageProps) {
               ) : null}
           </div>
         </section>
+        )}
+
+        {/* Opis (rich text z Sanity) — pod schematem i tabelą */}
+        {r.body && r.body.length > 0 && (
+          <section className="realization-block-in px-[6vw] pb-[12vh] max-w-[900px] mx-auto">
+            <PortableText value={r.body} components={BODY_COMPONENTS} />
+          </section>
         )}
 
         {/* Galeria — klik = duży podgląd ze strzałkami */}

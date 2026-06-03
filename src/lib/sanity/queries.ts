@@ -35,7 +35,28 @@ export const SITE_SETTINGS_QUERY = /* groq */ `
     footerAddress ${localized},
     footerCopyright ${localized},
     footerPrivacyLabel ${localized},
-    footerTermsLabel ${localized}
+    footerTermsLabel ${localized},
+    cookieTitle ${localized},
+    cookieText ${localized},
+    cookieAcceptLabel ${localized},
+    cookieRejectLabel ${localized},
+    cookieCustomizeLabel ${localized},
+    cookieSaveLabel ${localized},
+    cookieSettingsTitle ${localized},
+    cookieNecessaryTitle ${localized},
+    cookieNecessaryDesc ${localized},
+    cookieAnalyticsTitle ${localized},
+    cookieAnalyticsDesc ${localized},
+    cookieSettingsLinkLabel ${localized}
+  }
+`;
+
+export const LEGAL_PAGE_QUERY = /* groq */ `
+  *[_type == "legalPage" && slug.current == $slug][0] {
+    "slug": slug.current,
+    title ${localized},
+    effectiveDate ${localized},
+    body { translations[]{ value, language->{code} } }
   }
 `;
 

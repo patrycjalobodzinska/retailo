@@ -273,7 +273,7 @@ export default function ProductShowcase({
           {/* Phase 2 */}
           <div
             ref={phase2Ref}
-            className="relative h-[88vh] min-h-[600px] pb-[8vh] max-lg:h-auto max-lg:min-h-0 max-lg:pt-[1svh] max-lg:pb-[8svh]">
+            className="relative h-[88vh] min-h-[600px] pb-[8vh] max-lg:h-auto max-lg:min-h-0 max-lg:pt-[7svh] max-lg:pb-[8svh]">
             {/* Mobile-only inline image with photo → draft wavy mask wipe on enter */}
             <div className="hidden max-lg:flex justify-center px-[6vw] mb-6">
               <div className="relative w-[68vw] max-w-[320px] aspect-square">

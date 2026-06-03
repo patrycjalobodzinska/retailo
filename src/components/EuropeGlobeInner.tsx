@@ -68,7 +68,11 @@ export default function EuropeGlobeInner({
     const fitZoom = () => {
       const rect = container.getBoundingClientRect();
       const minDim = Math.min(rect.width, rect.height) || 600;
-      const z = Math.log2((SCALE * minDim * Math.PI) / 512);
+      // Glob jest centrowany w canvasie — średnica większa niż wysokość
+      // canvasu oznacza uciętą górną krawędź. Capujemy więc średnicę do
+      // wysokości: glob rośnie z szerokością ekranu tylko dopóki się mieści.
+      const dia = Math.min(SCALE * minDim, rect.height || 600);
+      const z = Math.log2((dia * Math.PI) / 512);
       return Math.max(0.4, Math.min(z, 4.5));
     };
 

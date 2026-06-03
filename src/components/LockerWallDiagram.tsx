@@ -78,14 +78,19 @@ export default function LockerWallDiagram({
 /** Legenda modeli — swatch + nazwa (unikalne po nazwie). */
 export function RealizationModuleLegend({
   modules,
+  horizontal = false,
 }: {
   modules: RealizationModule[];
+  horizontal?: boolean;
 }) {
   const legend = modules.filter(
     (m, i) => modules.findIndex((x) => x.title === m.title) === i,
   );
   return (
-    <div className="flex flex-col gap-3 text-xs uppercase tracking-wider text-[#3a5a60]">
+    <div
+      className={`flex ${
+        horizontal ? "flex-row flex-wrap gap-x-6 gap-y-2" : "flex-col gap-3"
+      } text-xs uppercase tracking-wider text-[#3a5a60]`}>
       {legend.map((m) => (
         <div key={m.title} className="flex items-center gap-2.5">
           <span

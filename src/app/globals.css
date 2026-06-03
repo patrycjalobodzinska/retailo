@@ -16,15 +16,18 @@ html, body {
 /* Custom scrollbar — tylko desktop (≥1024px), zawsze widoczny (klasyczny,
    nie overlay). Na mobile zostaje natywny pasek. */
 @media (min-width: 1024px) {
+  /* Track w kolorze tła strony — html/body mają #000 (overscroll), więc
+     „transparent" pokazywałby czarny pas. Biały zlewa się z treścią. */
   html {
     scrollbar-width: thin;
-    scrollbar-color: #59bfc8 rgba(10, 42, 46, 0.12);
+    scrollbar-color: #59bfc8 #ffffff;
   }
   html::-webkit-scrollbar {
     width: 12px;
+    background: #ffffff;
   }
   html::-webkit-scrollbar-track {
-    background: rgba(10, 42, 46, 0.1);
+    background: #ffffff;
   }
   html::-webkit-scrollbar-thumb {
     background: #59bfc8;

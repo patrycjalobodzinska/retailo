@@ -84,7 +84,7 @@ export default async function Home() {
       <div id="realizacje">
         <RealizationsCarousel items={realizations} data={home} />
       </div>
-      <EuropeGlobeSection data={home} settings={settings} />
+      <EuropeGlobeSection data={home} settings={settings} webGlobeOnMobile />
     </>
   );
 }
