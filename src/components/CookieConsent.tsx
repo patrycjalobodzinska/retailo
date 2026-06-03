@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import Script from "next/script";
+import { usePathname } from "next/navigation";
 import { GoogleAnalytics } from "@next/third-parties/google";
 import { useLang } from "@/lib/i18n/LanguageProvider";
 import type { SiteSettings } from "@/lib/sanity/fetch";
@@ -81,6 +82,7 @@ export default function CookieConsent({
   settings?: SiteSettings;
 }) {
   const { t } = useLang();
+  const pathname = usePathname();
   const [consent, setConsent] = useState<Consent | null>(null);
   const [bannerOpen, setBannerOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
@@ -145,6 +147,10 @@ export default function CookieConsent({
     },
     [consent],
   );
+
+  // Panel admina (Sanity Studio) — bez banera i bez GA. Guard po hookach,
+  // żeby nie łamać rules-of-hooks.
+  if (pathname?.startsWith("/admin")) return null;
 
   return (
     <>

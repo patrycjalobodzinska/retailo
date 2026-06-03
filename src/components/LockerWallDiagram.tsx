@@ -53,7 +53,10 @@ export default function LockerWallDiagram({
         className="mx-auto"
         style={{
           width: `calc(${wallH}px * ${sumRatio})`,
-          maxWidth: "100%",
+          // Cap wysokości przez szerokość (aspect-ratio trzyma proporcje):
+          // ściana nigdy nie przekroczy ~60vh, więc pojedynczy wysoki moduł
+          // nie zjada całego ekranu — ani na mobile, ani na desktopie.
+          maxWidth: `min(100%, calc(60vh * ${sumRatio}))`,
         }}>
         <div
           className="flex items-stretch w-full"
@@ -62,7 +65,11 @@ export default function LockerWallDiagram({
             <ModuleGrid
               key={`${m.id}-${i}`}
               module={m}
-              ratio={ratios[i]}
+              // Udział znormalizowany do sumy 1 — przy sumie flex-grow < 1
+              // flexbox wypełnia tylko ułamek kontenera, więc pojedynczy
+              // wąski moduł (ratio 0.5) brałby 50% szerokości ściany i
+              // łamał proporcje względem podglądu w Sanity.
+              ratio={ratios[i] / sumRatio}
               first={i === 0}
               last={i === modules.length - 1}
             />

@@ -164,16 +164,28 @@ export default async function RealizacjaDetailPage({ params }: PageProps) {
                 {r.title}
               </h1>
               </div>
-              {/* Krótki opis nad tabelą */}
+            </div>
+
+            {/* Zdjęcie — na mobile zaraz pod tytułem (nad opisem i CTA);
+                na desktopie prawa kolumna na całą wysokość. */}
+            <div className="lg:col-start-2 lg:row-start-1 lg:row-span-3">
+              <img
+                src={r.image}
+                alt={r.title}
+                className="realization-image-in block h-auto w-full max-w-[780px] max-h-[660px] object-contain lg:ml-auto max-lg:mx-auto max-lg:max-w-[560px]"
+              />
+            </div>
+
+            {/* Opis + CTA — na mobile POD zdjęciem; na desktopie lewa
+                kolumna / wiersz 2 (pod tytułem). */}
+            <div className="lg:col-start-1 lg:row-start-2">
               {r.description && (
                 <p
-                  className="m-0 mt-10 text-[#3a5a60] leading-relaxed max-w-[560px] max-lg:mt-6"
+                  className="m-0 text-[#3a5a60] leading-relaxed max-w-[560px]"
                   style={{ fontSize: "clamp(0.95rem, 1.1vw, 1.05rem)" }}>
                   {r.description}
                 </p>
               )}
-              {/* CTA — wypełnia lewą kolumnę pod opisem (po przeniesieniu
-                  tabeli danych do sekcji konfiguracji). */}
               <div className="mt-8 flex flex-wrap items-center gap-3 max-lg:mt-6">
                 <Link
                   href="/#kontakt"
@@ -209,21 +221,11 @@ export default async function RealizacjaDetailPage({ params }: PageProps) {
               </svg>
             </div>
 
-            {/* Zdjęcie — na mobile NAD danymi wdrożenia (wiersz 2 w kolejności
-                flow); na desktopie prawa kolumna na całą wysokość. */}
-            <div className="lg:col-start-2 lg:row-start-1 lg:row-span-2">
-              <img
-                src={r.image}
-                alt={r.title}
-                className="realization-image-in block h-auto w-full max-w-[780px] max-h-[660px] object-contain lg:ml-auto max-lg:mx-auto max-lg:max-w-[560px]"
-              />
-            </div>
-
             {/* Dane wdrożenia — w hero tylko gdy realizacja nie ma sekcji
                 „Konfiguracja wdrożenia" (z modułami tabela przenosi się tam,
                 obok schematu). */}
             {!r.modules?.length && (
-            <div className="lg:col-start-1 lg:row-start-2">
+            <div className="lg:col-start-1 lg:row-start-3">
               <p
                 className="m-0 mb-3 uppercase tracking-[0.22em] font-semibold text-[#0086b0]"
                 style={{ fontSize: "0.85rem" }}>
@@ -318,7 +320,7 @@ export default async function RealizacjaDetailPage({ params }: PageProps) {
                     {/* Dane wdrożenia po prawej (przeniesione z hero) — karta
                         w stylu schematu obok, pola rozdzielone subtelnymi
                         liniami. */}
-                    <div className="w-full lg:max-w-[440px] lg:pt-1">
+                    <div className="flex w-full flex-col gap-5 lg:max-w-[440px] lg:pt-1">
                       <div className="rounded-2xl bg-white/70 backdrop-blur-sm border border-[#0a2a2e]/10 p-6 md:p-7">
                         <p
                           className="m-0 mb-5 uppercase tracking-[0.22em] font-semibold text-[#0086b0]"
@@ -342,8 +344,9 @@ export default async function RealizacjaDetailPage({ params }: PageProps) {
                           ))}
                         </dl>
                       </div>
-                      {/* Legenda modeli — pod tabelą danych */}
-                      <div className="mt-5">
+                      {/* Legenda modeli — desktop: pod tabelą danych;
+                          mobile: nad tabelą (zaraz pod schematem). */}
+                      <div className="max-lg:order-first">
                         <RealizationModuleLegend modules={r.modules} horizontal />
                       </div>
                     </div>
@@ -443,7 +446,7 @@ export default async function RealizacjaDetailPage({ params }: PageProps) {
 
         {/* Opis (rich text z Sanity) — pod schematem i tabelą */}
         {r.body && r.body.length > 0 && (
-          <section className="realization-block-in px-[6vw] pb-[12vh] max-w-[900px] mx-auto">
+          <section className="realization-block-in px-[6vw] -mt-[6vh] pb-[6vh] max-w-[900px] mx-auto">
             <PortableText value={r.body} components={BODY_COMPONENTS} />
           </section>
         )}

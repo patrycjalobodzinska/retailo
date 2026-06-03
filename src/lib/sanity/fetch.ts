@@ -193,8 +193,12 @@ export type HomePage = {
 // Sanity content rarely changes mid-day; one-hour cache trades freshness
 // for far fewer cold fetches blocking SSR (was 60s → frequent server-side
 // waits on hard refresh, which delayed the hero animation).
+// W dev ZERO cache — edycje w Studio (np. macierze modeli) mają być widoczne
+// na stronie od razu po publikacji, bez czekania godziny.
 const fetchOpts = {
-  next: { revalidate: 3600 } as const,
+  next: {
+    revalidate: process.env.NODE_ENV === "development" ? 0 : 3600,
+  } as const,
 };
 
 export async function getLanguages(): Promise<Language[]> {

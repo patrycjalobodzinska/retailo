@@ -60,6 +60,19 @@ export default function RealizationsCarousel({
     setIndex((i) => i + d);
   }, []);
 
+  // Skok do konkretnego slajdu (pilsy) — zostajemy w bieżącej kopii listy,
+  // żeby wrap-around w handleTransitionEnd dalej działał.
+  const goTo = useCallback(
+    (target: number) => {
+      setAnimate(true);
+      setIndex((cur) => {
+        const curMod = ((cur % len) + len) % len;
+        return cur + (target - curMod);
+      });
+    },
+    [len],
+  );
+
   // Wrap-around: after transition ends, silently jump back into the
   // middle copy so the carousel feels infinite.
   const handleTransitionEnd = () => {
@@ -399,20 +412,27 @@ export default function RealizationsCarousel({
 
         {/* Controls + CTA below the track */}
         <div className="relative mx-auto mt-8 md:mt-14 flex w-full max-w-[1100px] flex-col items-center gap-5 px-6">
-          {/* Mobile-only carousel position dots — sugerują, że to karuzela */}
-          <div className="flex items-center gap-1.5 md:hidden" aria-hidden="true">
+          {/* Mobile-only carousel position dots — klikalne, skok do slajdu */}
+          <div className="flex items-center md:hidden">
             {Array.from({ length: len }).map((_, i) => {
               const active = ((index % len) + len) % len === i;
               return (
-                <span
+                <button
                   key={i}
-                  className="block rounded-full transition-all duration-300"
-                  style={{
-                    width: active ? "20px" : "6px",
-                    height: "6px",
-                    background: active ? "#0a2a2e" : "rgba(10,42,46,0.22)",
-                  }}
-                />
+                  type="button"
+                  onClick={() => goTo(i)}
+                  aria-label={`Slajd ${i + 1}`}
+                  aria-current={active}
+                  className="cursor-pointer border-0 bg-transparent p-1.5">
+                  <span
+                    className="block rounded-full transition-all duration-300"
+                    style={{
+                      width: active ? "20px" : "6px",
+                      height: "6px",
+                      background: active ? "#0a2a2e" : "rgba(10,42,46,0.22)",
+                    }}
+                  />
+                </button>
               );
             })}
           </div>
