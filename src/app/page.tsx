@@ -75,16 +75,20 @@ export default async function Home() {
   return (
     <>
       <Header settings={settings} />
-      <HeroConcept data={home} />
-      <div id="rozwiazanie">
-        <QASection data={home} />
-      </div>
-      <ProductShowcase data={home} />
-      {home?.modelsVisible !== false && <ModelsSection data={home} />}
-      <div id="realizacje">
-        <RealizationsCarousel items={realizations} data={home} />
-      </div>
-      <EuropeGlobeSection data={home} settings={settings} webGlobeOnMobile />
+      {/* Landmark <main> — nawigacja landmarkami dla czytników ekranu
+          (WCAG 1.3.1). */}
+      <main>
+        <HeroConcept data={home} />
+        <div id="rozwiazanie">
+          <QASection data={home} />
+        </div>
+        <ProductShowcase data={home} />
+        {home?.modelsVisible !== false && <ModelsSection data={home} />}
+        <div id="realizacje">
+          <RealizationsCarousel items={realizations} data={home} />
+        </div>
+        <EuropeGlobeSection data={home} settings={settings} webGlobeOnMobile />
+      </main>
     </>
   );
 }

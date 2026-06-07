@@ -40,11 +40,9 @@ export default function RealizationsCarousel({
     "PickUpWall wdrazany w salonach kosmetycznych, fashion i elektroniki.";
   const ctaLabel =
     t(data?.realizationsCtaLabel ?? null) || "Zobacz wszystkie realizacje";
-  const items = (
-    excludeSlug
-      ? (itemsProp ?? []).filter((r) => r.slug !== excludeSlug)
-      : (itemsProp ?? [])
-  );
+  const items = excludeSlug
+    ? (itemsProp ?? []).filter((r) => r.slug !== excludeSlug)
+    : (itemsProp ?? []);
   const len = items.length;
 
   // Render items 3 times so there is always a neighbour on each side of
@@ -125,42 +123,46 @@ export default function RealizationsCarousel({
     <section
       className={`relative w-full overflow-hidden bg-white pb-8 md:pt-14 md:pb-28 ${
         showHeader ? "pt-12" : "pt-3"
-      }`}>
+      }`}
+    >
       {showHeader && (
-      <div className="relative z-10 mx-auto max-w-[1100px] px-6 mb-4 md:mb-10 text-center">
-        <p
-          className="m-0 mb-2 uppercase tracking-[0.3em] font-semibold text-[#7a7a7a]"
-          style={{ fontSize: "0.62rem" }}>
-          {eyebrow}
-        </p>
-        <h2
-          className="m-0 font-bold tracking-tight text-[#0f0f0f]"
-          style={{
-            fontSize: "clamp(1.4rem, 2.4vw, 2.2rem)",
-            lineHeight: 1.15,
-            letterSpacing: "-0.02em",
-          }}>
-          <span
-            className="font-extrabold"
+        <div className="relative z-10 mx-auto max-w-[1100px] px-6 mb-4 md:mb-10 text-center">
+          <p
+            className="m-0 mb-2 uppercase tracking-[0.3em] font-semibold text-[#7a7a7a]"
+            style={{ fontSize: "0.62rem" }}
+          >
+            {eyebrow}
+          </p>
+          <h2
+            className="m-0 font-bold tracking-tight text-[#0f0f0f]"
             style={{
-              background:
-                "linear-gradient(135deg, #0086b0 0%, #16404a 100%)",
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent",
-              backgroundClip: "text",
-            }}>
-            {headlinePrefix}
-          </span>
-        </h2>
-        <p
-          className="m-0 mt-2.5 mx-auto font-light text-[#5a5a5a] leading-relaxed"
-          style={{
-            fontSize: "clamp(0.82rem, 0.9vw, 0.92rem)",
-            maxWidth: "480px",
-          }}>
-          {intro}
-        </p>
-      </div>
+              fontSize: "clamp(1.4rem, 2.4vw, 2.2rem)",
+              lineHeight: 1.15,
+              letterSpacing: "-0.02em",
+            }}
+          >
+            <span
+              className="font-extrabold"
+              style={{
+                background: "linear-gradient(135deg, #0086b0 0%, #16404a 100%)",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+                backgroundClip: "text",
+              }}
+            >
+              {headlinePrefix}
+            </span>
+          </h2>
+          <p
+            className="m-0 mt-2.5 mx-auto font-light text-[#5a5a5a] leading-relaxed"
+            style={{
+              fontSize: "clamp(0.82rem, 0.9vw, 0.92rem)",
+              maxWidth: "480px",
+            }}
+          >
+            {intro}
+          </p>
+        </div>
       )}
 
       <div
@@ -179,7 +181,8 @@ export default function RealizationsCarousel({
           className="relative h-[56vh] min-h-[420px] w-full md:h-[60vh] touch-pan-y"
           onTouchStart={handleTouchStart}
           onTouchMove={handleTouchMove}
-          onTouchEnd={handleTouchEnd}>
+          onTouchEnd={handleTouchEnd}
+        >
           <div
             onTransitionEnd={handleTransitionEnd}
             className="absolute top-1/2 left-0 flex h-[88%] -translate-y-1/2 items-center will-change-transform"
@@ -193,6 +196,11 @@ export default function RealizationsCarousel({
           >
             {tripled.map((item, i) => {
               const isActive = i === index;
+              // Kopie 1. i 3. służą tylko wizualnemu wrap-around — chowamy
+              // je przed czytnikami ekranu, żeby lista realizacji nie była
+              // czytana trzykrotnie (WCAG 1.3.1). Fokusowalna i klikalna
+              // z klawiatury jest środkowa kopia (WCAG 2.1.1).
+              const isClone = i < len || i >= 2 * len;
               const handleClick = () => {
                 if (!isActive) {
                   setAnimate(true);
@@ -201,17 +209,29 @@ export default function RealizationsCarousel({
                 }
                 router.push(`/realizacje/${item.slug}`);
               };
+              const a11yProps = {
+                "aria-hidden": isClone || undefined,
+                tabIndex: isClone ? -1 : 0,
+                role: "button" as const,
+                "aria-label": item.title,
+                onKeyDown: (e: React.KeyboardEvent) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    handleClick();
+                  }
+                },
+              };
               const brand =
                 item.client && item.client !== "—" ? item.client : null;
               const hasBadges =
-                !!item.config?.lockers ||
-                (item.tags && item.tags.length > 0);
+                !!item.config?.lockers || (item.tags && item.tags.length > 0);
 
               if (variant === "dark") {
                 return (
                   <article
                     key={`${item.slug}-${i}`}
                     onClick={handleClick}
+                    {...a11yProps}
                     className="group relative h-full shrink-0 cursor-pointer rounded-2xl overflow-hidden bg-[#0f1518] transition-all duration-700 ease-out opacity-100"
                     style={{
                       width: "var(--card-w)",
@@ -331,6 +351,7 @@ export default function RealizationsCarousel({
                 <article
                   key={`${item.slug}-${i}`}
                   onClick={handleClick}
+                  {...a11yProps}
                   className="relative h-full shrink-0 cursor-pointer rounded-2xl transition-all duration-700 ease-out opacity-100"
                   style={{
                     width: "var(--card-w)",
@@ -367,7 +388,11 @@ export default function RealizationsCarousel({
                         >
                           <span
                             className="block rounded-full"
-                            style={{ width: 5, height: 5, background: "#0086b0" }}
+                            style={{
+                              width: 5,
+                              height: 5,
+                              background: "#0086b0",
+                            }}
                           />
                           {brand}
                         </span>
@@ -423,7 +448,8 @@ export default function RealizationsCarousel({
                   onClick={() => goTo(i)}
                   aria-label={`Slajd ${i + 1}`}
                   aria-current={active}
-                  className="cursor-pointer border-0 bg-transparent p-1.5">
+                  className="cursor-pointer border-0 bg-transparent p-1.5"
+                >
                   <span
                     className="block rounded-full transition-all duration-300"
                     style={{
@@ -481,7 +507,8 @@ export default function RealizationsCarousel({
               height="14"
               viewBox="0 0 24 24"
               fill="none"
-              className="transition-transform">
+              className="transition-transform"
+            >
               <path
                 d="M5 12h14M19 12l-6-6M19 12l-6 6"
                 stroke="currentColor"

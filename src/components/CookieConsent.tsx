@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import Script from "next/script";
 import { usePathname } from "next/navigation";
@@ -58,10 +58,13 @@ function clearGaCookies() {
   }
 }
 
-const BTN_PRIMARY =
-  "cursor-pointer rounded-full bg-white px-5 py-2.5 text-sm font-semibold text-[#0a2a2e] transition hover:bg-[#7ed5e6]";
-const BTN_SECONDARY =
-  "cursor-pointer rounded-full border border-white/25 px-5 py-2.5 text-sm font-semibold text-white transition hover:border-white/50";
+const BTN_BASE =
+  "flex-1 cursor-pointer rounded-full px-3 py-2 text-center text-xs font-semibold whitespace-nowrap transition duration-200 hover:-translate-y-0.5 sm:flex-none sm:px-5 sm:py-2.5 sm:text-sm";
+// Kolory dobrane pod WCAG AA na beżowym tle banera (najciemniejszy stop
+// gradientu #e3dbcb): biały na #007293 = 5.5:1, link #00607f = 5.1:1.
+const BTN_PRIMARY = `${BTN_BASE} bg-[#007293] text-white shadow-[0_2px_10px_rgba(0,114,147,0.3)] hover:bg-[#0a2a2e] hover:shadow-[0_4px_14px_rgba(10,42,46,0.3)]`;
+const BTN_REJECT = `${BTN_BASE} bg-white/30 text-[#0a2a2e]/80 hover:bg-white/60 hover:text-[#0a2a2e]`;
+const BTN_SECONDARY = `${BTN_BASE} border border-[#0a2a2e]/15 bg-white/40 text-[#0a2a2e] hover:border-[#0a2a2e]/35 hover:bg-white/70`;
 
 /**
  * Baner zgody na cookies zgodny z RODO / ustawą Prawo komunikacji
@@ -84,9 +87,14 @@ export default function CookieConsent({
   const { t } = useLang();
   const pathname = usePathname();
   const [consent, setConsent] = useState<Consent | null>(null);
-  const [bannerOpen, setBannerOpen] = useState(false);
+  // true od startu: baner jest w HTML z SSR, a o widoczności przed
+  // hydracją decyduje CSS + atrybut data-cookie-pending ustawiany
+  // synchronicznym skryptem w <head> (zero mignięcia treści strony).
+  const [bannerOpen, setBannerOpen] = useState(true);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [analyticsChecked, setAnalyticsChecked] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+  const dialogRef = useRef<HTMLDivElement>(null);
 
   const txt = {
     title: t(settings?.cookieTitle ?? null) || "Szanujemy Twoją prywatność",
@@ -100,8 +108,7 @@ export default function CookieConsent({
     settingsTitle:
       t(settings?.cookieSettingsTitle ?? null) || "Ustawienia cookies",
     necessaryTitle:
-      t(settings?.cookieNecessaryTitle ?? null) ||
-      "Niezbędne — zawsze aktywne",
+      t(settings?.cookieNecessaryTitle ?? null) || "Niezbędne — zawsze aktywne",
     necessaryDesc:
       t(settings?.cookieNecessaryDesc ?? null) ||
       "Wymagane do działania strony (np. zapamiętanie Twojej decyzji o cookies). Nie zbierają danych do analityki ani marketingu.",
@@ -118,18 +125,75 @@ export default function CookieConsent({
   useEffect(() => {
     const stored = readConsent();
     setConsent(stored);
-    if (!stored) setBannerOpen(true);
-    else setAnalyticsChecked(stored.analytics);
+    if (stored) {
+      setBannerOpen(false);
+      setAnalyticsChecked(stored.analytics);
+      document.documentElement.removeAttribute("data-cookie-pending");
+    } else {
+      // Defensywnie (np. nawigacja client-side) — skrypt w <head> mógł
+      // nie zadziałać, a bez atrybutu CSS ukrywa baner.
+      document.documentElement.setAttribute("data-cookie-pending", "");
+    }
 
     const reopen = () => {
       const current = readConsent();
       setAnalyticsChecked(current?.analytics ?? false);
       setSettingsOpen(true);
       setBannerOpen(true);
+      document.documentElement.setAttribute("data-cookie-pending", "");
     };
     window.addEventListener(OPEN_COOKIE_SETTINGS_EVENT, reopen);
     return () => window.removeEventListener(OPEN_COOKIE_SETTINGS_EVENT, reopen);
   }, []);
+
+  // Na mobile baner działa jako modal — śledzimy breakpoint (< sm).
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 639px)");
+    const update = () => setIsMobile(mq.matches);
+    update();
+    mq.addEventListener("change", update);
+    return () => mq.removeEventListener("change", update);
+  }, []);
+
+  // Mobile modal: blokada scrolla strony, fokus w dialogu i pułapka fokusa
+  // (WCAG 2.1.2 — fokus nie ucieka pod przyciemnione tło; wyjście wyłącznie
+  // przez podjęcie decyzji, Tab krąży po elementach banera).
+  useEffect(() => {
+    if (!bannerOpen || !isMobile) return;
+    const dialog = dialogRef.current;
+    const prevBodyOverflow = document.body.style.overflow;
+    const prevHtmlOverflow = document.documentElement.style.overflow;
+    const prevFocus = document.activeElement as HTMLElement | null;
+    // Scroll w Next idzie po <html>, więc blokujemy oba elementy.
+    document.body.style.overflow = "hidden";
+    document.documentElement.style.overflow = "hidden";
+    dialog?.focus();
+
+    const trap = (e: KeyboardEvent) => {
+      if (e.key !== "Tab" || !dialog) return;
+      const focusables = dialog.querySelectorAll<HTMLElement>(
+        "a[href], button:not([disabled]), input:not([disabled])",
+      );
+      if (!focusables.length) return;
+      const first = focusables[0];
+      const last = focusables[focusables.length - 1];
+      const active = document.activeElement;
+      if (e.shiftKey && (active === first || active === dialog)) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && active === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    };
+    document.addEventListener("keydown", trap);
+    return () => {
+      document.body.style.overflow = prevBodyOverflow;
+      document.documentElement.style.overflow = prevHtmlOverflow;
+      document.removeEventListener("keydown", trap);
+      prevFocus?.focus?.();
+    };
+  }, [bannerOpen, isMobile]);
 
   const decide = useCallback(
     (analytics: boolean) => {
@@ -138,6 +202,7 @@ export default function CookieConsent({
       setConsent(next);
       setBannerOpen(false);
       setSettingsOpen(false);
+      document.documentElement.removeAttribute("data-cookie-pending");
       // Cofnięcie zgody: czyścimy cookies GA i przeładowujemy, żeby
       // załadowany już gtag przestał działać natychmiast.
       if (hadAnalytics && !analytics) {
@@ -169,104 +234,126 @@ export default function CookieConsent({
       )}
 
       {bannerOpen && (
-        <div
-          role="dialog"
-          aria-modal="false"
-          aria-label={txt.settingsTitle}
-          className="fixed inset-x-0 bottom-0 z-[200] p-3 sm:p-4">
-          <div className="mx-auto max-w-[680px] rounded-2xl border border-white/15 bg-[#0a2a2e]/95 p-5 text-white shadow-2xl backdrop-blur-md sm:p-6">
-            {!settingsOpen ? (
-              <>
-                <h2 className="m-0 mb-2 text-base font-semibold tracking-tight">
-                  {txt.title}
-                </h2>
-                <p className="m-0 mb-4 text-[13px] leading-relaxed text-white/70">
-                  {txt.text} Szczegóły w{" "}
-                  <Link
-                    href="/polityka-prywatnosci"
-                    className="text-[#7ed5e6] underline underline-offset-2">
-                    {txt.privacyLabel}
-                  </Link>
-                  .
-                </p>
-                <div className="flex flex-wrap items-center gap-2.5">
-                  <button
-                    type="button"
-                    onClick={() => decide(true)}
-                    className={BTN_PRIMARY}>
-                    {txt.accept}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => decide(false)}
-                    className={BTN_PRIMARY}>
-                    {txt.reject}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setSettingsOpen(true)}
-                    className={BTN_SECONDARY}>
-                    {txt.customize}
-                  </button>
-                </div>
-              </>
-            ) : (
-              <>
-                <h2 className="m-0 mb-3 text-base font-semibold tracking-tight">
-                  {txt.settingsTitle}
-                </h2>
-                <div className="mb-4 flex flex-col gap-3">
-                  <label className="flex items-start gap-3 rounded-xl border border-white/10 bg-white/5 p-3.5">
-                    <input
-                      type="checkbox"
-                      checked
-                      disabled
-                      className="mt-0.5 accent-[#0086b0]"
-                    />
-                    <span>
-                      <span className="block text-[13px] font-semibold">
-                        {txt.necessaryTitle}
-                      </span>
-                      <span className="block text-xs leading-relaxed text-white/60">
-                        {txt.necessaryDesc}
-                      </span>
+        <>
+          {/* Mobile: przyciemnione tło blokujące interakcję ze stroną
+              do czasu podjęcia decyzji. */}
+          <div
+            aria-hidden
+            data-cookie-consent
+            className="fixed inset-0 z-[199] bg-[#0a2a2e]/55 backdrop-blur-[2px] sm:hidden"
+          />
+          <div
+            ref={dialogRef}
+            data-cookie-consent
+            role="dialog"
+            aria-modal={isMobile}
+            aria-label={settingsOpen ? txt.settingsTitle : txt.title}
+            tabIndex={-1}
+            className="fixed inset-0 z-[200] flex items-center justify-center p-4 outline-none sm:inset-auto sm:right-4 sm:bottom-4 sm:block sm:w-[calc(100vw-32px)] sm:max-w-[480px] sm:p-0"
+          >
+            <div className="cookie-banner-in w-full max-w-[480px] rounded-3xl border border-white/60 bg-gradient-to-br from-[#fafaf8] via-[#f2ece1] to-[#e3dbcb] p-5 text-[#0a2a2e] shadow-[0_18px_50px_-12px_rgba(10,42,46,0.35)] ring-1 ring-[#0a2a2e]/5 backdrop-blur-xl sm:from-[#fafaf8]/85 sm:via-[#f2ece1]/80 sm:to-[#e3dbcb]/75 sm:p-6">
+              {!settingsOpen ? (
+                <>
+                  <h2 className="m-0 mb-2 flex items-center gap-2 text-base font-semibold tracking-tight">
+                    <span aria-hidden className="text-lg leading-none">
+                      🍪
                     </span>
-                  </label>
-                  <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-white/10 bg-white/5 p-3.5">
-                    <input
-                      type="checkbox"
-                      checked={analyticsChecked}
-                      onChange={(e) => setAnalyticsChecked(e.target.checked)}
-                      className="mt-0.5 cursor-pointer accent-[#0086b0]"
-                    />
-                    <span>
-                      <span className="block text-[13px] font-semibold">
-                        {txt.analyticsTitle}
+                    {txt.title}
+                  </h2>
+                  <p className="m-0 mb-4 text-[13px] leading-relaxed text-[#0a2a2e]/75">
+                    {txt.text} Szczegóły w{" "}
+                    <Link
+                      href="/polityka-prywatnosci"
+                      className="text-[#00607f] underline underline-offset-2"
+                    >
+                      {txt.privacyLabel}
+                    </Link>
+                    .
+                  </p>
+                  <div className="flex items-center gap-1.5 sm:flex-wrap sm:gap-2.5">
+                    <button
+                      type="button"
+                      onClick={() => decide(true)}
+                      className={BTN_PRIMARY}
+                    >
+                      {txt.accept}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => decide(false)}
+                      className={BTN_REJECT}
+                    >
+                      {txt.reject}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setSettingsOpen(true)}
+                      className={BTN_SECONDARY}
+                    >
+                      {txt.customize}
+                    </button>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <h2 className="m-0 mb-3 text-base font-semibold tracking-tight">
+                    {txt.settingsTitle}
+                  </h2>
+                  <div className="mb-4 flex flex-col gap-3">
+                    <label className="flex items-start gap-3 rounded-2xl border border-white/60 bg-white/40 p-3.5">
+                      <input
+                        type="checkbox"
+                        checked
+                        disabled
+                        className="mt-0.5 accent-[#0086b0]"
+                      />
+                      <span>
+                        <span className="block text-[13px] font-semibold">
+                          {txt.necessaryTitle}
+                        </span>
+                        <span className="block text-xs leading-relaxed text-[#0a2a2e]/75">
+                          {txt.necessaryDesc}
+                        </span>
                       </span>
-                      <span className="block text-xs leading-relaxed text-white/60">
-                        {txt.analyticsDesc}
+                    </label>
+                    <label className="flex cursor-pointer items-start gap-3 rounded-2xl border border-white/60 bg-white/40 p-3.5">
+                      <input
+                        type="checkbox"
+                        checked={analyticsChecked}
+                        onChange={(e) => setAnalyticsChecked(e.target.checked)}
+                        className="mt-0.5 cursor-pointer accent-[#0086b0]"
+                      />
+                      <span>
+                        <span className="block text-[13px] font-semibold">
+                          {txt.analyticsTitle}
+                        </span>
+                        <span className="block text-xs leading-relaxed text-[#0a2a2e]/75">
+                          {txt.analyticsDesc}
+                        </span>
                       </span>
-                    </span>
-                  </label>
-                </div>
-                <div className="flex flex-wrap items-center gap-2.5">
-                  <button
-                    type="button"
-                    onClick={() => decide(analyticsChecked)}
-                    className={BTN_PRIMARY}>
-                    {txt.save}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => decide(false)}
-                    className={BTN_SECONDARY}>
-                    {txt.reject}
-                  </button>
-                </div>
-              </>
-            )}
+                    </label>
+                  </div>
+                  <div className="flex items-center gap-1.5 sm:flex-wrap sm:gap-2.5">
+                    <button
+                      type="button"
+                      onClick={() => decide(analyticsChecked)}
+                      className={BTN_PRIMARY}
+                    >
+                      {txt.save}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => decide(false)}
+                      className={BTN_REJECT}
+                    >
+                      {txt.reject}
+                    </button>
+                  </div>
+                </>
+              )}
+            </div>
           </div>
-        </div>
+        </>
       )}
     </>
   );
@@ -286,7 +373,8 @@ export function CookieSettingsLink({
       onClick={() =>
         window.dispatchEvent(new Event(OPEN_COOKIE_SETTINGS_EVENT))
       }
-      className={`cursor-pointer ${className ?? ""}`}>
+      className={`cursor-pointer ${className ?? ""}`}
+    >
       {label || "Ustawienia cookies"}
     </button>
   );

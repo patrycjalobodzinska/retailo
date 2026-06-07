@@ -590,3 +590,33 @@ html, body {
   from { opacity: 0; transform: translateY(14px) scale(0.96); }
   to { opacity: 1; transform: translateY(0) scale(1); }
 }
+
+/* Baner cookies — wjazd od dołu po zamontowaniu. */
+@keyframes cookie-slide-in {
+  from { opacity: 0; transform: translateY(110%); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.cookie-banner-in {
+  animation: cookie-slide-in 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+@media (prefers-reduced-motion: reduce) {
+  .cookie-banner-in {
+    animation: none;
+  }
+}
+
+/* Baner cookies renderuje się w HTML z SSR (zero opóźnienia na hydration),
+   ale jest widoczny tylko gdy inline'owy skrypt w <head> ustawił
+   data-cookie-pending (= brak zapisanej decyzji). Bez JS baner pozostaje
+   ukryty — strona działa normalnie, bez analityki. */
+html:not([data-cookie-pending]) [data-cookie-consent] {
+  display: none !important;
+}
+/* Mobile: scroll zablokowany już od pierwszego paintu, zanim React
+   przejmie blokadę w efekcie (overflow na <html> i <body>). */
+@media (max-width: 639px) {
+  html[data-cookie-pending],
+  html[data-cookie-pending] body {
+    overflow: hidden;
+  }
+}

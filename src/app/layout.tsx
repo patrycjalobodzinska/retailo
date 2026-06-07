@@ -105,7 +105,12 @@ export default async function RootLayout({
   return (
     <html
       lang={defaultLang}
-      className={`${roboto.variable} ${raleway.variable}`}>
+      className={`${roboto.variable} ${raleway.variable}`}
+      // Skrypt w <head> ustawia data-cookie-pending przed hydracją,
+      // więc atrybuty <html> celowo różnią się od SSR — wyciszamy
+      // ostrzeżenie tylko dla tego elementu (dzieci dalej są sprawdzane).
+      suppressHydrationWarning
+    >
       <head>
         {/* Preload hero image — najważniejszy LCP element strony głównej */}
         <link
@@ -138,6 +143,17 @@ export default async function RootLayout({
         <script
           dangerouslySetInnerHTML={{
             __html: `(function(){try{if('scrollRestoration' in history){history.scrollRestoration='manual';}window.scrollTo(0,0);}catch(e){}})();`,
+          }}
+        />
+        {/* Synchroniczna detekcja zgody na cookies PRZED pierwszym paintem.
+            Baner i przyciemnienie są w HTML z SSR, ale domyślnie ukryte w
+            CSS — ten skrypt odsłania je atrybutem data-cookie-pending tylko
+            gdy brak zapisanej decyzji. Dzięki temu na mobile użytkownik od
+            pierwszej klatki widzi modal + dim zamiast treści hero, a kto już
+            wybrał, nie widzi żadnego mignięcia banera. */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{if(location.pathname.indexOf('/admin')===0)return;var p=JSON.parse(localStorage.getItem('retailo_cookie_consent_v1'));if(typeof (p&&p.analytics)==='boolean')return;}catch(e){}document.documentElement.setAttribute('data-cookie-pending','');})();`,
           }}
         />
       </head>

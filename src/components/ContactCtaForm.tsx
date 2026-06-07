@@ -12,7 +12,8 @@ export default function ContactCtaForm() {
       style={{
         background:
           "linear-gradient(180deg, #ffffff 0%, #eef4f5 55%, #e4eeef 100%)",
-      }}>
+      }}
+    >
       <div
         aria-hidden="true"
         className="absolute inset-0 pointer-events-none"
@@ -26,7 +27,8 @@ export default function ContactCtaForm() {
         <div>
           <p
             className="m-0 mb-3 uppercase tracking-[0.22em] font-semibold text-[#0086b0]"
-            style={{ fontSize: "0.72rem" }}>
+            style={{ fontSize: "0.72rem" }}
+          >
             Wlasny projekt
           </p>
           <h2
@@ -35,12 +37,14 @@ export default function ContactCtaForm() {
               fontSize: "clamp(1.8rem, 3.4vw, 3rem)",
               lineHeight: 1.05,
               letterSpacing: "-0.02em",
-            }}>
+            }}
+          >
             Planujesz wdrozenie PickUpWall?
           </h2>
           <p
             className="m-0 mt-4 text-[#3a5a60] leading-relaxed"
-            style={{ fontSize: "1rem", maxWidth: "480px" }}>
+            style={{ fontSize: "1rem", maxWidth: "480px" }}
+          >
             Dostosujemy format urzadzen, liczbe skrytek, obudowe i grafike pod
             potrzeby twojej marki i przestrzeni.
           </p>
@@ -64,7 +68,8 @@ export default function ContactCtaForm() {
           className="rounded-2xl border border-[#0a2a2e]/10 bg-white/80 p-5 shadow-[0_18px_50px_rgba(15,42,46,0.10)] backdrop-blur-sm md:p-6"
           onSubmit={(e) => {
             e.preventDefault();
-          }}>
+          }}
+        >
           <div className="mb-4">
             <h3 className="m-0 text-base font-semibold tracking-tight text-[#0a2a2e]">
               Napisz do nas
@@ -79,6 +84,7 @@ export default function ContactCtaForm() {
                 name="name"
                 type="text"
                 autoComplete="name"
+                aria-label="Imie i nazwisko"
                 placeholder="Imie i nazwisko"
                 className="rounded-lg border border-[#0a2a2e]/15 bg-white px-3 py-2 text-sm text-[#0a2a2e] placeholder:text-[#0a2a2e]/40 outline-none ring-[#0086b0]/30 transition focus:border-[#0086b0]/60 focus:ring-2"
               />
@@ -87,6 +93,7 @@ export default function ContactCtaForm() {
                 type="email"
                 autoComplete="email"
                 required
+                aria-label="E-mail"
                 placeholder="E-mail"
                 className="rounded-lg border border-[#0a2a2e]/15 bg-white px-3 py-2 text-sm text-[#0a2a2e] placeholder:text-[#0a2a2e]/40 outline-none ring-[#0086b0]/30 transition focus:border-[#0086b0]/60 focus:ring-2"
               />
@@ -95,25 +102,29 @@ export default function ContactCtaForm() {
               name="company"
               type="text"
               autoComplete="organization"
+              aria-label="Firma (opcjonalnie)"
               placeholder="Firma (opcjonalnie)"
               className="rounded-lg border border-[#0a2a2e]/15 bg-white px-3 py-2 text-sm text-[#0a2a2e] placeholder:text-[#0a2a2e]/40 outline-none ring-[#0086b0]/30 transition focus:border-[#0086b0]/60 focus:ring-2"
             />
             <textarea
               name="message"
               rows={3}
+              aria-label="Opisz krotko temat rozmowy..."
               placeholder="Opisz krotko temat rozmowy..."
               className="resize-none rounded-lg border border-[#0a2a2e]/15 bg-white px-3 py-2 text-sm text-[#0a2a2e] placeholder:text-[#0a2a2e]/40 outline-none ring-[#0086b0]/30 transition focus:border-[#0086b0]/60 focus:ring-2"
             />
             <button
               type="submit"
-              className="mt-1 inline-flex items-center justify-center gap-2 rounded-full bg-[#0086b0] px-6 py-3 text-sm font-semibold uppercase tracking-[0.18em] text-white transition hover:opacity-90">
+              className="mt-1 inline-flex items-center justify-center gap-2 rounded-full bg-[#0086b0] px-6 py-3 text-sm font-semibold uppercase tracking-[0.18em] text-white transition hover:opacity-90"
+            >
               Porozmawiajmy
               <svg
                 width="14"
                 height="14"
                 viewBox="0 0 24 24"
                 fill="none"
-                aria-hidden>
+                aria-hidden
+              >
                 <path
                   d="M5 12h14M19 12l-6-6M19 12l-6 6"
                   stroke="currentColor"
