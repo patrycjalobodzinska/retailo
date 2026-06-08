@@ -4,8 +4,6 @@ import { useEffect, useRef } from "react";
 import maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 
-// Domyślna lista krajów podświetlanych na globie (ISO_A2 z geojsona) — używana
-// gdy w Sanity (homePage.globalMapCountries) nic nie wybrano.
 const DEFAULT_SELECTED_ISO = [
   "PL",
   "DE",
@@ -21,11 +19,9 @@ const DEFAULT_SELECTED_ISO = [
   "NL",
 ];
 
-// Basemapa jak w mapcn — hostowany styl wektorowy Carto "dark-matter".
 const MAP_STYLE =
   "https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json";
 
-// Atmosfera/„kosmos" wokół globu — tony dopasowane do cyjanu sekcji (#59bfc8).
 const SKY: maplibregl.SkySpecification = {
   "sky-color": "#0a2c3a",
   "horizon-color": "#1f5e72",
@@ -38,7 +34,6 @@ const SKY: maplibregl.SkySpecification = {
 
 interface EuropeGlobeInnerProps {
   lowPerf?: boolean;
-  // Kody ISO_A2 do podświetlenia (z Sanity). Puste/brak → lista domyślna.
   selectedIso?: string[];
 }
 
@@ -48,7 +43,6 @@ export default function EuropeGlobeInner({
 }: EuropeGlobeInnerProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const wrapperRef = useRef<HTMLDivElement>(null);
-  // Stabilny string do zależności efektu — re-init mapy przy zmianie listy.
   const isoKey = (selectedIso ?? []).join(",");
 
   useEffect(() => {
@@ -60,17 +54,10 @@ export default function EuropeGlobeInner({
         ? selectedIso.map((c) => c.toUpperCase())
         : DEFAULT_SELECTED_ISO;
 
-    // SCALE=1 → średnica globu = wysokość canvasu, więc górna krawędź globu
-    // pokrywa się z górą canvasu (NIE ucina od góry). Rozmiar/pozycję steruje
-    // wysoki, zsunięty w dół kontener (patrz EuropeGlobeSection); dół wystaje
-    // pod viewport (ukryty).
     const SCALE = lowPerf ? 2.2 : 1.0;
     const fitZoom = () => {
       const rect = container.getBoundingClientRect();
       const minDim = Math.min(rect.width, rect.height) || 600;
-      // Glob jest centrowany w canvasie — średnica większa niż wysokość
-      // canvasu oznacza uciętą górną krawędź. Capujemy więc średnicę do
-      // wysokości: glob rośnie z szerokością ekranu tylko dopóki się mieści.
       const dia = Math.min(SCALE * minDim, rect.height || 600);
       const z = Math.log2((dia * Math.PI) / 512);
       return Math.max(0.4, Math.min(z, 4.5));
@@ -88,23 +75,19 @@ export default function EuropeGlobeInner({
       pixelRatio: lowPerf ? 1 : undefined,
     });
 
-    // Projekcja globu + atmosfera + podświetlenie krajów — po wczytaniu stylu.
     map.on("style.load", () => {
       map.setProjection({ type: "globe" });
       map.setSky(SKY);
 
-      // Usuwamy wszystkie etykiety (nazwy krajów/miast = symbol layers).
       for (const l of map.getStyle().layers ?? []) {
         if (l.type === "symbol") {
           try {
             map.removeLayer(l.id);
           } catch {
-            /* noop */
           }
         }
       }
 
-      // Kraje wdrożeń: fill + obrys z geojsona.
       const layers = map.getStyle().layers ?? [];
       const firstSymbol = layers.find((l) => l.type === "symbol")?.id;
       const filter = [
@@ -144,11 +127,9 @@ export default function EuropeGlobeInner({
     });
 
     map.on("load", () => {
-      // Pokaż globus dopiero po załadowaniu — bez błysku pustego prostokąta.
       if (wrapperRef.current) wrapperRef.current.style.opacity = "1";
     });
 
-    // Przy zmianie rozmiaru kontenera utrzymujemy glob w kadrze.
     const ro = new ResizeObserver(() => {
       map.resize();
       map.setZoom(fitZoom());

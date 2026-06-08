@@ -2,11 +2,6 @@ import { useCallback } from "react";
 import { set, unset, type StringInputProps } from "sanity";
 import { Flex, TextInput } from "@sanity/ui";
 
-/**
- * Input pola koloru akcentu — natywny color picker + pole HEX obok.
- * Wartość pozostaje zwykłym stringiem HEX (#rrggbb), więc GROQ/fetch i
- * frontend (m.accent jako kolor CSS) działają bez zmian.
- */
 const DEFAULT = "#0086b0";
 const isHex = (v: string) => /^#[0-9a-fA-F]{6}$/.test(v);
 

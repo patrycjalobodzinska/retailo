@@ -33,7 +33,6 @@ export function LanguageProvider({
 }) {
   const [lang, setLangState] = useState<string>(defaultLang);
 
-  // Pick up persisted preference on mount.
   useEffect(() => {
     if (typeof window === "undefined") return;
     const stored = window.localStorage.getItem(STORAGE_KEY);
@@ -80,7 +79,6 @@ export function LanguageProvider({
 export function useLang(): LanguageContextValue {
   const v = useContext(Ctx);
   if (!v) {
-    // Fallback when used outside the provider (e.g. SSR before mount).
     return {
       lang: "pl",
       defaultLang: "pl",

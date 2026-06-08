@@ -10,32 +10,30 @@ import type { HomePage, SiteSettings } from "@/lib/sanity/fetch";
 
 gsap.registerPlugin(ScrollTrigger);
 
-// Desktop: MapLibre (WebGL) — ładowany tylko po stronie klienta.
-// Mobile: lekki statyczny glob SVG (StaticGlobe), bez WebGL.
 const EuropeGlobeInner = dynamic(() => import("./EuropeGlobeInner"), {
   ssr: false,
 });
 const StaticGlobe = dynamic(() => import("./StaticGlobe"), { ssr: false });
 
-// Flagi nie podlegają tłumaczeniu — zawsze takie same na pozycjach 0..5.
-const LEFT_FLAGS = ["🇵🇱", "🇩🇪", "🇫🇷", "🇪🇸", "🇮🇹", "🇬🇧"];
-const RIGHT_FLAGS = ["🇨🇿", "🇸🇰", "🇦🇹", "🇷🇴", "🇸🇪", "🇳🇱"];
-const LEFT_COUNTRIES_FALLBACK = [
-  "Polska",
-  "Niemcy",
-  "Francja",
-  "Hiszpania",
-  "Wlochy",
-  "Wielka Brytania",
-];
-const RIGHT_COUNTRIES_FALLBACK = [
-  "Czechy",
-  "Slowacja",
-  "Austria",
-  "Rumunia",
-  "Szwecja",
-  "Holandia",
-];
+// Flaga po nazwie kraju (PL i EN), niezależnie od kolejności / języka.
+const FLAG_BY_NAME: Record<string, string> = {
+  Polska: "🇵🇱", Poland: "🇵🇱",
+  Niemcy: "🇩🇪", Germany: "🇩🇪",
+  Hiszpania: "🇪🇸", Spain: "🇪🇸",
+  Włochy: "🇮🇹", Wlochy: "🇮🇹", Italy: "🇮🇹",
+  Czechy: "🇨🇿", Czechia: "🇨🇿",
+  Szwecja: "🇸🇪", Sweden: "🇸🇪",
+  Dania: "🇩🇰", Denmark: "🇩🇰",
+  Turcja: "🇹🇷", Turkey: "🇹🇷",
+  Francja: "🇫🇷", France: "🇫🇷",
+  "Wielka Brytania": "🇬🇧", "United Kingdom": "🇬🇧",
+  Słowacja: "🇸🇰", Slowacja: "🇸🇰", Slovakia: "🇸🇰",
+  Austria: "🇦🇹",
+  Rumunia: "🇷🇴", Romania: "🇷🇴",
+  Holandia: "🇳🇱", Netherlands: "🇳🇱",
+};
+const LEFT_COUNTRIES_FALLBACK = ["Polska", "Niemcy", "Hiszpania", "Włochy"];
+const RIGHT_COUNTRIES_FALLBACK = ["Czechy", "Szwecja", "Dania", "Turcja"];
 
 const SECTION_SCROLL_VH = 130;
 const FOOTER_REVEAL_DELAY = 0.6;
@@ -44,6 +42,8 @@ const COUNTRY_SCROLL_PROGRESS = 0.18;
 const COUNTRY_STAGGER_SEC = 0.12;
 const COUNTRY_ITEM_DURATION = 0.78;
 
+const FORMSPREE_ENDPOINT = "https://formspree.io/f/xojzdpep";
+
 export default function EuropeGlobeSection({
   data,
   settings,
@@ -51,8 +51,6 @@ export default function EuropeGlobeSection({
 }: {
   data?: HomePage;
   settings?: SiteSettings;
-  // test2: pokaż na mobile ten sam glob co na web (MapLibre, SCALE 1.0 — nie
-  // ucinany od góry) zamiast statycznego SVG.
   webGlobeOnMobile?: boolean;
 } = {}) {
   const { t } = useLang();
@@ -72,31 +70,31 @@ export default function EuropeGlobeSection({
   const ctaSubmit = t(data?.globalCtaSubmitLabel ?? null) || "Wyślij";
   const footerTagline =
     t(settings?.footerTagline ?? null) || "Automaty paczkowe";
-  const footerEmail = settings?.footerEmail || "info@retailo.pl";
-  const footerPhone = settings?.footerPhone || "+48 123 456 789";
-  const footerAddress =
-    t(settings?.footerAddress ?? null) || "ul. Przykładowa 10, 00-001 Warszawa";
   const footerCopyright =
     t(settings?.footerCopyright ?? null) || "© 2026 retailo";
   const footerPrivacyLabel =
     t(settings?.footerPrivacyLabel ?? null) || "Polityka prywatności";
 
-  const leftCountries = (data?.globalCountriesLeft ?? []).map((f, i) => ({
-    flag: LEFT_FLAGS[i] ?? "🏳",
-    name: t(f) || LEFT_COUNTRIES_FALLBACK[i] || "",
-  }));
-  const rightCountries = (data?.globalCountriesRight ?? []).map((f, i) => ({
-    flag: RIGHT_FLAGS[i] ?? "🏳",
-    name: t(f) || RIGHT_COUNTRIES_FALLBACK[i] || "",
-  }));
-  const leftCountriesList = LEFT_COUNTRIES_FALLBACK.map((name, i) => ({
-    flag: LEFT_FLAGS[i] ?? "🏳",
+  const toCountry = (name: string) => ({
+    flag: FLAG_BY_NAME[name.trim()] ?? "🏳",
     name,
-  }));
-  const rightCountriesList = RIGHT_COUNTRIES_FALLBACK.map((name, i) => ({
-    flag: RIGHT_FLAGS[i] ?? "🏳",
-    name,
-  }));
+  });
+  // Kolumny krajów z Sanity (z fallbackiem, gdy puste). Render używa właśnie
+  // tych list - flaga dobierana po nazwie, więc kolejność nie ma znaczenia.
+  const leftCountriesList = (
+    data?.globalCountriesLeft?.length
+      ? data.globalCountriesLeft.map((f) => t(f) || "")
+      : LEFT_COUNTRIES_FALLBACK
+  )
+    .filter(Boolean)
+    .map(toCountry);
+  const rightCountriesList = (
+    data?.globalCountriesRight?.length
+      ? data.globalCountriesRight.map((f) => t(f) || "")
+      : RIGHT_COUNTRIES_FALLBACK
+  )
+    .filter(Boolean)
+    .map(toCountry);
   const wrapRef = useRef<HTMLDivElement>(null);
   const sectionRef = useRef<HTMLDivElement>(null);
   const introRef = useRef<HTMLDivElement>(null);
@@ -107,10 +105,31 @@ export default function EuropeGlobeSection({
   const footerRef = useRef<HTMLDivElement>(null);
   const ctaRef = useRef<HTMLDivElement>(null);
   const [mobileCtaOpen, setMobileCtaOpen] = useState(false);
-  // Mobile = nie renderujemy WebGL globu w ogóle (jest ukryty + ciężki).
+  const [ctaStatus, setCtaStatus] = useState<
+    "idle" | "sending" | "ok" | "error"
+  >("idle");
+
+  const handleCtaSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const form = e.currentTarget;
+    setCtaStatus("sending");
+    try {
+      const res = await fetch(FORMSPREE_ENDPOINT, {
+        method: "POST",
+        headers: { Accept: "application/json" },
+        body: new FormData(form),
+      });
+      if (res.ok) {
+        setCtaStatus("ok");
+        form.reset();
+      } else {
+        setCtaStatus("error");
+      }
+    } catch {
+      setCtaStatus("error");
+    }
+  };
   const [isMobile, setIsMobile] = useState(false);
-  // Globus jest ciężki (MapLibre + geojson) — montujemy go dopiero gdy sekcja
-  // zbliża się do viewportu.
   const [globeReady, setGlobeReady] = useState(false);
 
   useEffect(() => {
@@ -148,8 +167,6 @@ export default function EuropeGlobeSection({
         typeof window !== "undefined" &&
         window.matchMedia("(max-width: 1023px)").matches;
 
-      // Parallax (scrub) tylko na desktopie — na mobile scrub ScrollTrigger
-      // przy Lenis + sticky szarpał scrollem.
       if (!isMobile) {
         gsap.to(introRef.current, {
           y: "-30vh",
@@ -172,7 +189,6 @@ export default function EuropeGlobeSection({
         gsap.set(leftItems, { x: -22, opacity: 0 });
         gsap.set(rightItems, { x: 22, opacity: 0 });
 
-        // Reveal po wejściu sekcji w viewport.
         const badgesIo = new IntersectionObserver(
           (entries) => {
             for (const entry of entries) {
@@ -250,7 +266,6 @@ export default function EuropeGlobeSection({
           background: "linear-gradient(180deg, #154D6D 0%, #000000 100%)",
         }}
       >
-        {/* Intro text */}
         <div
           ref={introRef}
           className="absolute top-[16vh] max-lg:top-[8vh] left-0 right-0 z-10 flex justify-center px-[6vw]"
@@ -264,7 +279,6 @@ export default function EuropeGlobeSection({
               className="block w-[60px] h-px"
               style={{ background: "rgba(89,191,200,0.3)" }}
             />
-            {/* Dekoracyjny samolot — niewidoczny dla czytników ekranu. */}
             <span aria-hidden>&#9992;</span>
             <span
               className="block w-[60px] h-px"
@@ -273,7 +287,6 @@ export default function EuropeGlobeSection({
           </p>
         </div>
 
-        {/* GLOBAL text */}
         <div
           ref={bigTextRef}
           className="absolute top-[22vh] left-0 right-0 z-0 text-center font-black leading-[0.85] pointer-events-none select-none md:top-[14vh] max-lg:hidden"
@@ -289,7 +302,6 @@ export default function EuropeGlobeSection({
           {headline}
         </div>
 
-        {/* Glob desktop — MapLibre (płaski podświetlony glob). */}
         <div
           ref={globeWrapRef}
           className="absolute inset-x-0 top-[26vh] bottom-[-70vh] z-[1] pointer-events-none max-lg:hidden"
@@ -299,9 +311,6 @@ export default function EuropeGlobeSection({
           )}
         </div>
 
-        {/* Glob mobile. Domyślnie: statyczny SVG. test2 (webGlobeOnMobile):
-            ten sam MapLibre co na web — w kontenerze mieszczącym cały glob
-            (SCALE 1.0 → nie ucina od góry). */}
         {webGlobeOnMobile ? (
           <div className="lg:hidden absolute inset-x-0 top-[16vh] bottom-[-20vh] z-[1] pointer-events-none">
             {isMobile && globeReady && (
@@ -317,14 +326,13 @@ export default function EuropeGlobeSection({
           </div>
         )}
 
-        {/* Kraje wdrożeń — lewa lista */}
         <div
           ref={leftRef}
           className="absolute z-[4] left-[4vw] top-[34%] -translate-y-1/2 flex flex-col gap-4 max-lg:gap-2 max-lg:left-[3vw] max-lg:top-[52%] [@media(min-width:1024px)_and_(max-height:850px)]:top-[26%] [@media(min-width:1024px)_and_(max-height:850px)]:gap-2 [@media(max-width:1023px)_and_(max-height:740px)]:!top-[45%]"
         >
-          {leftCountriesList.map((c) => (
+          {leftCountriesList.map((c, i) => (
             <div
-              key={c.name}
+              key={`l-${i}`}
               className="flex items-center gap-2.5 px-4 py-2 bg-white/5 lg:backdrop-blur-lg max-lg:bg-white/10 border border-[#59bfc8]/20 rounded-xl opacity-0 max-lg:px-2.5 max-lg:py-1.5 max-lg:gap-1.5"
             >
               <span aria-hidden className="text-xl leading-none">
@@ -337,14 +345,13 @@ export default function EuropeGlobeSection({
           ))}
         </div>
 
-        {/* Kraje wdrożeń — prawa lista */}
         <div
           ref={rightRef}
           className="absolute z-[4] right-[4vw] top-[34%] -translate-y-1/2 flex flex-col gap-4 max-lg:gap-2 max-lg:right-[3vw] max-lg:top-[52%] [@media(min-width:1024px)_and_(max-height:850px)]:top-[26%] [@media(min-width:1024px)_and_(max-height:850px)]:gap-2 [@media(max-width:1023px)_and_(max-height:740px)]:!top-[45%]"
         >
-          {rightCountriesList.map((c) => (
+          {rightCountriesList.map((c, i) => (
             <div
-              key={c.name}
+              key={`r-${i}`}
               className="flex items-center gap-2.5 px-4 py-2 bg-white/5 lg:backdrop-blur-lg max-lg:bg-white/10 border border-[#59bfc8]/20 rounded-xl opacity-0 max-lg:px-2.5 max-lg:py-1.5 max-lg:gap-1.5"
             >
               <span aria-hidden className="text-xl leading-none">
@@ -357,10 +364,6 @@ export default function EuropeGlobeSection({
           ))}
         </div>
 
-        {/* CTA formularz. Pozycjonowanie (left/translate) trzyma zewnętrzny
-            div — GSAP animuje tylko wewnętrzny wrapper, żeby inline'owy
-            transform nie nadpisywał -translate-x-1/2 (form uciekał poza
-            ekran po resize do mobile). */}
         <div
           id="kontakt"
           className="pointer-events-auto absolute bottom-[128px] left-[5vw] z-30 w-[min(360px,calc(100vw-32px))] max-lg:bottom-[165px] max-lg:left-1/2 max-lg:-translate-x-1/2 max-lg:w-[min(340px,calc(100vw-32px))] [@media(min-width:1024px)_and_(max-height:850px)]:scale-[0.95] [@media(min-width:1024px)_and_(max-height:850px)]:origin-bottom-left [@media(min-width:1024px)_and_(max-height:720px)]:!scale-[0.85]"
@@ -405,7 +408,6 @@ export default function EuropeGlobeSection({
               className={`rounded-2xl border border-white/20 bg-black/85 px-3.5 py-3 shadow-lg lg:backdrop-blur-2xl ${
                 mobileCtaOpen
                   ? // display:none → block restartuje animację, więc formularz
-                    // wjeżdża z dołu z lekkim skalowaniem przy każdym otwarciu.
                     "max-lg:block max-lg:origin-bottom max-lg:animate-[cta-pop_0.35s_cubic-bezier(0.22,1,0.36,1)_both]"
                   : "max-lg:hidden"
               }`}
@@ -428,10 +430,7 @@ export default function EuropeGlobeSection({
                   <span className="text-base leading-none">&times;</span>
                 </button>
               </div>
-              <form
-                className="flex flex-col gap-2"
-                onSubmit={(e) => e.preventDefault()}
-              >
+              <form className="flex flex-col gap-2" onSubmit={handleCtaSubmit}>
                 <div className="grid grid-cols-2 gap-2">
                   <input
                     name="name"
@@ -460,9 +459,10 @@ export default function EuropeGlobeSection({
                 />
                 <button
                   type="submit"
-                  className="mt-0.5 self-end flex items-center justify-center gap-1.5 rounded-full bg-white px-5 py-2 text-sm font-semibold text-gray-900 transition hover:bg-white/95"
+                  disabled={ctaStatus === "sending"}
+                  className="mt-0.5 self-end flex items-center justify-center gap-1.5 rounded-full bg-white px-5 py-2 text-sm font-semibold text-gray-900 transition hover:bg-white/95 disabled:opacity-60"
                 >
-                  {ctaSubmit}
+                  {ctaStatus === "sending" ? "Wysylanie..." : ctaSubmit}
                   <svg
                     width="12"
                     height="12"
@@ -479,12 +479,21 @@ export default function EuropeGlobeSection({
                     />
                   </svg>
                 </button>
+                {ctaStatus === "ok" && (
+                  <p role="status" className="m-0 text-sm font-medium text-[#59bfc8]">
+                    Dziekujemy! Wiadomosc zostala wyslana.
+                  </p>
+                )}
+                {ctaStatus === "error" && (
+                  <p role="alert" className="m-0 text-sm font-medium text-red-300">
+                    Cos poszlo nie tak. Sprobuj ponownie.
+                  </p>
+                )}
               </form>
             </div>
           </div>
         </div>
 
-        {/* Stopka */}
         <div className="absolute bottom-0 left-0 right-0 z-20 flex flex-col items-stretch pointer-events-none pb-[env(safe-area-inset-bottom)]">
           <footer
             ref={footerRef}
@@ -518,23 +527,38 @@ export default function EuropeGlobeSection({
                   </div>
                   <div className="flex flex-wrap items-center gap-x-5 gap-y-1 text-xs text-white/75 md:text-sm md:gap-x-8">
                     <a
-                      href={`mailto:${footerEmail}`}
+                      href="mailto:kontakt@retailo.pl"
                       className="no-underline hover:text-white transition-colors"
                     >
-                      {footerEmail}
+                      kontakt@retailo.pl
                     </a>
                     <span className="text-white/35 hidden sm:inline">|</span>
                     <a
-                      href={`tel:${footerPhone.replace(/\s+/g, "")}`}
+                      href="tel:+48693731840"
                       className="no-underline hover:text-white transition-colors"
                     >
-                      {footerPhone}
+                      +48 693 731 840
+                    </a>
+                    <a
+                      href="tel:+48531607626"
+                      className="no-underline hover:text-white transition-colors"
+                    >
+                      +48 531 607 626
                     </a>
                     <span className="text-white/35 hidden md:inline">|</span>
-                    <span className="text-white/60">{footerAddress}</span>
+                    <a
+                      href="https://www.retailo.pl"
+                      className="no-underline hover:text-white transition-colors"
+                    >
+                      www.retailo.pl
+                    </a>
+                    <span className="text-white/35 hidden md:inline">|</span>
+                    <span className="text-white/60">
+                      Pl. Jana Kilińskiego 2, 35-005 Rzeszów, Polska · NIP: 5170407536
+                    </span>
                   </div>
                 </div>
-                <div className="mt-2.5 flex flex-wrap items-center justify-between gap-x-4 gap-y-1 border-t border-white/5 pt-2.5 text-[11px] text-white/30">
+                <div className="mt-2.5 flex flex-wrap items-center justify-between gap-x-4 gap-y-1 border-t border-white/5 pt-2.5 text-[11px] text-white/60">
                   <p className="m-0">{footerCopyright}</p>
                   <div className="flex gap-4">
                     <a
@@ -545,7 +569,7 @@ export default function EuropeGlobeSection({
                     </a>
                     <CookieSettingsLink
                       label={t(settings?.cookieSettingsLinkLabel ?? null)}
-                      className="border-0 bg-transparent p-0 text-[11px] text-white/30 hover:text-white/55 transition-colors"
+                      className="border-0 bg-transparent p-0 text-[11px] text-white/60 hover:text-white/90 transition-colors"
                     />
                   </div>
                 </div>

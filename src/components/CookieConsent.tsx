@@ -10,12 +10,10 @@ import type { SiteSettings } from "@/lib/sanity/fetch";
 
 const GA_ID = "G-EXF68478GE";
 const STORAGE_KEY = "retailo_cookie_consent_v1";
-/** Event otwierający panel ustawień (np. z linku w stopce). */
 export const OPEN_COOKIE_SETTINGS_EVENT = "retailo:open-cookie-settings";
 
 type Consent = {
   analytics: boolean;
-  /** Timestamp decyzji — dowód zgody (RODO art. 7 ust. 1). */
   decidedAt: string;
 };
 
@@ -39,12 +37,10 @@ function saveConsent(analytics: boolean): Consent {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(consent));
   } catch {
-    /* noop — np. tryb prywatny */
   }
   return consent;
 }
 
-/** Usuwa cookies Google Analytics po cofnięciu zgody. */
 function clearGaCookies() {
   const cookies = document.cookie.split(";");
   for (const c of cookies) {
@@ -60,25 +56,10 @@ function clearGaCookies() {
 
 const BTN_BASE =
   "flex-1 cursor-pointer rounded-full px-3 py-2 text-center text-xs font-semibold whitespace-nowrap transition duration-200 hover:-translate-y-0.5 sm:flex-none sm:px-5 sm:py-2.5 sm:text-sm";
-// Kolory dobrane pod WCAG AA na beżowym tle banera (najciemniejszy stop
-// gradientu #e3dbcb): biały na #007293 = 5.5:1, link #00607f = 5.1:1.
 const BTN_PRIMARY = `${BTN_BASE} bg-[#007293] text-white shadow-[0_2px_10px_rgba(0,114,147,0.3)] hover:bg-[#0a2a2e] hover:shadow-[0_4px_14px_rgba(10,42,46,0.3)]`;
 const BTN_REJECT = `${BTN_BASE} bg-white/30 text-[#0a2a2e]/80 hover:bg-white/60 hover:text-[#0a2a2e]`;
 const BTN_SECONDARY = `${BTN_BASE} border border-[#0a2a2e]/15 bg-white/40 text-[#0a2a2e] hover:border-[#0a2a2e]/35 hover:bg-white/70`;
 
-/**
- * Baner zgody na cookies zgodny z RODO / ustawą Prawo komunikacji
- * elektronicznej:
- * - żaden skrypt analityczny nie ładuje się przed wyrażeniem zgody,
- * - „Odrzucam" jest tak samo wyeksponowane jak „Akceptuję",
- * - granularny wybór kategorii (niezbędne / analityczne), bez domyślnych
- *   zaznaczeń,
- * - zgodę można cofnąć w każdej chwili (link „Ustawienia cookies" w stopce
- *   wysyła OPEN_COOKIE_SETTINGS_EVENT).
- * Google Analytics montuje się wyłącznie po zgodzie, z Consent Mode v2
- * (sygnały reklamowe zawsze denied — nie używamy Google Ads).
- * Treści edytowalne w Sanity (siteSettings, pola cookie*), z fallbackami PL.
- */
 export default function CookieConsent({
   settings,
 }: {
@@ -87,9 +68,6 @@ export default function CookieConsent({
   const { t } = useLang();
   const pathname = usePathname();
   const [consent, setConsent] = useState<Consent | null>(null);
-  // true od startu: baner jest w HTML z SSR, a o widoczności przed
-  // hydracją decyduje CSS + atrybut data-cookie-pending ustawiany
-  // synchronicznym skryptem w <head> (zero mignięcia treści strony).
   const [bannerOpen, setBannerOpen] = useState(true);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [analyticsChecked, setAnalyticsChecked] = useState(false);
@@ -108,7 +86,7 @@ export default function CookieConsent({
     settingsTitle:
       t(settings?.cookieSettingsTitle ?? null) || "Ustawienia cookies",
     necessaryTitle:
-      t(settings?.cookieNecessaryTitle ?? null) || "Niezbędne — zawsze aktywne",
+      t(settings?.cookieNecessaryTitle ?? null) || "Niezbędne - zawsze aktywne",
     necessaryDesc:
       t(settings?.cookieNecessaryDesc ?? null) ||
       "Wymagane do działania strony (np. zapamiętanie Twojej decyzji o cookies). Nie zbierają danych do analityki ani marketingu.",
@@ -117,7 +95,7 @@ export default function CookieConsent({
       "Analityczne (Google Analytics)",
     analyticsDesc:
       t(settings?.cookieAnalyticsDesc ?? null) ||
-      "Anonimowe statystyki odwiedzin (Google Analytics 4) — pomagają nam ulepszać stronę. Dane mogą być przekazywane do Google LLC. Włączane dopiero po Twojej zgodzie.",
+      "Anonimowe statystyki odwiedzin (Google Analytics 4) - pomagają nam ulepszać stronę. Dane mogą być przekazywane do Google LLC. Włączane dopiero po Twojej zgodzie.",
     privacyLabel:
       t(settings?.footerPrivacyLabel ?? null) || "Polityce prywatności",
   };
@@ -130,8 +108,6 @@ export default function CookieConsent({
       setAnalyticsChecked(stored.analytics);
       document.documentElement.removeAttribute("data-cookie-pending");
     } else {
-      // Defensywnie (np. nawigacja client-side) — skrypt w <head> mógł
-      // nie zadziałać, a bez atrybutu CSS ukrywa baner.
       document.documentElement.setAttribute("data-cookie-pending", "");
     }
 
@@ -146,7 +122,6 @@ export default function CookieConsent({
     return () => window.removeEventListener(OPEN_COOKIE_SETTINGS_EVENT, reopen);
   }, []);
 
-  // Na mobile baner działa jako modal — śledzimy breakpoint (< sm).
   useEffect(() => {
     const mq = window.matchMedia("(max-width: 639px)");
     const update = () => setIsMobile(mq.matches);
@@ -155,16 +130,12 @@ export default function CookieConsent({
     return () => mq.removeEventListener("change", update);
   }, []);
 
-  // Mobile modal: blokada scrolla strony, fokus w dialogu i pułapka fokusa
-  // (WCAG 2.1.2 — fokus nie ucieka pod przyciemnione tło; wyjście wyłącznie
-  // przez podjęcie decyzji, Tab krąży po elementach banera).
   useEffect(() => {
     if (!bannerOpen || !isMobile) return;
     const dialog = dialogRef.current;
     const prevBodyOverflow = document.body.style.overflow;
     const prevHtmlOverflow = document.documentElement.style.overflow;
     const prevFocus = document.activeElement as HTMLElement | null;
-    // Scroll w Next idzie po <html>, więc blokujemy oba elementy.
     document.body.style.overflow = "hidden";
     document.documentElement.style.overflow = "hidden";
     dialog?.focus();
@@ -203,8 +174,6 @@ export default function CookieConsent({
       setBannerOpen(false);
       setSettingsOpen(false);
       document.documentElement.removeAttribute("data-cookie-pending");
-      // Cofnięcie zgody: czyścimy cookies GA i przeładowujemy, żeby
-      // załadowany już gtag przestał działać natychmiast.
       if (hadAnalytics && !analytics) {
         clearGaCookies();
         window.location.reload();
@@ -213,13 +182,10 @@ export default function CookieConsent({
     [consent],
   );
 
-  // Panel admina (Sanity Studio) — bez banera i bez GA. Guard po hookach,
-  // żeby nie łamać rules-of-hooks.
   if (pathname?.startsWith("/admin")) return null;
 
   return (
     <>
-      {/* GA tylko po zgodzie — wcześniej zero requestów do Google. */}
       {consent?.analytics && (
         <>
           <Script
@@ -235,8 +201,6 @@ export default function CookieConsent({
 
       {bannerOpen && (
         <>
-          {/* Mobile: przyciemnione tło blokujące interakcję ze stroną
-              do czasu podjęcia decyzji. */}
           <div
             aria-hidden
             data-cookie-consent
@@ -359,7 +323,6 @@ export default function CookieConsent({
   );
 }
 
-/** Link/przycisk do stopki — otwiera panel ustawień cookies. */
 export function CookieSettingsLink({
   className,
   label,

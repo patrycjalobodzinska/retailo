@@ -1,19 +1,4 @@
-/**
- * Model macierzy układu skrytek modułu PickUpWall.
- *
- * Per-wiersz: każdy wiersz ma własną listę komórek o własnych szerokościach.
- * Dzięki temu różne wiersze mogą mieć różną liczbę skrytek (np. 6 małych w
- * większości wierszy, a 4 duże w środkowym) — flex rozkłada komórki na pełną
- * szerokość modułu niezależnie w każdym wierszu, więc kolumny NIE muszą się
- * pokrywać między wierszami.
- *
- * Zapis jako JSON w polu `matrix` (text) dokumentu lockerModule. Ten sam
- * kształt czyta edytor w Studio (LockerMatrixInput) i frontend
- * (LockerWallDiagram). Parser migruje też stary kształt {cols,rows,screen}.
- */
 
-// "joined" = skrytka łączona — scala się z sąsiednimi "joined" (pion+poziom),
-// dając jedną większą/wyższą skrytkę. "locker" = zwykłe, osobne drzwiczki.
 export type LockerCellKind = "locker" | "joined" | "screen" | "empty";
 export type LockerCell = { w: number; k: LockerCellKind };
 export type LockerRow = { h: number; cells: LockerCell[] };
@@ -53,7 +38,6 @@ export function parseLockerMatrix(value?: string | null): LockerMatrix {
   if (!o || typeof o !== "object") return DEFAULT_LOCKER_MATRIX;
   const obj = o as Record<string, unknown>;
 
-  // Nowy kształt: { rows: [{ h, cells: [{ w, k }] }] }
   if (
     Array.isArray(obj.rows) &&
     obj.rows.length > 0 &&
@@ -79,7 +63,6 @@ export function parseLockerMatrix(value?: string | null): LockerMatrix {
     return rows.length ? { rows } : DEFAULT_LOCKER_MATRIX;
   }
 
-  // Migracja starego kształtu: { cols: number[], rows: number[], screen }
   if (
     Array.isArray(obj.cols) &&
     Array.isArray(obj.rows) &&
@@ -110,7 +93,6 @@ export function parseLockerMatrix(value?: string | null): LockerMatrix {
   return DEFAULT_LOCKER_MATRIX;
 }
 
-/** Suma wag szerokości najszerszego wiersza — referencja szerokości modułu. */
 export function matrixWidthUnits(m: LockerMatrix): number {
   return m.rows.reduce(
     (max, r) => Math.max(max, r.cells.reduce((a, c) => a + c.w, 0)),
@@ -118,18 +100,10 @@ export function matrixWidthUnits(m: LockerMatrix): number {
   );
 }
 
-/** Suma wag wysokości wszystkich wierszy. */
 export function matrixHeightUnits(m: LockerMatrix): number {
   return m.rows.reduce((a, r) => a + r.h, 0) || 0.1;
 }
 
-/**
- * Prostokąt ekranu (w procentach szerokości/wysokości modułu) — obrys (bounding
- * box) wszystkich komórek oznaczonych jako ekran. Pozwala narysować ekran jako
- * JEDEN panel scalony w pionie i poziomie (np. wysoki na 3 wiersze obok
- * skrytek), niezależnie od tego, że wiersze mają różną liczbę komórek.
- * Zakłada jeden prostokątny obszar ekranu. Zwraca null, gdy brak ekranu.
- */
 export type ScreenRect = {
   left: number;
   top: number;
@@ -137,13 +111,6 @@ export type ScreenRect = {
   height: number;
 } | null;
 
-/**
- * Które krawędzie komórki są ZEWNĘTRZNE (sąsiad nie jest tego samego typu) —
- * tam dajemy margines/zaokrąglenie, a styki tego samego typu zostają bez szwu.
- * Działa dla typów scalanych: "screen" i "joined". Sąsiedztwo pionowe
- * sprawdzamy „czy wiersz wyżej/niżej ma komórkę tego typu" (dla prostokątnego
- * bloku wystarczająco dokładne).
- */
 export type OuterSides = {
   top: boolean;
   right: boolean;
@@ -160,7 +127,6 @@ export function mergeOuterSides(
   const k = row.cells[ci].k;
   const below = rows[ri + 1]?.cells[ci]?.k;
 
-  // "screen": scala w pionie (kolumnowo) i w poziomie (sąsiad obok).
   if (k === "screen") {
     return {
       top: rows[ri - 1]?.cells[ci]?.k !== "screen",
@@ -170,9 +136,6 @@ export function mergeOuterSides(
     };
   }
 
-  // Skrytki (locker/joined): scalanie TYLKO w pionie i wg jawnej decyzji.
-  // "joined" = „scal z komórką POWYŻEJ" → pełna kontrola par (np. 2+2),
-  // bo łańcuch tworzysz tylko tam, gdzie sam oznaczysz kolejne komórki.
   const mergeUp = k === "joined"; // ta komórka łączy się z górną
   const mergeDown = below === "joined"; // dolna łączy się w górę z tą
   return {

@@ -1,9 +1,5 @@
 import { defineField, defineType } from "sanity";
 
-/**
- * Strona prawna (polityka prywatności, w przyszłości np. regulamin).
- * Treść w pełni edytowalna w Studio, per język.
- */
 export const legalPage = defineType({
   name: "legalPage",
   title: "Strony prawne",

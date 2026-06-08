@@ -9,6 +9,8 @@ import {
 
 export const metadata = {
   title: "Realizacje · Retailo",
+  description:
+    "Wdrożenia PickUpWall w Polsce i Europie - automatyczne, modułowe systemy odbioru przesyłek pick-up in store. Zobacz nasze realizacje w sieciach retail.",
 };
 
 export const revalidate = 3600;
@@ -24,21 +26,18 @@ async function safeFetch(): Promise<Realization[]> {
 
 export default async function RealizacjePage() {
   const REALIZATIONS = await safeFetch();
-  // Promowane (z Sanity) wyświetlają się jako większe karty na górze listy.
   const featured = REALIZATIONS.filter((r) => r.featured);
   const rest = REALIZATIONS.filter((r) => !r.featured);
   return (
     <>
       <Header />
       <main className="relative w-full bg-white text-[#0a2a2e] overflow-hidden">
-        {/* HERO — fades smoothly from cyan to white across the full bottom edge */}
         <section
           className="relative w-full flex flex-col justify-end overflow-hidden"
           style={{
             background:
               "linear-gradient(180deg, #c0dbe2 0%, #d6e4e9 45%, #ecf1f3 75%, #ffffff 100%)",
           }}>
-          {/* Extra bottom-edge fade so the section blends seamlessly into white */}
           <div
             aria-hidden="true"
             className="absolute inset-x-0 bottom-0 h-[18vh] pointer-events-none z-[2]"
@@ -141,18 +140,12 @@ export default async function RealizacjePage() {
               Zobacz nasze wdrozenia dla{" "}
               <strong className="text-[#0a2a2e]">Empik</strong>,{" "}
               <strong className="text-[#0a2a2e]">Sephora</strong> i innych marek
-              premium — od salonu flagowego po biurowiec.
+              premium - od salonu flagowego po biurowiec.
             </p>
           </div>
         </section>
 
-        {/* GRID — image-led cards with same overlay style as the homepage
-            carousel cards, so visiting this list feels like a continuation
-            of the carousel, not a different page. */}
         <section className="relative w-full -mt-[4vh] pb-[14vh] z-[3]">
-          {/* Decorative background — soft blobs + dot grid behind the cards.
-              Pełna szerokość: bg leży na całym tle sekcji, nie ograniczony
-              do max-w kontenera z kartami. */}
           <div
             aria-hidden="true"
             className="absolute inset-0 pointer-events-none -z-10 overflow-hidden">
@@ -226,10 +219,7 @@ export default async function RealizacjePage() {
             </svg>
           </div>
 
-          {/* Inner constrained container — karty mają max-width, ale tło
-              powyżej rozciąga się na pełną szerokość ekranu. */}
           <div className="relative max-w-[1300px] mx-auto px-[6vw]">
-            {/* Promowane — szersza siatka 2-kolumnowa z większymi kartami */}
             {featured.length > 0 && (
               <div className="relative grid grid-cols-1 md:grid-cols-2 gap-5 mb-5">
                 {featured.map((r) => (
@@ -238,7 +228,6 @@ export default async function RealizacjePage() {
               </div>
             )}
 
-            {/* Pozostałe realizacje — gęstsza siatka 3-kolumnowa */}
             <div className="relative grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
               {rest.map((r) => (
                 <RealizationCard key={r.slug} r={r} />
@@ -261,7 +250,7 @@ function RealizationCard({
   r: Realization;
   featured?: boolean;
 }) {
-  const brand = r.client && r.client !== "—" ? r.client : null;
+  const brand = r.client && r.client !== "-" ? r.client : null;
   return (
     <Link
       href={`/realizacje/${r.slug}`}

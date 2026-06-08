@@ -13,6 +13,20 @@ const nextConfig = {
       },
     ],
   },
+  async redirects() {
+    return [
+      {
+        source: "/en/english-retailo",
+        destination: "/",
+        permanent: true,
+      },
+      {
+        source: "/en/english-retailo/:path*",
+        destination: "/",
+        permanent: true,
+      },
+    ];
+  },
 };
 
 export default nextConfig;

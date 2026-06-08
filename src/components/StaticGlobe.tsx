@@ -1,11 +1,5 @@
 import { STATIC_GLOBE } from "@/lib/staticGlobeData";
 
-/**
- * Lekki, STATYCZNY glob (SVG) na mobile — bez WebGL. Rysuje realne lądy +
- * podświetlone kraje (projekcja ortograficzna), z prekompilowanych ścieżek
- * (scripts/gen-static-globe.mjs). Wypełnia kontener (absolute inset-0); svg
- * przyklejony do góry kontenera, wyśrodkowany, powiększony.
- */
 export default function StaticGlobe() {
   const G = STATIC_GLOBE;
   return (
@@ -32,11 +26,8 @@ export default function StaticGlobe() {
             <stop offset="100%" stopColor="rgba(0,0,0,0.5)" />
           </radialGradient>
         </defs>
-        {/* Ocean / kula */}
         <circle cx={G.cx} cy={G.cy} r={G.r} fill="url(#sg-ocean)" />
-        {/* Lądy */}
         <path d={G.land} fill="#2a6072" fillOpacity={0.55} />
-        {/* Kraje wdrożeń */}
         <path
           d={G.highlight}
           fill="#59bfc8"
@@ -45,7 +36,6 @@ export default function StaticGlobe() {
           strokeWidth={1.3}
           strokeOpacity={0.7}
         />
-        {/* Przyciemnienie brzegu (efekt kuli) */}
         <circle cx={G.cx} cy={G.cy} r={G.r} fill="url(#sg-limb)" />
       </svg>
     </div>

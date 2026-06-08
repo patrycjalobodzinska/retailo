@@ -11,7 +11,7 @@ gsap.registerPlugin(ScrollTrigger);
 const STEPS_FALLBACK = [
   [
     "Integracja",
-    "Gwarantujemy elastycznosc w integracji — w sposobie komunikacji, jak i zakresie przesylanych danych.",
+    "Gwarantujemy elastycznosc w integracji - w sposobie komunikacji, jak i zakresie przesylanych danych.",
   ],
   [
     "RODO",
@@ -35,10 +35,10 @@ const SPECS_FALLBACK = [
 ] as const;
 
 const HARDWARE_FALLBACK = [
-  ["Liczba skrytek", "39 szt", "159 szt"],
-  ["Szerokosc", "1 m", "4 m"],
-  ["Wysokosc", "2.2 m", "2.2 m"],
-  ["Glebokosc", "0.5 m", "0.5 m"],
+  ["Liczba skrytek", "od 3 do 320"],
+  ["Ekran", 'od 10" do 21.5"'],
+  ["Kolory urzadzen", "dowolne z palety RAL"],
+  ["Rozwiazania", "indoor i outdoor"],
 ] as const;
 
 export default function ProductShowcase({
@@ -53,10 +53,6 @@ export default function ProductShowcase({
   const specsHeadline =
     t(data?.productSpecsHeadline ?? null) || "Specyfikacja techniczna";
   const hardwareLabel = t(data?.productHardwareLabel ?? null) || "Hardware";
-  const hardwareMinLabel =
-    t(data?.productHardwareMinLabel ?? null) || "Minimum";
-  const hardwareMaxLabel =
-    t(data?.productHardwareMaxLabel ?? null) || "Maximum";
 
   const steps: Array<[string, string]> =
     data?.productFeatures && data.productFeatures.length > 0
@@ -69,12 +65,10 @@ export default function ProductShowcase({
     data?.productSpecs && data.productSpecs.length > 0
       ? data.productSpecs.map((s) => [t(s.label) || "", t(s.value) || ""])
       : SPECS_FALLBACK.map((s) => [s[0], s[1]] as [string, string]);
-  const hardwareRows: Array<[string, string, string]> =
+  const hardwareRows: Array<[string, string]> =
     data?.productHardwareRows && data.productHardwareRows.length > 0
-      ? data.productHardwareRows.map((r) => [t(r.label) || "", r.min, r.max])
-      : HARDWARE_FALLBACK.map(
-          (r) => [r[0], r[1], r[2]] as [string, string, string],
-        );
+      ? data.productHardwareRows.map((r) => [t(r.label) || "", t(r.value) || ""])
+      : HARDWARE_FALLBACK.map((r) => [r[0], r[1]] as [string, string]);
   const sectionRef = useRef<HTMLElement>(null);
   const phase1Ref = useRef<HTMLDivElement>(null);
   const phase2Ref = useRef<HTMLDivElement>(null);
@@ -85,7 +79,6 @@ export default function ProductShowcase({
   const [mobilePhase2InView, setMobilePhase2InView] =
     useState<boolean>(false);
 
-  // Mobile: swap phase-2 inline image (photo → draft) when phase-2 enters.
   useEffect(() => {
     if (typeof window === "undefined") return;
     if (!window.matchMedia("(max-width: 1023px)").matches) return;
@@ -113,12 +106,6 @@ export default function ProductShowcase({
 
       gsap.set(sketchRef.current, { opacity: 0 });
 
-      // Phase 1 features list — animacja usunięta, lista renderuje się
-      // od razu statycznie.
-
-      // Phase-2 timeline: czysty crossfade opacity (GPU-accelerated,
-      // bez transformów na wrap'erze, bez mask-size — wszystko co
-      // generowało zacinanie zostało usunięte).
       const phase2Tl = gsap.timeline({ paused: true });
       phase2Tl
         .to(
@@ -161,14 +148,12 @@ export default function ProductShowcase({
           background: "linear-gradient(180deg, #c0dbe2 0%, #e9e2d8 100%)",
         }}>
 
-        {/* Desktop sticky image layer — photo crossfades to sketch when
-            entering phase 2 (Specyfikacja techniczna). */}
         <div className="pointer-events-none absolute inset-0 z-[5] max-lg:hidden">
           <div className="sticky top-0 h-screen w-full">
             <div ref={imageWrapRef} className="absolute right-[5vw] top-1/2 -translate-y-1/2 w-[480px] aspect-square 2xl:right-[8vw] max-2xl:!w-[420px] max-xl:!w-[360px] max-xl:!right-[3vw]">
               <img
                 ref={sketchRef}
-                src="/pickupwall-sketch.png"
+                src={data?.productSketch || "/pickupwall-sketch.png"}
                 alt="PickUpWall szkic"
                 loading="eager"
                 decoding="async"
@@ -177,7 +162,7 @@ export default function ProductShowcase({
               />
               <img
                 ref={photoRef}
-                src="/pickupwall-photo.png"
+                src={data?.productPhoto || "/pickupwall-photo.png"}
                 alt="PickUpWall"
                 loading="eager"
                 decoding="async"
@@ -189,16 +174,13 @@ export default function ProductShowcase({
           </div>
         </div>
 
-        {/* Content stack — two viewport-tall subsections. */}
         <div className="relative">
-          {/* Phase 1 */}
           <div
             ref={phase1Ref}
             className="relative h-[65vh] min-h-[480px] max-lg:h-auto max-lg:min-h-0 max-lg:pt-[5svh] max-lg:pb-[1svh]">
-            {/* Mobile-only inline image */}
             <div className="hidden max-lg:flex justify-center px-[6vw] mb-6">
               <img
-                src="/pickupwall-photo.png"
+                src={data?.productPhoto || "/pickupwall-photo.png"}
                 alt="PickUpWall"
                 className="block w-[68vw] max-w-[320px] h-auto object-contain"
                 style={{
@@ -270,16 +252,13 @@ export default function ProductShowcase({
             </div>
           </div>
 
-          {/* Phase 2 */}
           <div
             ref={phase2Ref}
             className="relative h-[88vh] min-h-[600px] pb-[8vh] max-lg:h-auto max-lg:min-h-0 max-lg:pt-[7svh] max-lg:pb-[8svh]">
-            {/* Mobile-only inline image with photo → draft wavy mask wipe on enter */}
             <div className="hidden max-lg:flex justify-center px-[6vw] mb-6">
               <div className="relative w-[68vw] max-w-[320px] aspect-square">
-                {/* Sketch (draft) sits beneath and reveals through the wipe */}
                 <img
-                  src="/pickupwall-sketch.png"
+                  src={data?.productSketch || "/pickupwall-sketch.png"}
                   alt="PickUpWall szkic"
                   className="absolute inset-0 w-full h-full object-contain transition-opacity ease-out"
                   style={{
@@ -288,9 +267,8 @@ export default function ProductShowcase({
                     transitionDelay: mobilePhase2InView ? "300ms" : "0ms",
                   }}
                 />
-                {/* Photo on top — opacity crossfade (mask-size było zbyt wolne) */}
                 <img
-                  src="/pickupwall-photo.png"
+                  src={data?.productPhoto || "/pickupwall-photo.png"}
                   alt="PickUpWall"
                   className="absolute inset-0 w-full h-full object-contain transition-opacity ease-out"
                   style={{
@@ -317,7 +295,6 @@ export default function ProductShowcase({
                   {specsHeadline}
                 </p>
 
-                {/* Component-level specs */}
                 <div className="grid grid-cols-2 gap-x-8 gap-y-4 mb-8 max-lg:mb-6">
                   {specs.map(([label, value]) => (
                     <div key={label} className="flex flex-col gap-1">
@@ -333,9 +310,8 @@ export default function ProductShowcase({
                   ))}
                 </div>
 
-                {/* Hardware Min/Max table */}
                 <div
-                  className="grid grid-cols-[1.5fr_1fr_1fr] items-end gap-x-6 pb-3 border-b"
+                  className="pb-3 border-b"
                   style={{ borderColor: "rgba(15,42,46,0.18)" }}>
                   <span
                     className="font-bold tracking-tight"
@@ -345,21 +321,11 @@ export default function ProductShowcase({
                     }}>
                     {hardwareLabel}
                   </span>
-                  <span
-                    className="text-right uppercase tracking-widest font-medium text-[#2a2a2a]/60"
-                    style={{ fontSize: "0.68rem" }}>
-                    {hardwareMinLabel}
-                  </span>
-                  <span
-                    className="text-right uppercase tracking-widest font-medium text-[#2a2a2a]/60"
-                    style={{ fontSize: "0.68rem" }}>
-                    {hardwareMaxLabel}
-                  </span>
                 </div>
-                {hardwareRows.map(([label, min, max], i, arr) => (
+                {hardwareRows.map(([label, value], i, arr) => (
                   <div
                     key={label}
-                    className={`grid grid-cols-[1.5fr_1fr_1fr] items-center gap-x-6 py-3 ${
+                    className={`grid grid-cols-[1fr_1.3fr] items-baseline gap-x-6 py-3 ${
                       i < arr.length - 1 ? "border-b" : ""
                     }`}
                     style={{ borderColor: "rgba(15,42,46,0.08)" }}>
@@ -369,14 +335,9 @@ export default function ProductShowcase({
                       {label}
                     </span>
                     <span
-                      className="text-right text-[#2a2a2a]/80 tabular-nums"
+                      className="text-right text-[#2a2a2a]/80"
                       style={{ fontSize: "clamp(0.92rem, 1.05vw, 1.05rem)" }}>
-                      {min}
-                    </span>
-                    <span
-                      className="text-right text-[#2a2a2a]/80 tabular-nums"
-                      style={{ fontSize: "clamp(0.92rem, 1.05vw, 1.05rem)" }}>
-                      {max}
+                      {value}
                     </span>
                   </div>
                 ))}

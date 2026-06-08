@@ -14,7 +14,6 @@ const PARA = "m-0 mt-3 text-[#3a5a60] leading-relaxed text-[0.95rem]";
 const LIST =
   "m-0 mt-3 pl-5 list-disc text-[#3a5a60] leading-relaxed text-[0.95rem] [&>li]:mt-1.5";
 
-/** Wybiera tłumaczenie rich-textu dla bieżącego języka (fallback: pl → pierwsze). */
 function resolveBlocks(
   page: LegalPage,
   lang: string,
@@ -38,7 +37,6 @@ export default function PrivacyPolicyContent({ page }: { page: LegalPage }) {
 
   return (
     <main className="relative w-full bg-white text-[#0a2a2e]">
-      {/* Hero — jasny gradient jak na pozostałych podstronach */}
       <section
         className="relative w-full overflow-hidden"
         style={{
@@ -79,9 +77,6 @@ export default function PrivacyPolicyContent({ page }: { page: LegalPage }) {
           <FallbackPolicyPl />
         )}
 
-        {/* Zmiana decyzji cookies — zawsze pod treścią, niezależnie od
-            źródła (przycisk musi być interaktywny, nie da się go włożyć
-            w rich text z Sanity). */}
         <p className={PARA + " mt-8"}>
           Swoją decyzję dotyczącą cookies możesz w każdej chwili zmienić:{" "}
           <CookieSettingsLink className="border-0 bg-transparent p-0 text-[0.95rem] text-[#0086b0] underline underline-offset-2" />
@@ -92,7 +87,6 @@ export default function PrivacyPolicyContent({ page }: { page: LegalPage }) {
   );
 }
 
-/** Pełna treść PL — fallback gdy dokument legalPage nie istnieje w Sanity. */
 function FallbackPolicyPl() {
   return (
     <>
@@ -109,9 +103,9 @@ function FallbackPolicyPl() {
       <p className={PARA}>
         Kontakt w sprawach ochrony danych osobowych: e-mail{" "}
         <a
-          href="mailto:info@retailo.pl"
+          href="mailto:kontakt@retailo.pl"
           className="text-[#0086b0] underline underline-offset-2">
-          info@retailo.pl
+          kontakt@retailo.pl
         </a>{" "}
         lub pisemnie na adres siedziby Administratora.
       </p>
@@ -123,25 +117,25 @@ function FallbackPolicyPl() {
       </p>
       <ul className={LIST}>
         <li>
-          <strong className="text-[#0a2a2e]">Formularz kontaktowy</strong> —
+          <strong className="text-[#0a2a2e]">Formularz kontaktowy</strong> -
           imię i nazwisko, adres e-mail, numer telefonu oraz treść wiadomości;
           w celu udzielenia odpowiedzi na zapytanie i prowadzenia
-          korespondencji (art. 6 ust. 1 lit. f RODO — prawnie uzasadniony
+          korespondencji (art. 6 ust. 1 lit. f RODO - prawnie uzasadniony
           interes Administratora polegający na obsłudze zapytań, a w przypadku
-          zmierzania do zawarcia umowy — art. 6 ust. 1 lit. b RODO).
+          zmierzania do zawarcia umowy - art. 6 ust. 1 lit. b RODO).
         </li>
         <li>
           <strong className="text-[#0a2a2e]">
             Statystyki odwiedzin (Google Analytics 4)
           </strong>{" "}
-          — dane o sposobie korzystania z Serwisu (m.in. odwiedzone podstrony,
+          - dane o sposobie korzystania z Serwisu (m.in. odwiedzone podstrony,
           czas wizyty, przybliżona lokalizacja, typ urządzenia, pseudonimowy
-          identyfikator); w celu analizy ruchu i ulepszania Serwisu — wyłącznie
+          identyfikator); w celu analizy ruchu i ulepszania Serwisu - wyłącznie
           za Twoją uprzednią zgodą (art. 6 ust. 1 lit. a RODO oraz art. 399
-          ustawy z 12 lipca 2024 r. — Prawo komunikacji elektronicznej).
+          ustawy z 12 lipca 2024 r. - Prawo komunikacji elektronicznej).
         </li>
         <li>
-          <strong className="text-[#0a2a2e]">Dane techniczne</strong> — adres
+          <strong className="text-[#0a2a2e]">Dane techniczne</strong> - adres
           IP i dane logowania serwera; w celu zapewnienia bezpieczeństwa i
           prawidłowego działania Serwisu (art. 6 ust. 1 lit. f RODO).
         </li>
@@ -161,11 +155,11 @@ function FallbackPolicyPl() {
       <ul className={LIST}>
         <li>dostawcom hostingu i infrastruktury IT,</li>
         <li>
-          Google Ireland Limited / Google LLC — w zakresie usługi Google
+          Google Ireland Limited / Google LLC - w zakresie usługi Google
           Analytics 4 (wyłącznie po wyrażeniu zgody na cookies analityczne),
         </li>
         <li>
-          podmiotom świadczącym usługi księgowe, prawne lub doradcze — w
+          podmiotom świadczącym usługi księgowe, prawne lub doradcze - w
           zakresie, w jakim jest to niezbędne.
         </li>
       </ul>
@@ -180,12 +174,12 @@ function FallbackPolicyPl() {
       <h2 className={SECTION_TITLE}>4. Okres przechowywania</h2>
       <ul className={LIST}>
         <li>
-          dane z formularza kontaktowego — przez czas prowadzenia
+          dane z formularza kontaktowego - przez czas prowadzenia
           korespondencji, a następnie przez okres przedawnienia ewentualnych
           roszczeń,
         </li>
-        <li>dane analityczne (GA4) — maksymalnie 14 miesięcy od zebrania,</li>
-        <li>logi serwera — do 12 miesięcy.</li>
+        <li>dane analityczne (GA4) - maksymalnie 14 miesięcy od zebrania,</li>
+        <li>logi serwera - do 12 miesięcy.</li>
       </ul>
 
       <h2 className={SECTION_TITLE}>5. Twoje prawa</h2>
@@ -201,7 +195,7 @@ function FallbackPolicyPl() {
           interesie,
         </li>
         <li>
-          cofnięcia zgody w dowolnym momencie — bez wpływu na zgodność z
+          cofnięcia zgody w dowolnym momencie - bez wpływu na zgodność z
           prawem przetwarzania dokonanego przed jej cofnięciem,
         </li>
         <li>
@@ -211,7 +205,7 @@ function FallbackPolicyPl() {
       </ul>
       <p className={PARA}>
         Aby skorzystać z powyższych praw, skontaktuj się z nami pod adresem
-        info@retailo.pl.
+        kontakt@retailo.pl.
       </p>
 
       <h2 className={SECTION_TITLE}>6. Pliki cookies</h2>
@@ -222,14 +216,14 @@ function FallbackPolicyPl() {
       </p>
       <ul className={LIST}>
         <li>
-          <strong className="text-[#0a2a2e]">Niezbędne</strong> — wymagane do
+          <strong className="text-[#0a2a2e]">Niezbędne</strong> - wymagane do
           prawidłowego działania Serwisu, m.in. zapamiętanie Twojej decyzji
           dotyczącej cookies (lokalny zapis
           &bdquo;retailo_cookie_consent_v1&rdquo;, przechowywany do czasu
           usunięcia). Ich stosowanie nie wymaga zgody.
         </li>
         <li>
-          <strong className="text-[#0a2a2e]">Analityczne</strong> — cookies
+          <strong className="text-[#0a2a2e]">Analityczne</strong> - cookies
           Google Analytics 4 (m.in. &bdquo;_ga&rdquo;, &bdquo;_ga_*&rdquo;;
           przechowywane do 24 miesięcy), służące do tworzenia anonimowych
           statystyk odwiedzin. Są instalowane{" "}

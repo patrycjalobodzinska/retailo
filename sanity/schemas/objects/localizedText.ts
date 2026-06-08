@@ -1,9 +1,5 @@
 import { defineField, defineType } from "sanity";
 
-/**
- * Localized longer text (multi-line). Same structure as localizedString,
- * but the value is a "text" type for paragraphs.
- */
 export const localizedText = defineType({
   name: "localizedText",
   title: "Akapit (tłumaczenia)",
@@ -37,7 +33,7 @@ export const localizedText = defineType({
             select: { lang: "language.code", value: "value" },
             prepare: ({ lang, value }) => ({
               title: (value ?? "").slice(0, 80),
-              subtitle: lang ? lang.toUpperCase() : "—",
+              subtitle: lang ? lang.toUpperCase() : "-",
             }),
           },
         },

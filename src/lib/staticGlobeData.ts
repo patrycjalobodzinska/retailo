@@ -1,5 +1,3 @@
-// AUTOGENEROWANE przez scripts/gen-static-globe.mjs — nie edytuj ręcznie.
-// Statyczny glob (ortograficzny, wyśrodkowany na Europie) do wariantu mobile.
 export const STATIC_GLOBE = {
   size: 1000,
   cx: 500.0,

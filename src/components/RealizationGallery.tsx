@@ -3,10 +3,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 
-/**
- * Galeria realizacji z lightboxem — klik w miniaturę otwiera duży podgląd,
- * w którym można przełączać zdjęcia strzałkami (UI + klawiatura) lub zamknąć.
- */
 export default function RealizationGallery({
   images,
   title,
@@ -58,7 +54,7 @@ export default function RealizationGallery({
             className="group relative block aspect-[4/3] overflow-hidden rounded-xl border border-[#0a2a2e]/15 cursor-pointer">
             <img
               src={img.thumb}
-              alt={`${title} — zdjęcie ${i + 1}`}
+              alt={`${title} - zdjęcie ${i + 1}`}
               className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
               loading="lazy"
             />
@@ -73,7 +69,6 @@ export default function RealizationGallery({
             onClick={close}
             role="dialog"
             aria-modal="true">
-          {/* Zamknij */}
           <button
             type="button"
             onClick={close}
@@ -82,7 +77,6 @@ export default function RealizationGallery({
             &times;
           </button>
 
-          {/* Poprzednie */}
           {images.length > 1 && (
             <button
               type="button"
@@ -106,12 +100,11 @@ export default function RealizationGallery({
 
           <img
             src={images[open].src}
-            alt={`${title} — zdjęcie ${open + 1}`}
+            alt={`${title} - zdjęcie ${open + 1}`}
             onClick={(e) => e.stopPropagation()}
             className="max-h-[85vh] max-w-[88vw] object-contain rounded-lg shadow-2xl"
           />
 
-          {/* Następne */}
           {images.length > 1 && (
             <button
               type="button"

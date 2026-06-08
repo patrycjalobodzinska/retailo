@@ -1,10 +1,35 @@
 "use client";
 
-// Inline'owy formularz kontaktowy używany na podstronach (np. /realizacje,
-// /realizacje/[slug]) — ten sam wygląd co formularz w stopce sekcji
-// Global na stronie głównej, tylko osadzony jako pełnoprawna sekcja CTA.
+import { useState } from "react";
+
+const FORMSPREE_ENDPOINT = "https://formspree.io/f/xojzdpep";
 
 export default function ContactCtaForm() {
+  const [status, setStatus] = useState<"idle" | "sending" | "ok" | "error">(
+    "idle",
+  );
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const form = e.currentTarget;
+    setStatus("sending");
+    try {
+      const res = await fetch(FORMSPREE_ENDPOINT, {
+        method: "POST",
+        headers: { Accept: "application/json" },
+        body: new FormData(form),
+      });
+      if (res.ok) {
+        setStatus("ok");
+        form.reset();
+      } else {
+        setStatus("error");
+      }
+    } catch {
+      setStatus("error");
+    }
+  };
+
   return (
     <section
       id="kontakt"
@@ -51,11 +76,15 @@ export default function ContactCtaForm() {
           <ul className="m-0 mt-6 flex list-none flex-col gap-2 p-0 text-sm text-[#3a5a60]">
             <li className="flex items-center gap-2">
               <span className="block h-1 w-4 bg-[#0086b0]" />
-              info@retailo.pl
+              kontakt@retailo.pl
             </li>
             <li className="flex items-center gap-2">
               <span className="block h-1 w-4 bg-[#0086b0]" />
-              +48 123 456 789
+              +48 693 731 840
+            </li>
+            <li className="flex items-center gap-2">
+              <span className="block h-1 w-4 bg-[#0086b0]" />
+              +48 531 607 626
             </li>
             <li className="flex items-center gap-2">
               <span className="block h-1 w-4 bg-[#0086b0]" />
@@ -66,9 +95,7 @@ export default function ContactCtaForm() {
 
         <form
           className="rounded-2xl border border-[#0a2a2e]/10 bg-white/80 p-5 shadow-[0_18px_50px_rgba(15,42,46,0.10)] backdrop-blur-sm md:p-6"
-          onSubmit={(e) => {
-            e.preventDefault();
-          }}
+          onSubmit={handleSubmit}
         >
           <div className="mb-4">
             <h3 className="m-0 text-base font-semibold tracking-tight text-[#0a2a2e]">
@@ -115,9 +142,10 @@ export default function ContactCtaForm() {
             />
             <button
               type="submit"
-              className="mt-1 inline-flex items-center justify-center gap-2 rounded-full bg-[#0086b0] px-6 py-3 text-sm font-semibold uppercase tracking-[0.18em] text-white transition hover:opacity-90"
+              disabled={status === "sending"}
+              className="mt-1 inline-flex items-center justify-center gap-2 rounded-full bg-[#0086b0] px-6 py-3 text-sm font-semibold uppercase tracking-[0.18em] text-white transition hover:opacity-90 disabled:opacity-60"
             >
-              Porozmawiajmy
+              {status === "sending" ? "Wysylanie..." : "Porozmawiajmy"}
               <svg
                 width="14"
                 height="14"
@@ -134,6 +162,19 @@ export default function ContactCtaForm() {
                 />
               </svg>
             </button>
+            {status === "ok" && (
+              <p
+                role="status"
+                className="m-0 text-sm font-medium text-[#0086b0]"
+              >
+                Dziekujemy! Wiadomosc zostala wyslana.
+              </p>
+            )}
+            {status === "error" && (
+              <p role="alert" className="m-0 text-sm font-medium text-red-600">
+                Cos poszlo nie tak. Sprobuj ponownie lub napisz na kontakt@retailo.pl.
+              </p>
+            )}
           </div>
         </form>
       </div>

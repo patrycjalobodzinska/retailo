@@ -1,5 +1,5 @@
 import type { CSSProperties } from "react";
-import type { RealizationModule } from "@/lib/sanity/fetch";
+import type { RealizationModule, RealizationDevice } from "@/lib/sanity/fetch";
 import {
   matrixWidthUnits,
   matrixHeightUnits,
@@ -7,22 +7,9 @@ import {
   mergeOuterSides,
 } from "@/lib/lockerMatrix";
 
-// Inset „drzwiczek"/marginesu (wizualna szczelina). Komórki w layoucie są BEZ
-// gapów (siatka równa co do piksela), a odstęp robimy wewnętrznym insetem:
-// skrytki — ze wszystkich stron; ekran — tylko na krawędziach zewnętrznych
-// bloku (styki ekran-ekran zostają bez szwu). Nic nie wchodzi na inne komórki.
 const DOOR = 1.5;
 const R = 3;
 
-/**
- * Wizualizacja ściany PickUpWall złożonej z modeli (lockerModule). Każdy wiersz
- * to niezależny flex-rząd — komórki rozkładają się na pełną szerokość modułu wg
- * wag `w`, więc wiersze mogą mieć różną liczbę skrytek. Ekran scala się z komórek
- * (poziomo i pionowo), więc może być wysoki na kilka wierszy obok skrytek.
- */
-// Maks. wysokość ściany na desktopie (px). Szerokość liczona jest z proporcji
-// całej ściany, a wysokość spada automatycznie, gdy zabraknie miejsca w poziomie
-// (mobile) — dzięki temu skrytki kurczą się proporcjonalnie zamiast wystawać.
 const MAX_WALL_H = 420;
 
 export default function LockerWallDiagram({
@@ -37,25 +24,15 @@ export default function LockerWallDiagram({
   const ratios = modules.map(
     (m) => matrixWidthUnits(m.matrix) / matrixHeightUnits(m.matrix),
   );
-  // Proporcja całej ściany (szer:wys) = suma proporcji modułów (wspólna wys.).
   const sumRatio = ratios.reduce((a, b) => a + b, 0) || 1;
-  // Pojedynczy moduł jest wąski (wysoki/cienki) → przy bazowej wysokości
-  // wychodzi mały i „ściśnięty”. Dajemy mu większą wysokość, żeby się rozciągnął.
   const wallH = modules.length === 1 ? 560 : MAX_WALL_H;
 
   return (
     <div>
-      {/* Cała ściana: szerokość docelowa = wallH·proporcja (KONKRETNA, nie
-          w-full — inaczej w karcie lg:w-fit zwija się do zera, bo moduły mają
-          flex-basis 0). maxWidth:100% przycina do dostępnego miejsca, więc na
-          mobile wypełnia szerokość, a aspect-ratio sam obniża wysokość. */}
       <div
         className="mx-auto"
         style={{
           width: `calc(${wallH}px * ${sumRatio})`,
-          // Cap wysokości przez szerokość (aspect-ratio trzyma proporcje):
-          // ściana nigdy nie przekroczy ~60vh, więc pojedynczy wysoki moduł
-          // nie zjada całego ekranu — ani na mobile, ani na desktopie.
           maxWidth: `min(100%, calc(60vh * ${sumRatio}))`,
         }}>
         <div
@@ -65,10 +42,6 @@ export default function LockerWallDiagram({
             <ModuleGrid
               key={`${m.id}-${i}`}
               module={m}
-              // Udział znormalizowany do sumy 1 — przy sumie flex-grow < 1
-              // flexbox wypełnia tylko ułamek kontenera, więc pojedynczy
-              // wąski moduł (ratio 0.5) brałby 50% szerokości ściany i
-              // łamał proporcje względem podglądu w Sanity.
               ratio={ratios[i] / sumRatio}
               first={i === 0}
               last={i === modules.length - 1}
@@ -82,7 +55,41 @@ export default function LockerWallDiagram({
   );
 }
 
-/** Legenda modeli — swatch + nazwa (unikalne po nazwie). */
+export function LockerDevicesDiagram({
+  devices,
+  showLegend = true,
+}: {
+  devices: RealizationDevice[];
+  showLegend?: boolean;
+}) {
+  const all = devices.flatMap((d) => d.modules);
+  if (!all.length) return null;
+
+  return (
+    <div>
+      <div className="flex flex-row flex-wrap items-end justify-center gap-x-8 gap-y-10 lg:gap-x-12">
+        {devices.map((d, i) => (
+          <div
+            key={i}
+            className="flex flex-col items-center gap-3 min-w-0 max-w-full">
+            <LockerWallDiagram modules={d.modules} showLegend={false} />
+            {d.label && (
+              <span className="text-xs uppercase tracking-wider text-[#3a5a60] text-center">
+                {d.label}
+              </span>
+            )}
+          </div>
+        ))}
+      </div>
+      {showLegend && (
+        <div className="mt-6">
+          <RealizationModuleLegend modules={all} horizontal />
+        </div>
+      )}
+    </div>
+  );
+}
+
 export function RealizationModuleLegend({
   modules,
   horizontal = false,
@@ -133,7 +140,6 @@ function ModuleGrid({
   const radius = 6;
 
   const outer: CSSProperties = {
-    // Szerokość proporcjonalna do reszty ściany; wysokość = 100% wiersza flex.
     flex: `${ratio} 1 0`,
     minWidth: 0,
     height: "100%",
@@ -219,7 +225,6 @@ function ModuleGrid({
           </div>
         ))}
 
-        {/* Tylko wyśrodkowany napis EKRAN (wypełnienie dają komórki). */}
         {rect && (
           <div
             aria-hidden

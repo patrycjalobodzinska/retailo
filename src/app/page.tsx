@@ -10,10 +10,6 @@ import {
   type SiteSettings,
 } from "@/lib/sanity/fetch";
 
-// Below-the-fold sections — heavy GSAP / ScrollTrigger / WebGL work that
-// blocks initial hydration if eager-imported alongside the hero. Lazy
-// loading them lets the hero animation kick off as soon as React hydrates
-// the small set of above-the-fold components.
 const QASection = nextDynamic(() => import("@/components/QASection"));
 const ProductShowcase = nextDynamic(
   () => import("@/components/ProductShowcase"),
@@ -26,18 +22,9 @@ const EuropeGlobeSection = nextDynamic(
   () => import("@/components/EuropeGlobeSection"),
 );
 
-// Force / to be prerendered as static at build time. Without this, the
-// async nature of the page + the wrapped Sanity fetch could make Next
-// emit / as a dynamic function — and if Vercel doesn't wire that
-// function up under the deployment's URL, every request to / returns
-// the platform's 404: NOT_FOUND.
 export const dynamic = "force-static";
 export const revalidate = 3600;
 
-// Wrap the Sanity fetch — if Sanity is unreachable / misconfigured at
-// build time we still want the home page in the route manifest, just
-// with empty data (every component already accepts a null `data` prop
-// and falls back to hardcoded copy).
 async function safeGetHomePage(): Promise<HomePage | null> {
   try {
     return await getHomePage();
@@ -75,8 +62,6 @@ export default async function Home() {
   return (
     <>
       <Header settings={settings} />
-      {/* Landmark <main> — nawigacja landmarkami dla czytników ekranu
-          (WCAG 1.3.1). */}
       <main>
         <HeroConcept data={home} />
         <div id="rozwiazanie">

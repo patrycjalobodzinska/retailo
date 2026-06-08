@@ -5,6 +5,7 @@ import { useLang } from "@/lib/i18n/LanguageProvider";
 import type { LocalizedField } from "@/lib/sanity/i18n";
 
 type QAData = {
+  qaClientLogo?: string;
   qaEyebrow?: LocalizedField;
   qaHeadline?: LocalizedField;
   qaSubtitle?: LocalizedField;
@@ -83,8 +84,6 @@ function TileIcon({
   }
 }
 
-// Seed kolejność qaTiles: 0=Modularność, 1=Skalowalność, 2=Personalizacja,
-// 3=Uniwersalność, 4=Bezpieczeństwo, 5=Wydajność.
 const SMALL_TILES = [
   {
     kind: "Modularnosc",
@@ -133,8 +132,6 @@ export default function QASection({ data }: { data?: QAData } = {}) {
     t(data?.qaSubtitle ?? null) ||
     'PickUpWall to rozwiazanie do zamowien typu "pick up in store".';
 
-  // Lokalna helper — wyciąga tytuł/opis z data.qaTiles[seedIdx] z
-  // fallbackiem na hardcoded wartości.
   const tileText = (seedIdx: number, fallbackTitle: string, fallbackDesc: string) => {
     const d = data?.qaTiles?.[seedIdx];
     return {
@@ -143,7 +140,6 @@ export default function QASection({ data }: { data?: QAData } = {}) {
     };
   };
 
-  // Zlokalizowane warianty kafelków.
   const smallTiles = SMALL_TILES.map((tile) => {
     const lt = tileText(tile.seedIdx, tile.title, tile.desc);
     return { ...tile, title: lt.title, desc: lt.desc };
@@ -156,7 +152,7 @@ export default function QASection({ data }: { data?: QAData } = {}) {
   const wydajnosc = tileText(
     5,
     "Wydajnosc",
-    "Odbior ponizej 15 sekund, krotsze kolejki i zwolnienie przestrzeni magazynowej zaplecza.",
+    "Odbior ponizej 10 sekund, krotsze kolejki i zwolnienie przestrzeni magazynowej zaplecza.",
   );
 
   const sectionRef = useRef<HTMLElement>(null);
@@ -166,7 +162,6 @@ export default function QASection({ data }: { data?: QAData } = {}) {
   const scrollerRef = useRef<HTMLDivElement>(null);
   const [activeIdx, setActiveIdx] = useState(0);
 
-  // Mobile snap-scroll active dot tracker
   useEffect(() => {
     const isMobile = window.matchMedia("(max-width: 1023px)").matches;
     if (!isMobile) return;
@@ -197,10 +192,6 @@ export default function QASection({ data }: { data?: QAData } = {}) {
     cards.forEach((c) => observer.observe(c));
     return () => observer.disconnect();
   }, []);
-
-  // Desktop reveal animations removed — sekcja renderuje się od razu
-  // statycznie (bez slide-in z dołu). Karty zostawiały artefakty przy
-  // scrollu w górę i utrzymywanie tej animacji nie wnosiło wartości.
 
   const scrollToCard = (i: number) => {
     const scroller = scrollerRef.current;
@@ -234,7 +225,6 @@ export default function QASection({ data }: { data?: QAData } = {}) {
       ref={sectionRef}
       className="relative w-full py-[12vh] max-lg:pt-[6svh] max-lg:pb-[6svh] overflow-hidden"
       style={{ background: BG_COLOR }}>
-      {/* MOBILE: horizontal snap carousel using the desktop bento card design */}
       <div className="lg:hidden relative">
         <div className="relative z-[1] mb-7 max-w-[520px] px-[6vw]">
           <p
@@ -262,7 +252,6 @@ export default function QASection({ data }: { data?: QAData } = {}) {
           ref={scrollerRef}
           className="flex overflow-x-auto snap-x snap-mandatory gap-4 px-[6vw] pb-10 no-scrollbar"
           style={{ scrollPaddingInline: "6vw" }}>
-          {/* Personalizacja */}
           <article
             className="flex-none w-[82vw] snap-center relative rounded-3xl overflow-hidden p-6 flex flex-col justify-between"
             style={{
@@ -274,7 +263,7 @@ export default function QASection({ data }: { data?: QAData } = {}) {
                 "0 1px 2px rgba(15,15,15,0.04), 0 14px 32px rgba(15,15,15,0.06)",
             }}>
             <img
-              src="/empik.png"
+              src={data?.qaClientLogo || "/empik.png"}
               alt=""
               aria-hidden="true"
               className="absolute pointer-events-none select-none"
@@ -345,7 +334,6 @@ export default function QASection({ data }: { data?: QAData } = {}) {
             </div>
           </article>
 
-          {/* Wydajnosc */}
           <article
             className="flex-none w-[82vw] snap-center relative rounded-3xl overflow-hidden p-6 flex flex-col justify-between"
             style={{
@@ -395,7 +383,7 @@ export default function QASection({ data }: { data?: QAData } = {}) {
                 <span
                   className="font-semibold text-[#0f0f0f] leading-none tracking-tighter"
                   style={{ fontSize: "2.8rem", letterSpacing: "-0.04em" }}>
-                  &lt;15s
+                  &lt;10s
                 </span>
               </div>
               <h3
@@ -415,7 +403,6 @@ export default function QASection({ data }: { data?: QAData } = {}) {
             </div>
           </article>
 
-          {/* Small tiles — grouped 2 per snap slide, stacked vertically. */}
           {Array.from({ length: Math.ceil(smallTiles.length / 2) }).map(
             (_, slideIdx) => (
               <div
@@ -465,7 +452,6 @@ export default function QASection({ data }: { data?: QAData } = {}) {
           )}
         </div>
 
-        {/* Pagination dots — tight under cards, inside shadow zone */}
         <div className="flex justify-center gap-2 -mt-2 px-[6vw]">
           {Array.from({
             length: 2 + Math.ceil(smallTiles.length / 2),
@@ -490,7 +476,6 @@ export default function QASection({ data }: { data?: QAData } = {}) {
         </div>
       </div>
 
-      {/* Decorative background — watermark + dot grid + radial accents */}
       <div
         aria-hidden="true"
         className="absolute inset-0 pointer-events-none overflow-hidden max-lg:hidden"
@@ -510,9 +495,7 @@ export default function QASection({ data }: { data?: QAData } = {}) {
         />
       </div>
 
-      {/* DESKTOP: bento layout */}
       <div className="max-lg:hidden relative max-w-[1280px] mx-auto px-[6vw]">
-        {/* Header */}
         <div
           ref={headerRef}
           className="mb-10 max-w-[680px]"
@@ -541,9 +524,7 @@ export default function QASection({ data }: { data?: QAData } = {}) {
           </p>
         </div>
 
-        {/* Featured row — 2 wide cards (Bezpieczenstwo dark + Wydajnosc light) */}
         <div ref={featuredRef} className="grid grid-cols-2 gap-5 mb-5">
-          {/* DARK CARD — Personalizacja with bleeding image + color swatches */}
           <article
             className="relative rounded-3xl overflow-hidden p-7 flex flex-col justify-between"
             style={{
@@ -555,7 +536,7 @@ export default function QASection({ data }: { data?: QAData } = {}) {
                 "0 1px 2px rgba(15,15,15,0.04), 0 14px 32px rgba(15,15,15,0.06)",
             }}>
             <img
-              src="/empik.png"
+              src={data?.qaClientLogo || "/empik.png"}
               alt=""
               aria-hidden="true"
               className="absolute pointer-events-none select-none"
@@ -626,7 +607,6 @@ export default function QASection({ data }: { data?: QAData } = {}) {
             </div>
           </article>
 
-          {/* LIGHT CARD — Wydajnosc with giant <15s + wave illustration */}
           <article
             className="relative rounded-3xl overflow-hidden p-7 flex flex-col justify-between"
             style={{
@@ -679,7 +659,7 @@ export default function QASection({ data }: { data?: QAData } = {}) {
                     fontSize: "clamp(2.6rem, 3.8vw, 3.8rem)",
                     letterSpacing: "-0.04em",
                   }}>
-                  &lt;15s
+                  &lt;10s
                 </span>
               </div>
               <h3
@@ -700,7 +680,6 @@ export default function QASection({ data }: { data?: QAData } = {}) {
           </article>
         </div>
 
-        {/* Small tiles row — 4 cards */}
         <div ref={tilesRef} className="grid grid-cols-4 gap-5">
           {smallTiles.map((tile) => (
             <article

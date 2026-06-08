@@ -27,7 +27,6 @@ export default function NotFound() {
           }}
         />
 
-        {/* Wielki napis "404" w tle */}
         <h1
           aria-hidden="true"
           className="pointer-events-none absolute select-none m-0 font-black tracking-tighter text-[#0f0f0f] leading-[0.78]"

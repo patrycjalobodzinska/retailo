@@ -1,10 +1,5 @@
 import { defineField, defineType } from "sanity";
 
-/**
- * Localized rich text (Portable Text). Same translations-array structure as
- * localizedString/localizedText, but the value is an array of blocks so the
- * editor gets full formatting (headings, lists, bold, links).
- */
 export const localizedBlockContent = defineType({
   name: "localizedBlockContent",
   title: "Tekst sformatowany (tłumaczenia)",

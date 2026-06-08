@@ -13,10 +13,10 @@ html, body {
   display: none;
 }
 
-/* Custom scrollbar — tylko desktop (≥1024px), zawsze widoczny (klasyczny,
+/* Custom scrollbar - tylko desktop (≥1024px), zawsze widoczny (klasyczny,
    nie overlay). Na mobile zostaje natywny pasek. */
 @media (min-width: 1024px) {
-  /* Track w kolorze tła strony — html/body mają #000 (overscroll), więc
+  /* Track w kolorze tła strony - html/body mają #000 (overscroll), więc
      „transparent" pokazywałby czarny pas. Biały zlewa się z treścią. */
   html {
     scrollbar-width: thin;
@@ -70,9 +70,9 @@ html, body {
   );
   --line-progress: calc(var(--line-raw) * (2 - var(--line-raw)));
   /* Two terms compose the Y position:
-       1) per-line slide-in: (1 - line-progress) * 30vh — pulls line up from
+       1) per-line slide-in: (1 - line-progress) * 30vh - pulls line up from
           its 30vh-below-rest starting offset to its rest position.
-       2) global upward drift: reveal-progress * 30vh — keeps every line,
+       2) global upward drift: reveal-progress * 30vh - keeps every line,
           even ones already at "rest", moving up as scroll progresses, so
           nothing visually stops mid-section.
      Net Y range across the full exit: +30vh (below) → 0 (rest) → -30vh
@@ -238,7 +238,7 @@ html, body {
   user-select: none;
   overflow: hidden;
 }
-/* Rozmycie tła w starej karuzeli — pasujący efekt do ciemniejszej maski.
+/* Rozmycie tła w starej karuzeli - pasujący efekt do ciemniejszej maski.
    Skala 1.08 ukrywa miękkie krawędzie powstające przy filter: blur. */
 .rl-carousel__bg > img,
 .rl-carousel__bg-image img {
@@ -247,7 +247,7 @@ html, body {
   transform-origin: center;
 }
 .rl-carousel__bg-image img {
-  /* Bg-image ma już własny transform na rodzicu — tu blur i delikatne
+  /* Bg-image ma już własny transform na rodzicu - tu blur i delikatne
      powiększenie wystarczą, transform skali nakładamy na obrazek. */
   transform: scale(1.08);
 }
@@ -258,7 +258,7 @@ html, body {
   background: #000;
   z-index: 1;
   /* Ciemniejsze tło: zaczyna od 0.6, dociemnia do 0.85 przy końcu reveal.
-     Wcześniej było 0.45→0.75 — robiło wrażenie zbyt prześwitującego. */
+     Wcześniej było 0.45→0.75 - robiło wrażenie zbyt prześwitującego. */
   opacity: calc(0.6 + var(--reveal-progress, 0) * 0.25);
 }
 /* Full-screen variant when bg sits at pinChild level (extends 40vh below the
@@ -350,7 +350,7 @@ html, body {
   --card-scale-offset: 1;
   --frame-rotation: 0deg;
   --opacity: 0;
-  /* same portrait dimensions for all roles — orientation comes from frame rotation */
+  /* same portrait dimensions for all roles - orientation comes from frame rotation */
   position: absolute;
   left: 50%;
   top: 50%;
@@ -536,7 +536,7 @@ html, body {
 }
 
 
-/* Detail-page entrance — runs on first paint of /realizacje/[slug].
+/* Detail-page entrance - runs on first paint of /realizacje/[slug].
    The destination's fixed gradient backdrop matches the carousel→detail
    navigation panel, so the panel can fade without any color shift. The
    content (main) then eases in on top. */
@@ -559,7 +559,7 @@ html, body {
   animation: realization-header-down 0.6s cubic-bezier(0.22, 0.61, 0.36, 1) 0.15s backwards;
 }
 
-/* Realization detail image fade-in — soft entry over the gradient. */
+/* Realization detail image fade-in - soft entry over the gradient. */
 @keyframes realization-image-in {
   from { opacity: 0; transform: scale(1.04); }
   to { opacity: 1; transform: scale(1); }
@@ -568,7 +568,7 @@ html, body {
   animation: realization-image-in 0.9s cubic-bezier(0.22, 0.61, 0.36, 1) 0.5s backwards;
 }
 
-/* Realization detail — staggered fade-in for each block. Header & hero
+/* Realization detail - staggered fade-in for each block. Header & hero
    image already use their own keyframes; these are for downstream blocks
    so the page reveals top-to-bottom rather than all-at-once. */
 @keyframes realization-block-in {
@@ -584,14 +584,14 @@ html, body {
 .realization-block-in-4 { animation-delay: 1.15s; }
 .realization-block-in-5 { animation-delay: 1.30s; }
 
-/* Mobilny formularz kontaktowy (globe section) — otwarcie po kliknięciu
+/* Mobilny formularz kontaktowy (globe section) - otwarcie po kliknięciu
    pigułki „Porozmawiajmy": wjazd z dołu + lekkie skalowanie. */
 @keyframes cta-pop {
   from { opacity: 0; transform: translateY(14px) scale(0.96); }
   to { opacity: 1; transform: translateY(0) scale(1); }
 }
 
-/* Baner cookies — wjazd od dołu po zamontowaniu. */
+/* Baner cookies - wjazd od dołu po zamontowaniu. */
 @keyframes cookie-slide-in {
   from { opacity: 0; transform: translateY(110%); }
   to { opacity: 1; transform: translateY(0); }
@@ -608,7 +608,7 @@ html, body {
 /* Baner cookies renderuje się w HTML z SSR (zero opóźnienia na hydration),
    ale jest widoczny tylko gdy inline'owy skrypt w <head> ustawił
    data-cookie-pending (= brak zapisanej decyzji). Bez JS baner pozostaje
-   ukryty — strona działa normalnie, bez analityki. */
+   ukryty - strona działa normalnie, bez analityki. */
 html:not([data-cookie-pending]) [data-cookie-consent] {
   display: none !important;
 }

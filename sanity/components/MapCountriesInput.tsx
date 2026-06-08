@@ -11,18 +11,8 @@ import {
   Select,
 } from "@sanity/ui";
 
-/**
- * Edytor listy krajów podświetlanych na globie (sekcja Global). Przechowuje
- * tablicę kodów ISO_A2 (string[]) — tych samych, których używa filtr geojsona
- * w EuropeGlobeInner. Dwa sposoby dodawania:
- *  1. SELECT z gotowej listy krajów Europy (po polskiej nazwie),
- *  2. ręczne wpisanie kodu ISO (np. US, JP) dla krajów spoza Europy.
- * Kraj musi istnieć w public/countries.geojson, żeby się podświetlił.
- */
-
 type Country = { iso: string; name: string };
 
-// Kraje Europy (ISO_A2), sortowane po polskiej nazwie.
 const EUROPE: Country[] = [
   { iso: "AL", name: "Albania" },
   { iso: "AD", name: "Andora" },
@@ -98,16 +88,14 @@ export function MapCountriesInput(props: ArrayOfPrimitivesInputProps) {
     setCustom("");
   };
 
-  // Kraje Europy jeszcze niedodane — do selecta.
   const available = EUROPE.filter((c) => !value.includes(c.iso));
 
   return (
     <Stack space={4}>
-      {/* Aktualnie wybrane kody — chipy z nazwą (jeśli znana) + usuwanie. */}
       <Card padding={3} radius={2} border tone="transparent">
         {value.length === 0 ? (
           <Text size={1} muted>
-            Brak krajów — dodaj z listy Europy lub wpisz kod ISO ręcznie.
+            Brak krajów - dodaj z listy Europy lub wpisz kod ISO ręcznie.
           </Text>
         ) : (
           <Flex gap={2} wrap="wrap">
@@ -141,7 +129,6 @@ export function MapCountriesInput(props: ArrayOfPrimitivesInputProps) {
         )}
       </Card>
 
-      {/* Dodawanie z listy Europy */}
       <Stack space={2}>
         <Text size={1} weight="semibold">
           Dodaj kraj Europy
@@ -154,7 +141,7 @@ export function MapCountriesInput(props: ArrayOfPrimitivesInputProps) {
             const v = e.currentTarget.value;
             if (v) add(v);
           }}>
-          <option value="">— wybierz kraj —</option>
+          <option value="">- wybierz kraj -</option>
           {available.map((c) => (
             <option key={c.iso} value={c.iso}>
               {c.name} ({c.iso})
@@ -163,7 +150,6 @@ export function MapCountriesInput(props: ArrayOfPrimitivesInputProps) {
         </Select>
       </Stack>
 
-      {/* Ręczne dodanie kodu ISO (spoza Europy) */}
       <Stack space={2}>
         <Text size={1} weight="semibold">
           Albo wpisz kod ISO ręcznie (spoza Europy)
@@ -196,7 +182,7 @@ export function MapCountriesInput(props: ArrayOfPrimitivesInputProps) {
           />
         </Flex>
         <Text size={0} muted>
-          2-literowy kod ISO_A2 (np. US — USA, JP — Japonia). Kraj musi być w
+          2-literowy kod ISO_A2 (np. US - USA, JP - Japonia). Kraj musi być w
           pliku countries.geojson, żeby się podświetlił.
         </Text>
       </Stack>

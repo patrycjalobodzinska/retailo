@@ -17,20 +17,12 @@ declare global {
 export default function SmoothScroll() {
   const pathname = usePathname();
   useEffect(() => {
-    // Na /admin (Sanity Studio) nie inicjalizujemy Lenis — przejmowałby
-    // scroll i psuł UI Studia.
     if (pathname?.startsWith("/admin")) return;
     if ("scrollRestoration" in history) {
       history.scrollRestoration = "manual";
     }
     window.scrollTo(0, 0);
 
-    // Lekka konfiguracja Lenis — mniej smoothingu, niezależny RAF.
-    // Wcześniejsza wersja drivowała Lenis z GSAP'owego tickera +
-    // wołała ScrollTrigger.update() na każdy event, co skutecznie
-    // łamało perf w sekcjach ze sticky. Teraz Lenis ma własny RAF,
-    // a ScrollTrigger sam się synchronizuje przez window scroll event.
-    // Klasyczny "Lenis feel" — długie, miękkie wygładzanie z cubic ease.
     const lenis = new Lenis({
       duration: 1.2,
       easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
@@ -49,9 +41,6 @@ export default function SmoothScroll() {
     };
     rafId = requestAnimationFrame(raf);
 
-    // ScrollTrigger refresh after async asset load — bez bindowania
-    // ScrollTrigger.update do każdego eventu Lenis (to było źródłem
-    // ciężkiego repaintu w sekcjach ze sticky).
     const refresh = () => ScrollTrigger.refresh();
     if (document.readyState === "complete") {
       requestAnimationFrame(refresh);
@@ -60,10 +49,6 @@ export default function SmoothScroll() {
     }
     document.fonts?.ready?.then(() => ScrollTrigger.refresh());
 
-    // ScrollTrigger.refresh TYLKO przy zmianie szerokości. Na mobile (iOS
-    // Safari) pasek URL chowa/pokazuje się podczas scrolla, zmieniając
-    // WYSOKOŚĆ viewportu — to wyzwalało refresh co chwilę i powodowało lag
-    // dokładnie w momencie wjazdu/zjazdu paska. Wysokość ignorujemy.
     let resizeTimer: number | undefined;
     let lastWidth = window.innerWidth;
     const onResize = () => {

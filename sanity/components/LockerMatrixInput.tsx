@@ -15,15 +15,7 @@ import {
 const DOOR = 1.5;
 const R = 3;
 
-/**
- * Wizualny edytor macierzy skrytek (model per-wiersz). Każdy wiersz ma własne
- * komórki o własnych szerokościach, więc wiersze mogą mieć różną liczbę skrytek
- * (np. 6 małych, a w środku 4 duże) — kolumny nie muszą się pokrywać.
- * Klik w komórkę podglądu = cykl typu (skrytka → ekran → puste).
- */
-
 const ACCENT = "#0086b0";
-// Cykl kliknięcia: skrytka → skrytka łączona → ekran → puste.
 const NEXT_KIND: Record<LockerCellKind, LockerCellKind> = {
   locker: "joined",
   joined: "screen",
@@ -91,7 +83,6 @@ export function LockerMatrixInput(props: StringInputProps) {
 
   return (
     <Stack space={4}>
-      {/* Podgląd WYSIWYG — klik = cykl typu komórki */}
       <Card padding={3} radius={2} tone="transparent" border>
         <Stack space={3}>
           <Text size={1} muted>
@@ -208,9 +199,6 @@ export function LockerMatrixInput(props: StringInputProps) {
                   </div>
                 ))}
 
-                {/* Tylko wyśrodkowany napis EKRAN; pointer-events:none, więc
-                    komórki pod spodem dalej są klikalne. Wypełnienie ekranu
-                    dają same komórki, więc nie wchodzi na sąsiednie. */}
                 {rect && (
                   <div
                     style={{
@@ -242,7 +230,6 @@ export function LockerMatrixInput(props: StringInputProps) {
         </Stack>
       </Card>
 
-      {/* Sterowanie per wiersz */}
       <Stack space={2}>
         {matrix.rows.map((row, ri) => (
           <Card key={ri} padding={3} radius={2} border>

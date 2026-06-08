@@ -1,8 +1,3 @@
-/**
- * GROQ queries used by Server Components.
- * Each translatable field is selected as the full {translations[]} object;
- * the i18n helper resolves to a plain string at render time.
- */
 
 const localized = `{ translations[]{ value, language->{code} } }`;
 
@@ -60,8 +55,10 @@ export const LEGAL_PAGE_QUERY = /* groq */ `
   }
 `;
 
-export const HOME_PAGE_QUERY = /* groq */ `
-  *[_type == "homePage"][0] {
+export const HOME_PAGE_QUERY = /* groq */ `{
+  "hero": *[_type == "homeHero"][0]{
+    "heroImage": heroImage.asset->url,
+    "heroInstallImage": heroInstallImage.asset->url,
     heroSubtitle ${localized},
     heroDescription ${localized},
     heroScrollLabel ${localized},
@@ -71,16 +68,21 @@ export const HOME_PAGE_QUERY = /* groq */ `
     },
     heroInstallEyebrow ${localized},
     heroInstallTitle ${localized},
-    heroInstallSubtitle ${localized},
-
+    heroInstallSubtitle ${localized}
+  },
+  "qa": *[_type == "homeQa"][0]{
+    "qaClientLogo": qaClientLogo.asset->url,
     qaEyebrow ${localized},
     qaHeadline ${localized},
     qaSubtitle ${localized},
     qaTiles[]{
       title ${localized},
       description ${localized}
-    },
-
+    }
+  },
+  "product": *[_type == "homeProduct"][0]{
+    "productPhoto": productPhoto.asset->url,
+    "productSketch": productSketch.asset->url,
     productEyebrow ${localized},
     productHeadline ${localized},
     productFeatures[]{
@@ -101,14 +103,12 @@ export const HOME_PAGE_QUERY = /* groq */ `
     productStepsLabel ${localized},
     productSpecsHeadline ${localized},
     productHardwareLabel ${localized},
-    productHardwareMinLabel ${localized},
-    productHardwareMaxLabel ${localized},
     productHardwareRows[]{
       label ${localized},
-      min,
-      max
-    },
-
+      value ${localized}
+    }
+  },
+  "realizations": *[_type == "homeRealizations"][0]{
     realizationsEyebrow ${localized},
     realizationsHeadline ${localized},
     realizationsIntro ${localized},
@@ -119,16 +119,28 @@ export const HOME_PAGE_QUERY = /* groq */ `
     realizationsSystemItems[]{
       title ${localized},
       description ${localized}
-    },
-
+    }
+  },
+  "integration": *[_type == "homeIntegration"][0]{
     integrationEyebrow ${localized},
     integrationHeadline ${localized},
     integrationIntro ${localized},
     integrationItems[]{
       title ${localized},
       description ${localized}
-    },
-
+    }
+  },
+  "models": *[_type == "homeModels"][0]{
+    modelsVisible,
+    modelsHeadline ${localized},
+    models[]{
+      name ${localized},
+      description ${localized},
+      featured,
+      "image": image.asset->url
+    }
+  },
+  "global": *[_type == "homeGlobal"][0]{
     globalEyebrow ${localized},
     globalHeadline ${localized},
     globalIntro ${localized},
@@ -141,18 +153,9 @@ export const HOME_PAGE_QUERY = /* groq */ `
     globalCtaNamePlaceholder ${localized},
     globalCtaEmailPlaceholder ${localized},
     globalCtaMessagePlaceholder ${localized},
-    globalCtaSubmitLabel ${localized},
-
-    modelsVisible,
-    modelsHeadline ${localized},
-    models[]{
-      name ${localized},
-      description ${localized},
-      featured,
-      "image": image.asset->url
-    }
+    globalCtaSubmitLabel ${localized}
   }
-`;
+}`;
 
 export const REALIZATIONS_PAGE_QUERY = /* groq */ `
   *[_type == "realizationsPage"][0] {
@@ -196,6 +199,16 @@ export const REALIZATION_BY_SLUG_QUERY = /* groq */ `
       accent,
       lockers,
       matrix
+    },
+    devices[]{
+      label,
+      modules[]->{
+        "id": _id,
+        title,
+        accent,
+        lockers,
+        matrix
+      }
     },
     summary ${localized},
     body,

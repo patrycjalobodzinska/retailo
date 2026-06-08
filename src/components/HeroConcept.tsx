@@ -6,6 +6,8 @@ import { useLang } from "@/lib/i18n/LanguageProvider";
 import type { LocalizedField } from "@/lib/sanity/i18n";
 
 type HeroData = {
+  heroImage?: string;
+  heroInstallImage?: string;
   heroSubtitle?: LocalizedField;
   heroDescription?: LocalizedField;
   heroScrollLabel?: LocalizedField;
@@ -15,14 +17,12 @@ type HeroData = {
   heroInstallSubtitle?: LocalizedField;
 } | null;
 
-// Clone głównego Hero ze strony głównej — punkt wyjścia do dalszych
-// modyfikacji wariantu koncepcyjnego.
 export default function HeroConcept({ data }: { data?: HeroData } = {}) {
   const { t, lang } = useLang();
   const subtitle = t(data?.heroSubtitle ?? null) || "PickUpWall";
   const description =
     t(data?.heroDescription ?? null) ||
-    "Automatyczne, modulowe systemy odbioru przesylek typu pick-up in store dla sieci retailu. Projektujemy, produkujemy i wdrazamy rozwiazania dopasowane do specyfiki marki — od jednostki glownej z dotykowym ekranem po skalowalna konfiguracje skrytek i bezdotykowy odbior ponizej 15 sekund.";
+    "Automatyczne, modulowe systemy odbioru przesylek typu pick-up in store dla sieci retailu. Projektujemy, produkujemy i wdrazamy rozwiazania dopasowane do specyfiki marki - od jednostki glownej z dotykowym ekranem po skalowalna konfiguracje skrytek i bezdotykowy odbior ponizej 10 sekund.";
   const installEyebrow =
     t(data?.heroInstallEyebrow ?? null) || "Zaufali nam";
   const installTitle =
@@ -31,11 +31,10 @@ export default function HeroConcept({ data }: { data?: HeroData } = {}) {
     t(data?.heroInstallSubtitle ?? null) ||
     "Sieci kosmetyczne, fashion, elektronika.";
 
-  // Layout (pozycja + ikona) jest lokalny; value/label z Sanity.
   const BADGE_LAYOUT = [
     {
       cls: "top-[18vh] right-[11vw]",
-      fallbackValue: "<15 s",
+      fallbackValue: "<10 s",
       fallbackLabel: "Czas odbioru",
     },
     {
@@ -65,9 +64,6 @@ export default function HeroConcept({ data }: { data?: HeroData } = {}) {
   const statsWrapRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    // Hero: TYLKO fade-in przy pierwszym wejściu — żadnego ruchu, zoomu ani
-    // animacji scrollowych. Zerujemy ewentualne inline translate (x/y), żeby
-    // elementy nie były przesunięte, i animujemy wyłącznie opacity.
     const badges = statsWrapRef.current
       ? Array.from(statsWrapRef.current.children)
       : [];
@@ -78,8 +74,6 @@ export default function HeroConcept({ data }: { data?: HeroData } = {}) {
       ...badges,
     ].filter(Boolean);
 
-    // Karta ma transition-transform (hover) — wyłączamy na czas resetu
-    // transformacji, żeby się nie animowała.
     const card = cardRef.current;
     if (card) card.style.transition = "none";
 
@@ -94,7 +88,6 @@ export default function HeroConcept({ data }: { data?: HeroData } = {}) {
       requestAnimationFrame(() => {
         card.style.transition = "";
       });
-    // Re-run przy zmianie języka (hero się re-renderuje).
   }, [lang]);
 
   return (
@@ -105,8 +98,6 @@ export default function HeroConcept({ data }: { data?: HeroData } = {}) {
         background:
           "linear-gradient(45deg, #ffffff 0%, #f4f2ee 35%, #e0ddd8 70%, #cbc8c2 100%)",
       }}>
-      {/* Dodatkowy świetlisty hotspot w lewym dolnym rogu — jeszcze
-          mocniej rozjaśnia jasną część gradientu i zmiękcza przejście. */}
       <div
         aria-hidden="true"
         className="pointer-events-none absolute inset-0"
@@ -116,10 +107,6 @@ export default function HeroConcept({ data }: { data?: HeroData } = {}) {
         }}
       />
 
-      {/* Gigantyczny napis "pickupwall" — pełni rolę głównego tytułu,
-          startuje w tym samym miejscu co stary <h1>, rozciąga się pod
-          zdjęcie produktu (poza krawędź sekcji), nieco większe opacity. */}
-      {/* Desktop watermark */}
       <h1
         ref={titleRef}
         className="pointer-events-none absolute select-none m-0 font-black tracking-tighter text-[#0f0f0f] leading-[0.78] max-lg:hidden"
@@ -135,8 +122,8 @@ export default function HeroConcept({ data }: { data?: HeroData } = {}) {
         }}>
         pickupwall.
       </h1>
-      {/* Mobile watermark — wyżej i większy */}
-      <h1
+      <p
+        aria-hidden="true"
         className="pointer-events-none absolute select-none m-0 font-black tracking-tighter text-[#0f0f0f] leading-[0.82] lg:hidden"
         style={{
           left: "-2vw",
@@ -149,9 +136,8 @@ export default function HeroConcept({ data }: { data?: HeroData } = {}) {
           whiteSpace: "nowrap",
         }}>
         pickupwall.
-      </h1>
+      </p>
 
-      {/* LEFT: text content */}
       <div
         ref={contentRef}
         className="relative z-[2] flex flex-col justify-start pl-[5vw] pr-[2vw] pt-[18vh] w-[32%] 2xl:pl-[8vw] max-2xl:w-[34%] max-xl:w-[38%] max-lg:w-full max-lg:pl-[6vw] max-lg:pr-[6vw] max-lg:pt-[17svh]"
@@ -163,9 +149,6 @@ export default function HeroConcept({ data }: { data?: HeroData } = {}) {
           style={{ width: "auto" }}
         />
 
-        {/* Desktop-only spacer — rezerwuje miejsce nad opisem na obszar
-            zajęty przez wielki watermark "pickupwall", żeby opis się
-            z nim nie nakładał. */}
         <div
           aria-hidden="true"
           className="hidden lg:block mb-7"
@@ -189,7 +172,6 @@ export default function HeroConcept({ data }: { data?: HeroData } = {}) {
         </p>
       </div>
 
-      {/* RIGHT: image przesunięte lekko w lewo (większa prawa przestrzeń) */}
       <div className="relative z-[2] flex-1 flex items-center justify-end pl-[6vw] pr-[14vw] pt-[10vh] pb-[8vh] max-lg:flex-none max-lg:pl-[2vw] max-lg:pr-[2vw] max-lg:justify-center max-lg:pt-0 max-lg:pb-0 max-lg:flex-col">
         <div
           aria-hidden="true"
@@ -204,7 +186,7 @@ export default function HeroConcept({ data }: { data?: HeroData } = {}) {
         />
         <img
           ref={imageRef}
-          src="/model3_retailo.png"
+          src={data?.heroImage || "/model3_retailo.png"}
           alt="PickUpWall"
           className="relative block h-[78vh] w-auto object-contain max-lg:h-[36svh]"
           style={{
@@ -221,8 +203,6 @@ export default function HeroConcept({ data }: { data?: HeroData } = {}) {
         </p>
       </div>
 
-      {/* 3 osobne pływające badge'e z backdrop-blur, rozrzucone wokół
-          i nachodzące na zdjęcie produktu */}
       <div ref={statsWrapRef} className="contents">
         {[
           {
@@ -335,8 +315,6 @@ export default function HeroConcept({ data }: { data?: HeroData } = {}) {
         ))}
       </div>
 
-      {/* Install reference card — lewy dolny róg, flex-row, translucent
-          szarawe tło z backdrop-blur */}
       <a
         ref={cardRef}
         href="/realizacje"
@@ -354,7 +332,7 @@ export default function HeroConcept({ data }: { data?: HeroData } = {}) {
           className="flex w-[170px] shrink-0 items-center justify-center overflow-hidden self-stretch max-lg:w-[110px]"
           style={{ background: "rgba(240,239,235,0.7)" }}>
           <img
-            src="/sephora-pickupwall.jpeg"
+            src={data?.heroInstallImage || "/sephora-pickupwall.jpeg"}
             alt="Wdrozenie PickUpWall"
             className="block h-full w-full object-cover"
           />

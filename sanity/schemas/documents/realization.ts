@@ -64,7 +64,7 @@ export const realization = defineType({
       title: "Dodatkowe pola tabeli (nazwa + wartość)",
       type: "array",
       description:
-        "Własne wiersze tabeli „Dane wdrożenia” — dowolne per realizacja, np. Powierzchnia / 12 m².",
+        "Własne wiersze tabeli „Dane wdrożenia” - dowolne per realizacja, np. Powierzchnia / 12 m².",
       of: [
         {
           type: "object",
@@ -107,7 +107,7 @@ export const realization = defineType({
       title: "Liczba jednostek głównych (Master, z ekranem)",
       type: "number",
       description:
-        "Ile modułów Master w instalacji. Domyślnie 1 — używane w schemacie konfiguracji.",
+        "Ile modułów Master w instalacji. Domyślnie 1 - używane w schemacie konfiguracji.",
       initialValue: 1,
       validation: (rule) => rule.min(0).integer(),
     }),
@@ -116,7 +116,7 @@ export const realization = defineType({
       title: "Liczba jednostek rozszerzających (Slave)",
       type: "number",
       description:
-        "Ile modułów Slave (bez ekranu). Domyślnie 1 — używane w schemacie konfiguracji (fallback, gdy nie wybrano modeli poniżej).",
+        "Ile modułów Slave (bez ekranu). Domyślnie 1 - używane w schemacie konfiguracji (fallback, gdy nie wybrano modeli poniżej).",
       initialValue: 1,
       validation: (rule) => rule.min(0).integer(),
     }),
@@ -125,9 +125,47 @@ export const realization = defineType({
       title: "Konfiguracja ściany (modele w kolejności)",
       type: "array",
       description:
-        "Złóż ścianę wybierając modele od lewej do prawej. Jeśli puste — używany jest prosty schemat Master/Slave z liczb powyżej. Pod polem widać podgląd złożonej ściany.",
+        "Jedno urządzenie: złóż ścianę wybierając modele od lewej do prawej. Jeśli puste - używany jest prosty schemat Master/Slave z liczb powyżej. Pod polem widać podgląd złożonej ściany. Gdy realizacja ma kilka osobnych urządzeń, użyj pola „Urządzenia” poniżej - to pole zostanie wtedy ukryte.",
       of: [{ type: "reference", to: [{ type: "lockerModule" }] }],
       components: { input: LockerWallPreview },
+      hidden: ({ document }) =>
+        Array.isArray((document as { devices?: unknown[] })?.devices) &&
+        ((document as { devices?: unknown[] }).devices?.length ?? 0) > 0,
+    }),
+    defineField({
+      name: "devices",
+      title: "Urządzenia (kilka osobnych ścian obok siebie)",
+      type: "array",
+      description:
+        "Użyj, gdy realizacja ma KILKA osobnych urządzeń stojących obok siebie (np. 2 urządzenia po 2 moduły). Każde urządzenie złóż osobno z modeli. Jeśli wypełnione - ma pierwszeństwo nad pojedynczą „Konfiguracją ściany” powyżej. Na schemacie urządzenia rysują się obok siebie z przerwą.",
+      of: [
+        {
+          type: "object",
+          name: "device",
+          fields: [
+            defineField({
+              name: "label",
+              title: "Nazwa urządzenia (opcjonalnie, np. „Urządzenie A”)",
+              type: "string",
+            }),
+            defineField({
+              name: "modules",
+              title: "Moduły urządzenia (w kolejności)",
+              type: "array",
+              of: [{ type: "reference", to: [{ type: "lockerModule" }] }],
+              components: { input: LockerWallPreview },
+              validation: (rule) => rule.required().min(1),
+            }),
+          ],
+          preview: {
+            select: { label: "label", modules: "modules" },
+            prepare: ({ label, modules }) => ({
+              title: label || "Urządzenie",
+              subtitle: `${(modules as unknown[] | undefined)?.length ?? 0} modułów`,
+            }),
+          },
+        },
+      ],
     }),
     defineField({
       name: "summary",
@@ -136,7 +174,7 @@ export const realization = defineType({
     }),
     defineField({
       name: "body",
-      title: "Opis (opcjonalny, rich text — pod schematem i tabelą)",
+      title: "Opis (opcjonalny, rich text - pod schematem i tabelą)",
       type: "array",
       of: [{ type: "block" }],
     }),
@@ -152,8 +190,7 @@ export const realization = defineType({
       name: "gallery",
       title: "Galeria",
       type: "array",
-      description:
-        "Miniatury są automatycznie kadrowane do 4:3 wg punktu ostrości (kółko, które przeciągasz na zdjęciu). Domyślny cropper Sanity nie ma wyboru proporcji — kadr ustala właśnie to kółko. W podglądzie (klik) widać całe zdjęcie.",
+      description: "",
       of: [
         {
           type: "image",
@@ -169,7 +206,8 @@ export const realization = defineType({
       cover: "coverImage",
     },
     prepare: ({ titleTranslations, slug, cover }) => {
-      const list = (titleTranslations as { value?: string }[] | undefined) ?? [];
+      const list =
+        (titleTranslations as { value?: string }[] | undefined) ?? [];
       const first = list.find((i) => i?.value)?.value;
       return {
         title: first ?? "(bez tytułu)",

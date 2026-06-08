@@ -17,21 +17,11 @@ import type { PortableTextBlock } from "@portabletext/types";
 
 const builder = createImageUrlBuilder({ projectId, dataset });
 
-// Tylko obrazy z podpiętym assetem da się zbudować — puste/„osierocone"
-// obiekty image ({_type:'image'} bez asset) rzucają błędem w builderze
-// (i wywalały prerender). Zwracamy dla nich "" i odfiltrowujemy dalej.
 const hasAsset = (src: unknown): boolean =>
   !!src &&
   typeof src === "object" &&
   !!(src as { asset?: { _ref?: string } }).asset?._ref;
 
-// Optymalizacja po stronie dostarczania (CDN Sanity): oryginał zostaje w
-// storage, a do przeglądarki leci wariant przeskalowany, w AVIF/WebP i
-// dociśnięty jakością. Dzięki temu nawet wielki upload klienta (np. 20 MB
-// / 6000 px) ładuje się szybko — bez kompresji przy wrzucaniu.
-//
-// `fit("max")` = przeskaluj w dół do limitu, ale NIGDY w górę (małe zdjęcia
-// zostają nietknięte). 1920 px wystarcza na pełnoekranowy hero i lightbox.
 const MAX_W = 1920;
 const QUALITY = 80;
 
@@ -45,8 +35,6 @@ const urlFor = (src: unknown) =>
         .quality(QUALITY)
         .url()
     : "";
-// Kadr o stałych proporcjach wg punktu ostrości (hotspot) — daje spójne
-// miniatury bez zależności od (nieistniejącego) wyboru proporcji w cropperze.
 const urlForCrop = (src: unknown, w: number, h: number) =>
   hasAsset(src)
     ? builder
@@ -100,8 +88,6 @@ export type SiteSettings = {
   cookieSettingsLinkLabel?: LocalizedField;
 } | null;
 
-/** Rich text per język — taki sam kształt translations jak LocalizedField,
-    ale wartością jest Portable Text. */
 export type LocalizedBlocks = {
   translations?: Array<{
     language?: { code?: string } | null;
@@ -119,6 +105,8 @@ export type LegalPage = {
 export type LocalizedItem = { title: LocalizedField; description: LocalizedField };
 
 export type HomePage = {
+  heroImage?: string;
+  heroInstallImage?: string;
   heroSubtitle?: LocalizedField;
   heroDescription?: LocalizedField;
   heroScrollLabel?: LocalizedField;
@@ -127,11 +115,14 @@ export type HomePage = {
   heroInstallTitle?: LocalizedField;
   heroInstallSubtitle?: LocalizedField;
 
+  qaClientLogo?: string;
   qaEyebrow?: LocalizedField;
   qaHeadline?: LocalizedField;
   qaSubtitle?: LocalizedField;
   qaTiles?: LocalizedItem[];
 
+  productPhoto?: string;
+  productSketch?: string;
   productEyebrow?: LocalizedField;
   productHeadline?: LocalizedField;
   productFeatures?: LocalizedItem[];
@@ -143,12 +134,9 @@ export type HomePage = {
   productStepsLabel?: LocalizedField;
   productSpecsHeadline?: LocalizedField;
   productHardwareLabel?: LocalizedField;
-  productHardwareMinLabel?: LocalizedField;
-  productHardwareMaxLabel?: LocalizedField;
   productHardwareRows?: Array<{
     label: LocalizedField;
-    min: string;
-    max: string;
+    value: LocalizedField;
   }>;
 
   realizationsEyebrow?: LocalizedField;
@@ -170,7 +158,6 @@ export type HomePage = {
   globalIntro?: LocalizedField;
   globalCountriesLeft?: LocalizedField[];
   globalCountriesRight?: LocalizedField[];
-  // Kody ISO_A2 krajów podświetlanych na globie (override domyślnej listy).
   globalMapCountries?: string[];
   globalCtaToggleLabel?: LocalizedField;
   globalCtaTitle?: LocalizedField;
@@ -190,11 +177,6 @@ export type HomePage = {
   }>;
 } | null;
 
-// Sanity content rarely changes mid-day; one-hour cache trades freshness
-// for far fewer cold fetches blocking SSR (was 60s → frequent server-side
-// waits on hard refresh, which delayed the hero animation).
-// W dev ZERO cache — edycje w Studio (np. macierze modeli) mają być widoczne
-// na stronie od razu po publikacji, bez czekania godziny.
 const fetchOpts = {
   next: {
     revalidate: process.env.NODE_ENV === "development" ? 0 : 3600,
@@ -215,7 +197,24 @@ export async function getSiteSettings(): Promise<SiteSettings> {
 }
 
 export async function getHomePage(): Promise<HomePage> {
-  return sanityClient.fetch<HomePage>(HOME_PAGE_QUERY, {}, fetchOpts);
+  // Treść strony głównej jest podzielona na osobne dokumenty sekcji
+  // (homeHero, homeQa, ...). Łączymy je w jeden płaski obiekt HomePage,
+  // żeby komponenty nie wymagały zmian.
+  const r = await sanityClient.fetch<Record<string, object | null>>(
+    HOME_PAGE_QUERY,
+    {},
+    fetchOpts,
+  );
+  if (!r) return null;
+  return {
+    ...(r.hero ?? {}),
+    ...(r.qa ?? {}),
+    ...(r.product ?? {}),
+    ...(r.realizations ?? {}),
+    ...(r.integration ?? {}),
+    ...(r.models ?? {}),
+    ...(r.global ?? {}),
+  } as HomePage;
 }
 
 export async function getRealizationsPage() {
@@ -226,9 +225,6 @@ export async function getLegalPage(slug: string): Promise<LegalPage> {
   return sanityClient.fetch<LegalPage>(LEGAL_PAGE_QUERY, { slug }, fetchOpts);
 }
 
-// Płaski typ Realization używany przez RealizationsCarousel, listę
-// /realizacje i detal /realizacje/[slug]. Zlokalizowane pola Sanity
-// (LocalizedField) zostawiamy do resolve'owania na kliencie via useLang.
 export type Realization = {
   slug: string;
   title: string;
@@ -238,21 +234,16 @@ export type Realization = {
   gallery?: { src: string; thumb: string }[];
   client?: string;
   year?: number;
-  // Własne wiersze tabeli „Dane wdrożenia" (per realizacja).
   specs?: { label: string; value: string }[];
-  // Opcjonalny opis (rich text / Portable Text) pod schematem i tabelą.
   body?: PortableTextBlock[];
   config?: {
     lockers?: number;
     masterCount?: number;
     slaveCount?: number;
-    moduleDimensions?: string;
     notes?: string;
   };
-  // Konfiguracja ściany złożona z modeli (lockerModule) — w kolejności.
-  // Każdy moduł ma sparsowaną macierz układu skrytek.
   modules?: RealizationModule[];
-  // Promowane realizacje renderowane są jako większe karty na liście.
+  devices?: RealizationDevice[];
   featured?: boolean;
   tags?: string[];
 };
@@ -265,8 +256,11 @@ export type RealizationModule = {
   matrix: LockerMatrix;
 };
 
-// Pomocnik wyciągania pierwszego tłumaczenia z LocalizedField — używany
-// po stronie serwera, bo komponenty konsumujące oczekują plain string.
+export type RealizationDevice = {
+  label?: string;
+  modules: RealizationModule[];
+};
+
 type LocalizedRaw = {
   translations?: { value?: string; language?: { code?: string } }[];
 };
@@ -289,16 +283,27 @@ type SanityRealizationRaw = {
   masterCount?: number;
   slaveCount?: number;
   featured?: boolean;
-  modules?: Array<{
-    id?: string;
-    title?: string;
-    accent?: string;
-    lockers?: number;
-    matrix?: string;
-  }>;
+  modules?: Array<RawModule>;
+  devices?: Array<{ label?: string; modules?: Array<RawModule> }>;
   coverImage?: unknown;
   gallery?: unknown[];
 };
+
+type RawModule = {
+  id?: string;
+  title?: string;
+  accent?: string;
+  lockers?: number;
+  matrix?: string;
+};
+
+const mapModule = (m: RawModule, fallbackId: string): RealizationModule => ({
+  id: m.id ?? fallbackId,
+  title: m.title ?? "Moduł",
+  accent: m.accent || "#0086b0",
+  lockers: m.lockers,
+  matrix: parseLockerMatrix(m.matrix),
+});
 
 const normalize = (r: SanityRealizationRaw): Realization => ({
   slug: r.slug ?? "",
@@ -316,25 +321,26 @@ const normalize = (r: SanityRealizationRaw): Realization => ({
     .map((s) => ({ label: pickString(s?.label), value: pickString(s?.value) }))
     .filter((s) => s.label && s.value),
   body: r.body,
-  // Konfiguracja Master/Slave do schematu na stronie detalu. Domyślnie
-  // standardowy układ 1× Master + 1× Slave (79 skrytek) — tak jak każda
-  // realizacja miała wcześniej; Sanity może to nadpisać per realizacja.
   config: {
     lockers: r.lockerCount ?? 79,
     masterCount: r.masterCount ?? 1,
     slaveCount: r.slaveCount ?? 1,
-    moduleDimensions: "1970 × 1025 × 50 mm",
   },
   featured: r.featured ?? false,
   modules:
     r.modules && r.modules.length > 0
-      ? r.modules.map((m, i) => ({
-          id: m.id ?? `module-${i}`,
-          title: m.title ?? "Moduł",
-          accent: m.accent || "#0086b0",
-          lockers: m.lockers,
-          matrix: parseLockerMatrix(m.matrix),
-        }))
+      ? r.modules.map((m, i) => mapModule(m, `module-${i}`))
+      : undefined,
+  devices:
+    r.devices && r.devices.length > 0
+      ? r.devices
+          .map((d, di) => ({
+            label: d.label,
+            modules: (d.modules ?? []).map((m, i) =>
+              mapModule(m, `device-${di}-module-${i}`),
+            ),
+          }))
+          .filter((d) => d.modules.length > 0)
       : undefined,
 });
 

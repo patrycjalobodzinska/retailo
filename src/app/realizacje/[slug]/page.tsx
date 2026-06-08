@@ -5,6 +5,7 @@ import Footer from "@/components/Footer";
 import ContactCtaForm from "@/components/ContactCtaForm";
 import RealizationsCarousel from "@/components/RealizationsCarousel";
 import LockerWallDiagram, {
+  LockerDevicesDiagram,
   RealizationModuleLegend,
 } from "@/components/LockerWallDiagram";
 import RealizationGallery from "@/components/RealizationGallery";
@@ -33,8 +34,19 @@ export async function generateStaticParams() {
 export async function generateMetadata({ params }: PageProps) {
   const { slug } = await params;
   const r = await getRealizationBySlug(slug);
+  if (!r) return { title: "Realizacja · Retailo" };
+  const title = `${r.title} · Realizacje · Retailo`;
+  const description =
+    r.description ||
+    `Wdrożenie PickUpWall: ${r.title}${r.location ? `, ${r.location}` : ""}. Automatyczny system odbioru przesyłek pick-up in store.`;
   return {
-    title: r ? `${r.title} · Realizacje · Retailo` : "Realizacja · Retailo",
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      ...(r.image ? { images: [{ url: r.image }] } : {}),
+    },
   };
 }
 
@@ -48,28 +60,27 @@ export default async function RealizacjaDetailPage({ params }: PageProps) {
 
   const config = r.config;
 
+  const hasDevices = !!r.devices?.length;
+  const hasWall = hasDevices || !!r.modules?.length;
+  const allModules = hasDevices
+    ? r.devices!.flatMap((d) => d.modules)
+    : (r.modules ?? []);
+
   const META_ROWS: Array<[string, string]> = [
     ["Lokalizacja", r.location],
-    ["Rok wdrozenia", r.year ? String(r.year) : "—"],
-    ["Liczba skrytek", config?.lockers ? String(config.lockers) : "—"],
-    ["Wymiary jednostki", "1970 × 1025 × 50 mm"],
-    // Własne pola tabeli z Sanity (per realizacja).
+    ["Rok wdrozenia", r.year ? String(r.year) : "-"],
+    ["Liczba skrytek", config?.lockers ? String(config.lockers) : "-"],
     ...(r.specs ?? []).map((s) => [s.label, s.value] as [string, string]),
   ];
 
   return (
     <>
-      {/* Header slides down from above. */}
       <div className="realization-header-in">
         <Header />
       </div>
 
       <main className="relative z-[1] w-full bg-white text-[#0a2a2e]">
-        {/* Hero — gradient + napis „realizacje" jako KRÓTKA warstwa-tło
-            (absolute). Tekst i zdjęcie są w normalnym flow, więc zdjęcie nachodzi
-            tylko na tło (gradient/biel), nie na treść następnej sekcji. */}
         <section className="relative w-full lg:min-h-[100vh]">
-          {/* Tło: gradient + dekoracje + duży napis */}
           <div
             aria-hidden="true"
             className="absolute inset-x-0 top-0 h-[40vh] z-0 overflow-hidden pointer-events-none lg:h-[380px]"
@@ -82,8 +93,6 @@ export default async function RealizacjaDetailPage({ params }: PageProps) {
               style={{
                 background:
                   "radial-gradient(ellipse 70% 70% at 5% 100%, rgba(0,134,176,0.22) 0%, rgba(0,134,176,0) 60%), radial-gradient(ellipse 60% 65% at 95% -5%, rgba(126,213,230,0.35) 0%, rgba(126,213,230,0) 60%)",
-                // Wygaszamy kolorowe plamy do przezroczystości przed dolną
-                // krawędzią — bez tego cyjan urywał się ostro na bieli (odcięcie).
                 WebkitMaskImage:
                   "linear-gradient(180deg, #000 45%, transparent 85%)",
                 maskImage:
@@ -122,14 +131,8 @@ export default async function RealizacjaDetailPage({ params }: PageProps) {
             </p>
           </div>
 
-          {/* Treść — normalny flow: tekst | zdjęcie (zdjęcie wychodzi pod
-              gradient na białe tło, ale nie nachodzi na sekcję niżej). */}
           <div className="realization-block-in realization-block-in-1 relative z-[1] flex flex-col lg:grid lg:grid-cols-2 gap-10 items-start px-[6vw] pt-[120px] pb-[8vh] max-w-[1500px] mx-auto max-lg:pt-[64px] max-lg:gap-6 max-lg:pb-[4vh]">
-            {/* Tekst górny: tytuł + opis. Na mobile pierwszy w kolejności,
-                na desktopie lewa kolumna / wiersz 1. */}
             <div className="lg:col-start-1 lg:row-start-1">
-              {/* Blok tytułu rezerwuje wysokość warstwy-tła (gradient), więc
-                  tabela poniżej zawsze ląduje na białym, nigdy na gradiencie. */}
               <div className="lg:min-h-[260px]">
                 <Link
                   href="/realizacje"
@@ -142,7 +145,7 @@ export default async function RealizacjaDetailPage({ params }: PageProps) {
                 <span aria-hidden="true">&larr;</span>
                 Realizacje
               </Link>
-              {r.client && r.client !== "—" && (
+              {r.client && r.client !== "-" && (
                 <p
                   className="m-0 mb-2 font-bold uppercase tracking-[0.14em] text-[#0a2a2e]"
                   style={{ fontSize: "clamp(1rem, 1.4vw, 1.35rem)" }}>
@@ -166,8 +169,6 @@ export default async function RealizacjaDetailPage({ params }: PageProps) {
               </div>
             </div>
 
-            {/* Zdjęcie — na mobile zaraz pod tytułem (nad opisem i CTA);
-                na desktopie prawa kolumna na całą wysokość. */}
             <div className="lg:col-start-2 lg:row-start-1 lg:row-span-3">
               <img
                 src={r.image}
@@ -176,8 +177,6 @@ export default async function RealizacjaDetailPage({ params }: PageProps) {
               />
             </div>
 
-            {/* Opis + CTA — na mobile POD zdjęciem; na desktopie lewa
-                kolumna / wiersz 2 (pod tytułem). */}
             <div className="lg:col-start-1 lg:row-start-2">
               {r.description && (
                 <p
@@ -199,7 +198,6 @@ export default async function RealizacjaDetailPage({ params }: PageProps) {
                   Inne realizacje
                 </Link>
               </div>
-              {/* Dekoracyjny dot-grid — wypełnia resztę lewej kolumny. */}
               <svg
                 aria-hidden="true"
                 className="mt-12 max-lg:hidden"
@@ -221,10 +219,7 @@ export default async function RealizacjaDetailPage({ params }: PageProps) {
               </svg>
             </div>
 
-            {/* Dane wdrożenia — w hero tylko gdy realizacja nie ma sekcji
-                „Konfiguracja wdrożenia" (z modułami tabela przenosi się tam,
-                obok schematu). */}
-            {!r.modules?.length && (
+            {!hasWall && (
             <div className="lg:col-start-1 lg:row-start-3">
               <p
                 className="m-0 mb-3 uppercase tracking-[0.22em] font-semibold text-[#0086b0]"
@@ -250,10 +245,8 @@ export default async function RealizacjaDetailPage({ params }: PageProps) {
           </div>
         </section>
 
-        {/* Konfiguracja wdrożenia — tylko gdy wybrano modele w Sanity */}
-        {r.modules && r.modules.length > 0 && (
+        {hasWall && (
           <section className="relative realization-block-in realization-block-in-2 px-[6vw] pt-[2vh] pb-[12vh] max-w-[1500px] mx-auto">
-          {/* Dekoracyjne tło sekcji */}
           <div
             aria-hidden="true"
             className="absolute inset-0 -z-10 overflow-hidden pointer-events-none">
@@ -301,9 +294,7 @@ export default async function RealizacjaDetailPage({ params }: PageProps) {
             </svg>
           </div>
           <div className="relative flex flex-col gap-10">
-              {/* Konfiguracja: ściana złożona z modeli (Sanity) — z fallbackiem
-                  do prostego schematu Master/Slave gdy modele nie wybrane. */}
-              {r.modules?.length ? (
+              {hasWall ? (
                 <div className="realization-block-in realization-block-in-3">
                   <p
                     className="m-0 mb-6 uppercase tracking-[0.18em] font-semibold text-[#0086b0]"
@@ -311,15 +302,21 @@ export default async function RealizacjaDetailPage({ params }: PageProps) {
                     Konfiguracja wdrozenia
                   </p>
                   <div className="flex flex-col lg:flex-row lg:items-start lg:justify-center gap-8 lg:gap-14">
-                    {/* Schemat po lewej, pod nim opis + legenda */}
                     <div className="flex flex-col gap-5 lg:w-fit lg:max-w-full lg:shrink-0">
                       <div className="rounded-2xl bg-white/70 backdrop-blur-sm p-6 md:p-8 border border-[#0a2a2e]/10 max-lg:-mx-[6vw] max-lg:rounded-none max-lg:border-x-0 max-lg:px-3 max-lg:py-5">
-                        <LockerWallDiagram modules={r.modules} showLegend={false} />
+                        {hasDevices ? (
+                          <LockerDevicesDiagram
+                            devices={r.devices!}
+                            showLegend={false}
+                          />
+                        ) : (
+                          <LockerWallDiagram
+                            modules={r.modules!}
+                            showLegend={false}
+                          />
+                        )}
                       </div>
                     </div>
-                    {/* Dane wdrożenia po prawej (przeniesione z hero) — karta
-                        w stylu schematu obok, pola rozdzielone subtelnymi
-                        liniami. */}
                     <div className="flex w-full flex-col gap-5 lg:max-w-[440px] lg:pt-1">
                       <div className="rounded-2xl bg-white/70 backdrop-blur-sm border border-[#0a2a2e]/10 p-6 md:p-7">
                         <p
@@ -344,10 +341,11 @@ export default async function RealizacjaDetailPage({ params }: PageProps) {
                           ))}
                         </dl>
                       </div>
-                      {/* Legenda modeli — desktop: pod tabelą danych;
-                          mobile: nad tabelą (zaraz pod schematem). */}
                       <div className="max-lg:order-first">
-                        <RealizationModuleLegend modules={r.modules} horizontal />
+                        <RealizationModuleLegend
+                          modules={allModules}
+                          horizontal
+                        />
                       </div>
                     </div>
                   </div>
@@ -360,7 +358,6 @@ export default async function RealizacjaDetailPage({ params }: PageProps) {
                     Konfiguracja wdrozenia
                   </p>
                   <div className="flex flex-col lg:flex-row lg:items-start lg:justify-center gap-8 lg:gap-14">
-                    {/* Schemat po lewej */}
                     <div className="rounded-2xl bg-white/70 backdrop-blur-sm p-6 md:p-8 border border-[#0a2a2e]/10 lg:w-fit lg:max-w-full lg:shrink-0 max-lg:-mx-[6vw] max-lg:rounded-none max-lg:border-x-0 max-lg:px-3 max-lg:py-5">
                       <div className="flex items-end justify-center">
                       {(() => {
@@ -394,12 +391,11 @@ export default async function RealizacjaDetailPage({ params }: PageProps) {
                       })()}
                       </div>
                     </div>
-                    {/* Opis + legenda po prawej, wyrównane do góry */}
                     <div className="flex flex-col gap-6 lg:max-w-[360px] lg:pt-1">
                       <p
                         className="m-0 lg:mt-6 text-[#3a5a60] leading-relaxed"
                         style={{ fontSize: "0.95rem" }}>
-                        Schematyczny widok od frontu —{" "}
+                        Schematyczny widok od frontu -{" "}
                         {config.masterCount + (config.slaveCount ?? 0)}{" "}
                         {(() => {
                           const n =
@@ -421,7 +417,7 @@ export default async function RealizacjaDetailPage({ params }: PageProps) {
                               borderRadius: 3,
                             }}
                           />
-                          Master — 39 skrytek + ekran
+                          Master - 39 skrytek + ekran
                         </div>
                         <div className="flex items-center gap-2.5">
                           <span
@@ -444,14 +440,12 @@ export default async function RealizacjaDetailPage({ params }: PageProps) {
         </section>
         )}
 
-        {/* Opis (rich text z Sanity) — pod schematem i tabelą */}
         {r.body && r.body.length > 0 && (
           <section className="realization-block-in px-[6vw] -mt-[6vh] pb-[6vh] max-w-[900px] mx-auto">
             <PortableText value={r.body} components={BODY_COMPONENTS} />
           </section>
         )}
 
-        {/* Galeria — klik = duży podgląd ze strzałkami */}
         {r.gallery && r.gallery.length > 0 && (
           <section className="realization-block-in px-[6vw] pb-[12vh] max-w-[1500px] mx-auto">
             <div className="mb-6">
@@ -474,7 +468,6 @@ export default async function RealizacjaDetailPage({ params }: PageProps) {
           </section>
         )}
 
-        {/* Carousel: all other realizations */}
         <section className="realization-block-in realization-block-in-5 border-t border-[#0a2a2e]/10 pt-[6vh] pb-[2vh] max-lg:pt-[4vh]">
           <div className="max-w-[1500px] mx-auto px-[6vw] mb-2">
             <p
@@ -498,8 +491,6 @@ export default async function RealizacjaDetailPage({ params }: PageProps) {
       </main>
       <Footer />
 
-      {/* Gradient backdrop — sits behind main, matches the carousel→detail
-          transition panel so the page lands seamlessly. */}
       <div
         aria-hidden
         className="fixed inset-0 z-0 pointer-events-none"
@@ -511,10 +502,6 @@ export default async function RealizacjaDetailPage({ params }: PageProps) {
   );
 }
 
-// Visualization of the PickUpWall cabinet — vertical front-view with
-// "lockers" grid. Master variant adds a prominent screen band at eye
-// level; slave is just the grid. `position` rounds only the outer-most
-// edges of a row, so adjacent units read as one continuous installation.
 type ModulePosition = "first" | "middle" | "last" | "only";
 function ModuleDiagram({
   variant,

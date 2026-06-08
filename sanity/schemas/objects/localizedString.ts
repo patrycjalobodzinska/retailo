@@ -1,12 +1,5 @@
 import { defineField, defineType } from "sanity";
 
-/**
- * Localized short string. Stored as an array of {language, value} entries.
- * Editor flow:
- *   1. Admin creates languages in the "Język" document type.
- *   2. For each translatable field, the editor adds one entry per language
- *      from the dropdown — no developer involvement to add a new language.
- */
 export const localizedString = defineType({
   name: "localizedString",
   title: "Tekst (tłumaczenia)",
@@ -39,7 +32,7 @@ export const localizedString = defineType({
             select: { lang: "language.code", value: "value" },
             prepare: ({ lang, value }) => ({
               title: value,
-              subtitle: lang ? lang.toUpperCase() : "—",
+              subtitle: lang ? lang.toUpperCase() : "-",
             }),
           },
         },

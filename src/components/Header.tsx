@@ -9,8 +9,6 @@ import type { SiteSettings } from "@/lib/sanity/fetch";
 type NavItem = {
   label: string;
   target: string;
-  // Optional offset (in viewport heights) added on top of the target
-  // element's top — used to land partway into a pinned/long section.
   vhOffset?: number;
 };
 
@@ -20,7 +18,6 @@ const NAV_ITEMS_FALLBACK: NavItem[] = [
   { label: "Kontakt", target: "kontakt" },
 ];
 
-// vhOffset per target — przesunięcie scrolla dla docelowej kotwicy.
 const TARGET_OFFSETS: Record<string, number> = {
   rozwiazanie: 0.15,
   realizacje: 0.05,
@@ -43,10 +40,7 @@ export default function Header({
           };
         })
       : NAV_ITEMS_FALLBACK;
-  // Nawigacja: na podstronach logo prowadzi do "/"; na home scroll do góry.
   const isSubpage = pathname !== "/" && pathname !== "/test2";
-  // Styl: ciemne pigułki na JASNYM tle (home, test2, realizacje, polityka
-  // prywatności — jasny gradient), jasne pigułki na CIEMNYM tle (pozostałe).
   const onDark =
     isSubpage &&
     !pathname.startsWith("/realizacje") &&
@@ -54,9 +48,6 @@ export default function Header({
 
   const [open, setOpen] = useState(false);
 
-  // Na mobile wyłączamy backdrop-blur pigułek headera — fixed element z
-  // backdrop-filter repaintuje rozmycie na KAŻDEJ klatce scrolla, co szarpie
-  // płynny scroll (zwłaszcza przy ciągłym przeciąganiu palcem).
   const [isMobile, setIsMobile] = useState(false);
   useEffect(() => {
     const update = () =>
@@ -84,8 +75,6 @@ export default function Header({
   ) => {
     e.preventDefault();
     setOpen(false);
-    // Na podstronach kotwice nie istnieją — przenosimy na stronę główną
-    // z hashem (przeglądarka sama doscrolluje do sekcji po załadowaniu).
     if (isSubpage) {
       window.location.href = `/#${item.target}`;
       return;
@@ -118,16 +107,16 @@ export default function Header({
           href="/"
           onClick={(e) => {
             setOpen(false);
-            // On subpages let the browser navigate normally to "/".
-            // On the home page intercept and smooth-scroll to the top.
             if (isSubpage) return;
             e.preventDefault();
             const lenis = window.__lenis;
             if (lenis) lenis.scrollTo(0, { duration: 1.1 });
             else window.scrollTo({ top: 0, behavior: "smooth" });
           }}
-          className="inline-flex items-center no-underline"
-          aria-label="retailo. — strona glowna"
+          className={`inline-flex items-center no-underline transition-opacity duration-200 ${
+            open ? "pointer-events-none opacity-0" : "opacity-100"
+          }`}
+          aria-label="retailo. - strona glowna"
           style={{
             background: onDark
               ? "rgba(255,255,255,0.85)"
@@ -147,7 +136,6 @@ export default function Header({
           />
         </a>
 
-        {/* Desktop nav */}
         <nav
           className="hidden md:flex items-center"
           style={{
@@ -187,12 +175,13 @@ export default function Header({
           </div>
         </nav>
 
-        {/* Mobile burger */}
         <button
           type="button"
           aria-label={open ? "Zamknij menu" : "Otworz menu"}
           onClick={() => setOpen((o) => !o)}
-          className="md:hidden flex flex-col gap-1.5 cursor-pointer w-12 h-12 justify-center items-center"
+          className={`md:hidden flex flex-col gap-1.5 cursor-pointer w-12 h-12 justify-center items-center transition-opacity duration-200 ${
+            open ? "pointer-events-none opacity-0" : "opacity-100"
+          }`}
           style={{
             background: onDark
               ? "rgba(255,255,255,0.92)"
@@ -236,7 +225,6 @@ export default function Header({
         </button>
       </header>
 
-      {/* Mobile drawer — editorial light style pasujący do Hero/QASection */}
       <div
         className={`md:hidden fixed inset-0 z-[99] transition-opacity duration-300 ${
           open
@@ -251,7 +239,6 @@ export default function Header({
         <div
           className="relative flex h-full flex-col"
           onClick={(e) => e.stopPropagation()}>
-          {/* Subtelna siatka kropek w tle */}
           <svg
             aria-hidden="true"
             className="pointer-events-none absolute inset-0 h-full w-full"
@@ -268,8 +255,7 @@ export default function Header({
             <rect width="100%" height="100%" fill="url(#menu-dots)" />
           </svg>
 
-          {/* Top bar — eyebrow + close */}
-          <div className="relative z-[1] flex items-center justify-between px-[6vw] pt-[2svh]">
+          <div className="relative z-[1] flex items-center justify-between px-[6vw] pt-[max(2svh,env(safe-area-inset-top))]">
             <span
               className="font-mono uppercase tracking-[0.28em] text-[#0a2a2e]/55"
               style={{ fontSize: "0.58rem" }}>
@@ -299,7 +285,6 @@ export default function Header({
             </button>
           </div>
 
-          {/* Nav list — numbered items with hairline dividers */}
           <nav className="relative z-[1] mt-[10svh] flex flex-col px-[6vw]">
             {navItems.map((item, i) => (
               <a
@@ -349,7 +334,6 @@ export default function Header({
             ))}
           </nav>
 
-          {/* Footer area — language switcher + contact pill */}
           <div className="relative z-[1] mt-auto flex flex-col gap-4 px-[6vw] pb-[5svh] pt-8">
             <div
               className="flex items-center gap-3"
@@ -369,7 +353,7 @@ export default function Header({
               <LanguageSwitcher variant="drawer" />
             </div>
             <a
-              href="mailto:info@retailo.pl"
+              href="mailto:kontakt@retailo.pl"
               className="font-mono uppercase tracking-[0.22em] text-[#0a2a2e]/65 no-underline"
               style={{
                 fontSize: "0.56rem",
@@ -379,7 +363,7 @@ export default function Header({
                 transitionDelay: open ? "380ms" : "0ms",
                 transitionProperty: "transform, opacity",
               }}>
-              info@retailo.pl
+              kontakt@retailo.pl
             </a>
           </div>
         </div>

@@ -1,25 +1,45 @@
 import type { StructureResolver } from "sanity/structure";
 
-/**
- * Custom desk so the editor sees:
- *   – Strona główna  (singleton)
- *   – Strona realizacji  (singleton)
- *   – Realizacje  (collection)
- *   – Ustawienia strony  (singleton)
- *   – Języki  (collection)
- */
+const singleton = (
+  S: Parameters<StructureResolver>[0],
+  id: string,
+  type: string,
+  title: string,
+) =>
+  S.listItem()
+    .title(title)
+    .id(id)
+    .child(S.document().schemaType(type).documentId(id).title(title));
+
 export const structure: StructureResolver = (S) =>
   S.list()
     .title("Treści")
     .items([
       S.listItem()
         .title("Strona główna")
-        .id("homePage")
+        .id("home")
         .child(
-          S.document()
-            .schemaType("homePage")
-            .documentId("homePage")
-            .title("Strona główna"),
+          S.list()
+            .title("Strona główna")
+            .items([
+              singleton(S, "homeHero", "homeHero", "Hero"),
+              singleton(S, "homeQa", "homeQa", "Nasze rozwiązanie"),
+              singleton(S, "homeProduct", "homeProduct", "PickUpWall (specs)"),
+              singleton(
+                S,
+                "homeRealizations",
+                "homeRealizations",
+                "Realizacje (karuzela)",
+              ),
+              singleton(
+                S,
+                "homeIntegration",
+                "homeIntegration",
+                "Integracja, instalacja, wsparcie",
+              ),
+              singleton(S, "homeModels", "homeModels", "Modele PickUpWall"),
+              singleton(S, "homeGlobal", "homeGlobal", "Global (mapa)"),
+            ]),
         ),
       S.listItem()
         .title("Strona realizacji")
@@ -33,14 +53,6 @@ export const structure: StructureResolver = (S) =>
       S.documentTypeListItem("realization").title("Realizacje"),
       S.documentTypeListItem("lockerModule").title("Modele"),
       S.divider(),
-      S.listItem()
-        .title("Ustawienia strony")
-        .id("siteSettings")
-        .child(
-          S.document()
-            .schemaType("siteSettings")
-            .documentId("siteSettings")
-            .title("Ustawienia strony"),
-        ),
+      singleton(S, "siteSettings", "siteSettings", "Ustawienia strony"),
       S.documentTypeListItem("language").title("Języki"),
     ]);

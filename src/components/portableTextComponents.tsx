@@ -1,8 +1,5 @@
 import type { PortableTextComponents } from "next-sanity";
 
-/* Mapa stylów edytora Sanity → typografia strony. Rozmiary odwzorowują
-   hierarchię z edytora (H1 > H2 > H3 > H4 > normal). Współdzielona przez
-   detal realizacji i strony prawne. */
 export const BODY_COMPONENTS: PortableTextComponents = {
   block: {
     normal: ({ children }) => (

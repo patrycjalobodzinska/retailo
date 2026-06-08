@@ -22,19 +22,10 @@ type ResolvedModule = {
   matrix: LockerMatrix;
 };
 
-/**
- * Podgląd złożonej ściany PickUpWall pod polem „Konfiguracja ściany". Czyta
- * referencje do modeli (lockerModule) z wartości pola, dociąga ich dane
- * (nazwa, kolor, macierz) i rysuje moduły obok siebie w wybranej kolejności —
- * dokładnie tak, jak wyświetlą się na stronie realizacji. Renderuje też
- * domyślny edytor referencji (renderDefault), więc dodaje podgląd, a nie
- * zastępuje standardowej obsługi pola.
- */
 export function LockerWallPreview(props: ArrayOfObjectsInputProps) {
   const client = useClient({ apiVersion: API_VERSION });
   const value = props.value as Array<Reference> | undefined;
 
-  // Stabilna lista _ref w kolejności wybranej w polu.
   const refIds = (value ?? [])
     .map((item) => item?._ref)
     .filter((id): id is string => typeof id === "string");
@@ -51,8 +42,6 @@ export function LockerWallPreview(props: ArrayOfObjectsInputProps) {
     let cancelled = false;
     setLoading(true);
 
-    // Dociągamy też wersje robocze (drafts.*), żeby podgląd działał zanim
-    // model zostanie opublikowany. Mapę budujemy po „czystym" _id.
     const draftIds = refIds.map((id) => `drafts.${id}`);
     client
       .fetch<
@@ -72,12 +61,10 @@ export function LockerWallPreview(props: ArrayOfObjectsInputProps) {
         const byId = new Map<string, (typeof docs)[number]>();
         for (const d of docs) {
           const baseId = d._id.replace(/^drafts\./, "");
-          // Draft ma pierwszeństwo (świeższe dane podczas edycji).
           if (d._id.startsWith("drafts.") || !byId.has(baseId)) {
             byId.set(baseId, d);
           }
         }
-        // Zachowujemy kolejność z pola.
         const resolved: ResolvedModule[] = refIds
           .map((id) => byId.get(id))
           .filter((d): d is (typeof docs)[number] => Boolean(d))
@@ -147,7 +134,6 @@ export function LockerWallPreview(props: ArrayOfObjectsInputProps) {
   );
 }
 
-/** Legenda — swatch + nazwa (unikalne po nazwie). */
 function ModuleLegend({ modules }: { modules: ResolvedModule[] }) {
   const legend = modules.filter(
     (m, i) => modules.findIndex((x) => x.title === m.title) === i,
@@ -178,7 +164,6 @@ function ModuleLegend({ modules }: { modules: ResolvedModule[] }) {
 
 const PREVIEW_H = 240;
 
-/** Jeden moduł — siatka per-wiersz, identyczna logika jak LockerWallDiagram. */
 function ModuleGrid({
   module: m,
   first,

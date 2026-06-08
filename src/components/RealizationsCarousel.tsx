@@ -7,10 +7,6 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import type { HomePage, Realization } from "@/lib/sanity/fetch";
 import { useLang } from "@/lib/i18n/LanguageProvider";
 
-// Mobile: cards take most of the viewport with a small side peek.
-// Desktop overridden via responsive Tailwind classes below.
-// Sized so 3 cards + 2 gaps always fit within the viewport on desktop
-// (3 * 28vw + 2 * 24px ≈ 84vw + 48px, leaves safe margins from md up).
 const CARD_W_DESKTOP = "clamp(220px, 28vw, 420px)";
 const CARD_GAP_DESKTOP = "24px";
 
@@ -45,10 +41,6 @@ export default function RealizationsCarousel({
     : (itemsProp ?? []);
   const len = items.length;
 
-  // Render items 3 times so there is always a neighbour on each side of
-  // the centred card. Start the index in the middle copy so the user can
-  // navigate freely in either direction; after each transition we snap
-  // back to the middle copy without a visible jump.
   const tripled = [...items, ...items, ...items];
   const [index, setIndex] = useState(len);
   const [animate, setAnimate] = useState(true);
@@ -58,8 +50,6 @@ export default function RealizationsCarousel({
     setIndex((i) => i + d);
   }, []);
 
-  // Skok do konkretnego slajdu (pilsy) — zostajemy w bieżącej kopii listy,
-  // żeby wrap-around w handleTransitionEnd dalej działał.
   const goTo = useCallback(
     (target: number) => {
       setAnimate(true);
@@ -71,8 +61,6 @@ export default function RealizationsCarousel({
     [len],
   );
 
-  // Wrap-around: after transition ends, silently jump back into the
-  // middle copy so the carousel feels infinite.
   const handleTransitionEnd = () => {
     if (index >= 2 * len) {
       setAnimate(false);
@@ -83,7 +71,6 @@ export default function RealizationsCarousel({
     }
   };
 
-  // Re-enable transitions one frame after a silent jump.
   useEffect(() => {
     if (!animate) {
       const id = requestAnimationFrame(() => setAnimate(true));
@@ -100,7 +87,6 @@ export default function RealizationsCarousel({
     return () => window.removeEventListener("keydown", onKey);
   }, [go]);
 
-  // Touch swipe (mobile drag)
   const touchStartX = useRef<number | null>(null);
   const touchDeltaX = useRef<number>(0);
   const handleTouchStart = (e: React.TouchEvent) => {
@@ -174,9 +160,6 @@ export default function RealizationsCarousel({
           } as React.CSSProperties
         }
       >
-        {/* Track viewport — outer section already clips horizontally, so
-            we let this layer be overflow-visible vertically so card
-            shadows aren't sliced off at the top/bottom. */}
         <div
           className="relative h-[56vh] min-h-[420px] w-full md:h-[60vh] touch-pan-y"
           onTouchStart={handleTouchStart}
@@ -196,10 +179,6 @@ export default function RealizationsCarousel({
           >
             {tripled.map((item, i) => {
               const isActive = i === index;
-              // Kopie 1. i 3. służą tylko wizualnemu wrap-around — chowamy
-              // je przed czytnikami ekranu, żeby lista realizacji nie była
-              // czytana trzykrotnie (WCAG 1.3.1). Fokusowalna i klikalna
-              // z klawiatury jest środkowa kopia (WCAG 2.1.1).
               const isClone = i < len || i >= 2 * len;
               const handleClick = () => {
                 if (!isActive) {
@@ -222,7 +201,7 @@ export default function RealizationsCarousel({
                 },
               };
               const brand =
-                item.client && item.client !== "—" ? item.client : null;
+                item.client && item.client !== "-" ? item.client : null;
               const hasBadges =
                 !!item.config?.lockers || (item.tags && item.tags.length > 0);
 
@@ -435,9 +414,7 @@ export default function RealizationsCarousel({
           </div>
         </div>
 
-        {/* Controls + CTA below the track */}
         <div className="relative mx-auto mt-8 md:mt-14 flex w-full max-w-[1100px] flex-col items-center gap-5 px-6">
-          {/* Mobile-only carousel position dots — klikalne, skok do slajdu */}
           <div className="flex items-center md:hidden">
             {Array.from({ length: len }).map((_, i) => {
               const active = ((index % len) + len) % len === i;
@@ -465,6 +442,7 @@ export default function RealizationsCarousel({
 
           <div className="flex items-center gap-4 md:absolute md:right-6 md:top-1/2 md:-translate-y-1/2">
             <button
+              type="button"
               onClick={() => go(-1)}
               aria-label="Poprzednia"
               className="grid h-12 w-12 md:h-14 md:w-14 place-items-center rounded-full border border-[#0a2a2e]/20 text-[#0a2a2e]/80 transition hover:border-[#0a2a2e]/60 hover:text-[#0a2a2e]"
@@ -480,6 +458,7 @@ export default function RealizationsCarousel({
               </svg>
             </button>
             <button
+              type="button"
               onClick={() => go(1)}
               aria-label="Nastepna"
               className="grid h-12 w-12 md:h-14 md:w-14 place-items-center rounded-full bg-[#0a2a2e] text-white transition hover:bg-[#16404a]"
@@ -496,7 +475,6 @@ export default function RealizationsCarousel({
             </button>
           </div>
 
-          {/* CTA button — pełnoprawny przycisk pod strzałkami */}
           <Link
             href="/realizacje"
             className="inline-flex items-center gap-2 rounded-full bg-[#0a2a2e] px-6 py-3 text-xs font-semibold uppercase tracking-[0.18em] text-white no-underline transition hover:bg-[#16404a] md:bg-transparent md:text-[#3a5a60] md:px-0 md:py-0 md:font-medium md:hover:bg-transparent md:hover:text-[#0a2a2e]"

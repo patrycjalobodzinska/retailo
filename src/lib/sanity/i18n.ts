@@ -1,21 +1,3 @@
-/**
- * Resolve a localized field (`localizedString` / `localizedText`) to a plain
- * string, given the current language code and a default fallback.
- *
- * Storage shape (from Sanity):
- *   {
- *     translations: [
- *       { language: { code: "pl" }, value: "Tekst po polsku" },
- *       { language: { code: "en" }, value: "Text in English" },
- *     ]
- *   }
- *
- * Resolution order:
- *   1. exact match on `lang`
- *   2. fallback to `defaultLang`
- *   3. first non-empty value
- *   4. empty string
- */
 
 export type LocalizedField = {
   translations?: Array<{

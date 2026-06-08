@@ -9,24 +9,23 @@ const SIDE_TONE_BG = "rgba(212, 214, 216, 0.42)";
 const CENTER_TONE = "rgb(172, 170, 165)";
 const CENTER_TONE_BG = "rgba(172, 170, 165, 0.48)";
 
-// Fallback gdy w Sanity nie wprowadzono modeli (homePage.models puste).
 const FALLBACK_MODELS = [
   {
     img: "/model2_retailo.png",
     name: "PickUpWall M",
-    desc: "Standardowa konfiguracja dwujednostkowa do sklepow retail.",
+    desc: "Kompaktowa konfiguracja PickUpWall dla sklepow o duzym ruchu, zoptymalizowana pod paczki o roznych wymiarach.",
     featured: false,
   },
   {
     img: "/model3_retailo.png",
     name: "PickUpWall L",
-    desc: "Rozszerzona konfiguracja dla wysokich wolumenow zamowien.",
+    desc: "Standardowa konfiguracja PickUpWall dla sklepow o duzym ruchu, zoptymalizowana pod paczki o roznych wymiarach.",
     featured: true,
   },
   {
     img: "/model4_retailo.png",
     name: "PickUpWall XL",
-    desc: "Pelnowymiarowa sciana odbioru w przestrzeniach o duzym ruchu.",
+    desc: "Rozszerzona konfiguracja PickUpWall dla sklepow o duzym ruchu, zoptymalizowana pod paczki o roznych wymiarach.",
     featured: false,
   },
 ];
@@ -39,8 +38,6 @@ export default function ModelsSection({ data }: { data?: HomePage } = {}) {
   const headline =
     t(data?.modelsHeadline ?? null) || "Poznaj modele PickUpWall";
 
-  // Modele z Sanity (z tłumaczeniami); fallback do listy wbudowanej. Tony
-  // (tło karty / koło) wynikają z „featured”, nie z CMS.
   const sanityModels = (data?.models ?? [])
     .map((m) => ({
       img: m.image || "",
@@ -112,7 +109,6 @@ export default function ModelsSection({ data }: { data?: HomePage } = {}) {
           {headline}
         </h2>
 
-        {/* Desktop grid */}
         <div className="grid grid-cols-3 gap-7 items-center max-xl:gap-5 max-lg:hidden">
           {MODELS.map((m) => (
             <article
@@ -174,7 +170,6 @@ export default function ModelsSection({ data }: { data?: HomePage } = {}) {
           ))}
         </div>
 
-        {/* Mobile: horizontal snap carousel */}
         <div className="lg:hidden -mx-[6vw]">
           <div
             ref={scrollerRef}
@@ -227,7 +222,6 @@ export default function ModelsSection({ data }: { data?: HomePage } = {}) {
             ))}
           </div>
 
-          {/* Pagination dots — tight under cards, inside shadow zone */}
           <div className="flex justify-center gap-2 -mt-2 px-[6vw]">
             {MODELS.map((_, i) => (
               <button
