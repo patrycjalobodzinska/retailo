@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-const FORMSPREE_ENDPOINT = "https://formspree.io/f/xojzdpep";
+const FORMSPREE_ENDPOINT = "https://formspree.io/f/mojzwnbd";
 
 export default function ContactCtaForm() {
   const [status, setStatus] = useState<"idle" | "sending" | "ok" | "error">(

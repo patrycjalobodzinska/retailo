@@ -42,7 +42,7 @@ const COUNTRY_SCROLL_PROGRESS = 0.18;
 const COUNTRY_STAGGER_SEC = 0.12;
 const COUNTRY_ITEM_DURATION = 0.78;
 
-const FORMSPREE_ENDPOINT = "https://formspree.io/f/xojzdpep";
+const FORMSPREE_ENDPOINT = "https://formspree.io/f/mojzwnbd";
 
 export default function EuropeGlobeSection({
   data,
