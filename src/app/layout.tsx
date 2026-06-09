@@ -164,6 +164,16 @@ export default async function RootLayout({
             __html: `(function(){try{if(location.pathname.indexOf('/admin')===0)return;var p=JSON.parse(localStorage.getItem('retailo_cookie_consent_v1'));if(typeof (p&&p.analytics)==='boolean')return;}catch(e){}document.documentElement.setAttribute('data-cookie-pending','');})();`,
           }}
         />
+        {/* Google Consent Mode v2: gtag + domyślna zgoda USTAWIANE PRZED
+            załadowaniem gtag.js (tag wykrywalny przez Google). Domyślnie
+            analytics_storage = denied; granted tylko jeśli użytkownik już
+            zaakceptował (zapis w localStorage). Aktualizacja po kliknięciu
+            zgody robiona jest w CookieConsent przez gtag('consent','update'). */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}window.gtag=gtag;gtag('js',new Date());var __a='denied';try{var __p=JSON.parse(localStorage.getItem('retailo_cookie_consent_v1'));if(__p&&__p.analytics===true)__a='granted';}catch(e){}gtag('consent','default',{ad_storage:'denied',ad_user_data:'denied',ad_personalization:'denied',analytics_storage:__a,wait_for_update:500});`,
+          }}
+        />
       </head>
       <body className="font-[family-name:var(--font-roboto)]">
         <LanguageProvider languages={languages} defaultLang={defaultLang}>

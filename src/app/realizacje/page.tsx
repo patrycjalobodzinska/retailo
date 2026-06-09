@@ -119,7 +119,7 @@ export default async function RealizacjePage() {
               <p
                 className="m-0 uppercase tracking-[0.22em] font-semibold text-[#0086b0]"
                 style={{ fontSize: "clamp(0.7rem, 0.8vw, 0.8rem)" }}>
-                Realizacje · {REALIZATIONS.length} wdrozen
+                Realizacje
               </p>
             </div>
             <h1

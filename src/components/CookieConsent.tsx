@@ -2,7 +2,6 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import Script from "next/script";
 import { usePathname } from "next/navigation";
 import { GoogleAnalytics } from "@next/third-parties/google";
 import { useLang } from "@/lib/i18n/LanguageProvider";
@@ -174,9 +173,18 @@ export default function CookieConsent({
       setBannerOpen(false);
       setSettingsOpen(false);
       document.documentElement.removeAttribute("data-cookie-pending");
+      // Consent Mode v2: aktualizujemy zgodę na żywo (bez przeładowania).
+      const w = window as unknown as {
+        gtag?: (...args: unknown[]) => void;
+      };
+      w.gtag?.("consent", "update", {
+        ad_storage: "denied",
+        ad_user_data: "denied",
+        ad_personalization: "denied",
+        analytics_storage: analytics ? "granted" : "denied",
+      });
       if (hadAnalytics && !analytics) {
         clearGaCookies();
-        window.location.reload();
       }
     },
     [consent],
@@ -186,18 +194,10 @@ export default function CookieConsent({
 
   return (
     <>
-      {consent?.analytics && (
-        <>
-          <Script
-            id="ga-consent-mode"
-            strategy="afterInteractive"
-            dangerouslySetInnerHTML={{
-              __html: `window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('consent','default',{ad_storage:'denied',ad_user_data:'denied',ad_personalization:'denied',analytics_storage:'granted'});`,
-            }}
-          />
-          <GoogleAnalytics gaId={GA_ID} />
-        </>
-      )}
+      {/* Consent Mode v2: gtag.js ładuje się zawsze (tag wykrywalny przez
+          Google), ale faktyczne zbieranie zależy od domyślnej zgody ustawionej
+          w <head> (denied) i aktualizacji w decide(). */}
+      <GoogleAnalytics gaId={GA_ID} />
 
       {bannerOpen && (
         <>
