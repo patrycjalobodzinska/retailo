@@ -35,14 +35,18 @@ const SKY: maplibregl.SkySpecification = {
 interface EuropeGlobeInnerProps {
   lowPerf?: boolean;
   selectedIso?: string[];
+  onReady?: () => void;
 }
 
 export default function EuropeGlobeInner({
   lowPerf = false,
   selectedIso,
+  onReady,
 }: EuropeGlobeInnerProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const wrapperRef = useRef<HTMLDivElement>(null);
+  const onReadyRef = useRef(onReady);
+  onReadyRef.current = onReady;
   const isoKey = (selectedIso ?? []).join(",");
 
   useEffect(() => {
@@ -72,8 +76,20 @@ export default function EuropeGlobeInner({
       bearing: 0,
       interactive: false,
       attributionControl: false,
-      pixelRatio: lowPerf ? 1 : undefined,
+      // Na mobile (lowPerf) renderujemy w rozdzielczości ekranu z capem 2x -
+      // pixelRatio:1 dawał rozmyty globus na ekranach retina. Cap 2 trzyma
+      // ostrość, a nie obciąża GPU tak jak natywne 3x.
+      pixelRatio: lowPerf
+        ? Math.min(
+            typeof window !== "undefined" ? window.devicePixelRatio || 1 : 1,
+            2,
+          )
+        : undefined,
     });
+
+    // Pierwsze pełne wyrenderowanie (kafelki doczytane) - sygnał, że globus
+    // jest gotowy i można ukryć placeholder SVG (inaczej widać dwa globusy).
+    map.once("idle", () => onReadyRef.current?.());
 
     map.on("style.load", () => {
       map.setProjection({ type: "globe" });

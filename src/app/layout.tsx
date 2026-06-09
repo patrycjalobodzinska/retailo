@@ -112,6 +112,14 @@ export default async function RootLayout({
       suppressHydrationWarning
     >
       <head>
+        {/* Szybsze ładowanie globusa: wczesne nawiązanie połączenia z CDN
+            kafelków/stylu MapLibre (Carto) - oszczędza DNS + TLS handshake. */}
+        <link
+          rel="preconnect"
+          href="https://basemaps.cartocdn.com"
+          crossOrigin="anonymous"
+        />
+        <link rel="dns-prefetch" href="https://basemaps.cartocdn.com" />
         {/* Preload hero image - najważniejszy LCP element strony głównej */}
         <link
           rel="preload"

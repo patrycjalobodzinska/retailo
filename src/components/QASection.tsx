@@ -163,34 +163,20 @@ export default function QASection({ data }: { data?: QAData } = {}) {
   const [activeIdx, setActiveIdx] = useState(0);
 
   useEffect(() => {
-    const isMobile = window.matchMedia("(max-width: 1023px)").matches;
-    if (!isMobile) return;
     const scroller = scrollerRef.current;
     if (!scroller) return;
-    const cards = Array.from(scroller.children) as HTMLElement[];
-    if (cards.length === 0) return;
-
-    const ratios = new Array(cards.length).fill(0);
-    const observer = new IntersectionObserver(
-      (entries) => {
-        for (const entry of entries) {
-          const idx = cards.indexOf(entry.target as HTMLElement);
-          if (idx >= 0) ratios[idx] = entry.intersectionRatio;
-        }
-        let bestIdx = 0;
-        let best = -1;
-        for (let i = 0; i < ratios.length; i++) {
-          if (ratios[i] > best) {
-            best = ratios[i];
-            bestIdx = i;
-          }
-        }
-        setActiveIdx(bestIdx);
-      },
-      { root: scroller, threshold: [0, 0.25, 0.5, 0.75, 1] },
-    );
-    cards.forEach((c) => observer.observe(c));
-    return () => observer.disconnect();
+    const onScroll = () => {
+      const card = scroller.firstElementChild as HTMLElement | null;
+      if (!card) return;
+      const step = card.offsetWidth + 16;
+      if (step <= 0) return;
+      const count = scroller.children.length;
+      const idx = Math.round(scroller.scrollLeft / step);
+      setActiveIdx(Math.max(0, Math.min(idx, count - 1)));
+    };
+    scroller.addEventListener("scroll", onScroll, { passive: true });
+    onScroll();
+    return () => scroller.removeEventListener("scroll", onScroll);
   }, []);
 
   const scrollToCard = (i: number) => {
