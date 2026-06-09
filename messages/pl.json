@@ -1,53 +1,53 @@
 {
   "nav": {
-    "rozwiazanie": "Rozwiazanie",
+    "rozwiazanie": "Rozwiązanie",
     "realizacje": "Realizacje",
     "kontakt": "Kontakt",
-    "stronaGlowna": "Strona glowna",
+    "stronaGlowna": "Strona główna",
     "menu": "Menu",
-    "openMenu": "Otworz menu",
+    "openMenu": "Otwórz menu",
     "closeMenu": "Zamknij menu"
   },
   "hero": {
     "eyebrow": "Pick up · in · store",
-    "description": "Automatyczne, modulowe systemy odbioru przesylek typu pick-up in store dla sieci retailu. Projektujemy, produkujemy i wdrazamy rozwiazania dopasowane do specyfiki marki — od jednostki glownej z dotykowym ekranem po skalowalna konfiguracje skrytek i bezdotykowy odbior ponizej 15 sekund.",
+    "description": "Automatyczne, modułowe systemy odbioru przesyłek typu pick-up in store dla sieci retailu. Projektujemy, produkujemy i wdrażamy rozwiązania dopasowane do specyfiki marki - od jednostki głównej z dotykowym ekranem po skalowalną konfigurację skrytek i bezdotykowy odbiór poniżej 10 sekund.",
     "stats": {
       "czasOdbioru": "Czas odbioru",
-      "modulowy": "Modulowy",
+      "modulowy": "Modułowy",
       "systemSkrytek": "System skrytek",
       "api": "API",
       "integracja": "Integracja"
     },
     "zaufaliNam": "Zaufali nam",
-    "wdrazamyDla": "Wdrazamy dla najwiekszych marek.",
+    "wdrazamyDla": "Wdrażamy dla największych marek.",
     "sieciKosmetyczne": "Sieci kosmetyczne, fashion, elektronika.",
     "porozmawiajmy": "Porozmawiajmy",
     "zobaczRealizacje": "Zobacz realizacje"
   },
   "qa": {
-    "wdrozenieKrokPoKroku": "Wdrozenie krok po kroku"
+    "wdrozenieKrokPoKroku": "Wdrożenie krok po kroku"
   },
   "realizations": {
     "title": "Realizacje",
-    "wspolpracujemy": "Wspolpracujemy z",
-    "najwiekszymiMarkami": "najwiekszymi markami",
-    "subtitle": "PickUpWall wdrazany w salonach kosmetycznych, fashion i elektroniki.",
+    "wspolpracujemy": "Współpracujemy z",
+    "najwiekszymiMarkami": "największymi markami",
+    "subtitle": "PickUpWall wdrażany w salonach kosmetycznych, fashion i elektroniki.",
     "zobaczWszystkie": "Zobacz wszystkie realizacje",
     "skrytek": "skrytek",
     "tejStronyNieMa": "Tej strony tu nie ma."
   },
   "global": {
-    "wdrozeniaWEuropie": "Wdrozenia w calej Europie",
+    "wdrozeniaWEuropie": "Wdrożenia w całej Europie",
     "napiszDoNas": "Napisz do nas",
     "odezwiemySie": "Odezwiemy się w ciągu 24h.",
     "imieINazwisko": "Imię i nazwisko",
     "email": "E-mail",
     "wiadomosc": "Wiadomość...",
-    "wyslij": "Wyslij",
+    "wyslij": "Wyślij",
     "porozmawiajmy": "Porozmawiajmy"
   },
   "footer": {
-    "automatyczneSystemy": "Automatyczne systemy odbioru przesylek",
+    "automatyczneSystemy": "Automatyczne systemy odbioru przesyłek",
     "kontakt": "Kontakt",
     "adres": "Adres",
     "politykaPrywatnosci": "Polityka prywatnosci",
@@ -55,16 +55,16 @@
     "wszelkiePrawa": "Wszelkie prawa zastrzezone"
   },
   "contact": {
-    "wlasnyProjekt": "Wlasny projekt",
-    "planujesz": "Planujesz wdrozenie PickUpWall?",
-    "dostosujemy": "Dostosujemy format urzadzen, liczbe skrytek, obudowe i grafike pod potrzeby twojej marki i przestrzeni.",
+    "wlasnyProjekt": "Własny projekt",
+    "planujesz": "Planujesz wdrożenie PickUpWall?",
+    "dostosujemy": "Dostosujemy format urządzeń, liczbę skrytek, obudowę i grafikę pod potrzeby twojej marki i przestrzeni.",
     "wszystkiePola": "Wszystkie pola wymagane.",
     "firma": "Firma (opcjonalnie)",
-    "opiszTemat": "Opisz krotko temat rozmowy..."
+    "opiszTemat": "Opisz krótko temat rozmowy..."
   },
   "notFound": {
-    "blad": "Blad 404 · Strona nie znaleziona",
+    "blad": "Błąd 404 · Strona nie znaleziona",
     "title": "Tej strony tu nie ma.",
-    "description": "Strona, ktorej szukasz, mogla zostac przeniesiona, usunieta, albo adres jest po prostu niewlasciwy. Sprawdz link albo wroc na strone glowna."
+    "description": "Strona, której szukasz, mogła zostać przeniesiona, usunięta, albo adres jest po prostu niewłaściwy. Sprawdź link albo wróć na stronę główną."
   }
 }
