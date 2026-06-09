@@ -8,7 +8,7 @@ import { GoogleAnalytics } from "@next/third-parties/google";
 import { useLang } from "@/lib/i18n/LanguageProvider";
 import type { SiteSettings } from "@/lib/sanity/fetch";
 
-const GA_ID = "G-EXF68478GE";
+const GA_ID = "G-YHPVXVF8K6";
 const STORAGE_KEY = "retailo_cookie_consent_v1";
 export const OPEN_COOKIE_SETTINGS_EVENT = "retailo:open-cookie-settings";
 

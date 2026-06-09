@@ -143,7 +143,7 @@ export default function ContactCtaForm() {
             <button
               type="submit"
               disabled={status === "sending"}
-              className="mt-1 inline-flex items-center justify-center gap-2 rounded-full bg-[#0086b0] px-6 py-3 text-sm font-semibold uppercase tracking-[0.18em] text-white transition hover:opacity-90 disabled:opacity-60"
+              className="mt-1 inline-flex cursor-pointer items-center justify-center gap-2 rounded-full bg-[#0086b0] px-6 py-3 text-sm font-semibold uppercase tracking-[0.18em] text-white transition hover:opacity-90 disabled:cursor-default disabled:opacity-60"
             >
               {status === "sending" ? "Wysylanie..." : "Porozmawiajmy"}
               <svg

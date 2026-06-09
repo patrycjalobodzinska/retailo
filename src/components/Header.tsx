@@ -265,7 +265,7 @@ export default function Header({
               type="button"
               aria-label="Zamknij menu"
               onClick={() => setOpen(false)}
-              className="flex h-10 w-10 items-center justify-center rounded-full border border-[#0a2a2e]/10 bg-white/60 text-[#0a2a2e] transition active:scale-95"
+              className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-full border border-[#0a2a2e]/10 bg-white/60 text-[#0a2a2e] transition active:scale-95"
               style={{
                 backdropFilter: "blur(8px)",
                 WebkitBackdropFilter: "blur(8px)",

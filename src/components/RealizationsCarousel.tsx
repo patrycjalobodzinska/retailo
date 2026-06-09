@@ -445,7 +445,7 @@ export default function RealizationsCarousel({
               type="button"
               onClick={() => go(-1)}
               aria-label="Poprzednia"
-              className="grid h-12 w-12 md:h-14 md:w-14 place-items-center rounded-full border border-[#0a2a2e]/20 text-[#0a2a2e]/80 transition hover:border-[#0a2a2e]/60 hover:text-[#0a2a2e]"
+              className="grid h-12 w-12 md:h-14 md:w-14 cursor-pointer place-items-center rounded-full border border-[#0a2a2e]/20 text-[#0a2a2e]/80 transition hover:border-[#0a2a2e]/60 hover:text-[#0a2a2e]"
             >
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
                 <path
@@ -461,7 +461,7 @@ export default function RealizationsCarousel({
               type="button"
               onClick={() => go(1)}
               aria-label="Nastepna"
-              className="grid h-12 w-12 md:h-14 md:w-14 place-items-center rounded-full bg-[#0a2a2e] text-white transition hover:bg-[#16404a]"
+              className="grid h-12 w-12 md:h-14 md:w-14 cursor-pointer place-items-center rounded-full bg-[#0a2a2e] text-white transition hover:bg-[#16404a]"
             >
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
                 <path

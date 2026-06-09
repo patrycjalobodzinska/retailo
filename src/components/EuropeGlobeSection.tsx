@@ -373,7 +373,7 @@ export default function EuropeGlobeSection({
               <button
                 type="button"
                 onClick={() => setMobileCtaOpen(true)}
-                className="lg:hidden group flex w-full items-center gap-2 rounded-full border border-white/20 bg-black/80 p-1.5 pl-2 shadow-md transition hover:border-white/30 hover:bg-black/85"
+                className="lg:hidden group flex w-full cursor-pointer items-center gap-2 rounded-full border border-white/20 bg-black/80 p-1.5 pl-2 shadow-md transition hover:border-white/30 hover:bg-black/85"
               >
                 <span className="min-w-0 flex-1 rounded-full bg-white px-3.5 py-2 text-center text-sm font-semibold leading-snug tracking-tight text-gray-900">
                   {ctaToggleLabel}

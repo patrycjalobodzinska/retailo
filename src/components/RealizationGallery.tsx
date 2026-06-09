@@ -85,7 +85,7 @@ export default function RealizationGallery({
                 prev();
               }}
               aria-label="Poprzednie zdjęcie"
-              className="absolute left-3 md:left-6 flex h-12 w-12 items-center justify-center rounded-full border border-white/20 bg-white/10 text-white transition hover:bg-white/20">
+              className="absolute left-3 md:left-6 flex h-12 w-12 cursor-pointer items-center justify-center rounded-full border border-white/20 bg-white/10 text-white transition hover:bg-white/20">
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
                 <path
                   d="M15 5l-7 7 7 7"
@@ -113,7 +113,7 @@ export default function RealizationGallery({
                 next();
               }}
               aria-label="Następne zdjęcie"
-              className="absolute right-3 md:right-6 flex h-12 w-12 items-center justify-center rounded-full border border-white/20 bg-white/10 text-white transition hover:bg-white/20">
+              className="absolute right-3 md:right-6 flex h-12 w-12 cursor-pointer items-center justify-center rounded-full border border-white/20 bg-white/10 text-white transition hover:bg-white/20">
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
                 <path
                   d="M9 5l7 7-7 7"
