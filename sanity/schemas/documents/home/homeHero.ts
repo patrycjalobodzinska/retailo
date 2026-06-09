@@ -38,7 +38,7 @@ export const homeHero = defineType({
           fields: [
             defineField({
               name: "value",
-              title: "Wartość (np. <10 s, Modulowy, API)",
+              title: "Wartość (np. <10 s, Modułowy, API)",
               type: "localizedString",
               validation: (rule) => rule.required(),
             }),

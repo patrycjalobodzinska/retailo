@@ -70,9 +70,9 @@ export default function NotFound() {
           <p
             className="m-0 mb-9 max-w-[460px] font-light leading-relaxed text-[#3a3a3a]"
             style={{ fontSize: "clamp(1rem, 1.15vw, 1.13rem)" }}>
-            Strona, ktorej szukasz, mogla zostac przeniesiona, usunieta, albo
-            adres jest po prostu niewlasciwy. Sprawdz link albo wroc na strone
-            glowna.
+            Strona, której szukasz, mogła zostać przeniesiona, usunięta, albo
+            adres jest po prostu niewłaściwy. Sprawdź link albo wróć na stronę
+            główną.
           </p>
 
           <div className="flex items-center gap-3 max-lg:flex-wrap">
@@ -93,7 +93,7 @@ export default function NotFound() {
                   strokeLinejoin="round"
                 />
               </svg>
-              Strona glowna
+              Strona główna
             </Link>
             <Link
               href="/realizacje"
@@ -139,7 +139,7 @@ export default function NotFound() {
                 <span
                   className="font-semibold tracking-tight text-[#0a2a2e]"
                   style={{ fontSize: "0.95rem" }}>
-                  Zobacz wdrozenia
+                  Zobacz wdrożenia
                 </span>
               </span>
               <span aria-hidden className="text-[#0a2a2e]/55">

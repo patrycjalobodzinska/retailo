@@ -109,7 +109,7 @@ export default async function RealizacjePage() {
                 textTransform: "uppercase",
               }}>
               <span aria-hidden="true">&larr;</span>
-              Strona glowna
+              Strona główna
             </Link>
             <div className="flex items-center gap-3 mb-3">
               <span
@@ -137,7 +137,7 @@ export default async function RealizacjePage() {
                 fontSize: "clamp(0.95rem, 1.1vw, 1.1rem)",
                 maxWidth: "640px",
               }}>
-              Zobacz nasze wdrozenia dla{" "}
+              Zobacz nasze wdrożenia dla{" "}
               <strong className="text-[#0a2a2e]">Empik</strong>,{" "}
               <strong className="text-[#0a2a2e]">Sephora</strong> i innych marek
               premium - od salonu flagowego po biurowiec.

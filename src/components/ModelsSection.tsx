@@ -13,19 +13,19 @@ const FALLBACK_MODELS = [
   {
     img: "/model2_retailo.png",
     name: "PickUpWall M",
-    desc: "Kompaktowa konfiguracja PickUpWall dla sklepow o duzym ruchu, zoptymalizowana pod paczki o roznych wymiarach.",
+    desc: "Kompaktowa konfiguracja PickUpWall dla sklepów o dużym ruchu, zoptymalizowana pod paczki o różnych wymiarach.",
     featured: false,
   },
   {
     img: "/model3_retailo.png",
     name: "PickUpWall L",
-    desc: "Standardowa konfiguracja PickUpWall dla sklepow o duzym ruchu, zoptymalizowana pod paczki o roznych wymiarach.",
+    desc: "Standardowa konfiguracja PickUpWall dla sklepów o dużym ruchu, zoptymalizowana pod paczki o różnych wymiarach.",
     featured: true,
   },
   {
     img: "/model4_retailo.png",
     name: "PickUpWall XL",
-    desc: "Rozszerzona konfiguracja PickUpWall dla sklepow o duzym ruchu, zoptymalizowana pod paczki o roznych wymiarach.",
+    desc: "Rozszerzona konfiguracja PickUpWall dla sklepów o dużym ruchu, zoptymalizowana pod paczki o różnych wymiarach.",
     featured: false,
   },
 ];

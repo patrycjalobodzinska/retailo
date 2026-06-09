@@ -33,7 +33,7 @@ function TileIcon({
     "aria-hidden": true,
   };
   switch (kind) {
-    case "Modularnosc":
+    case "Modularność":
       return (
         <svg {...common}>
           <rect x="3" y="3" width="7" height="7" rx="1" />
@@ -42,7 +42,7 @@ function TileIcon({
           <rect x="14" y="14" width="7" height="7" rx="1" />
         </svg>
       );
-    case "Skalowalnosc":
+    case "Skalowalność":
       return (
         <svg {...common}>
           <path d="M4 14v6h6" />
@@ -59,21 +59,21 @@ function TileIcon({
           <circle cx="16.5" cy="10.5" r="1" fill={stroke} stroke="none" />
         </svg>
       );
-    case "Uniwersalnosc":
+    case "Uniwersalność":
       return (
         <svg {...common}>
           <circle cx="12" cy="12" r="9" />
           <path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18" />
         </svg>
       );
-    case "Bezpieczenstwo":
+    case "Bezpieczeństwo":
       return (
         <svg {...common}>
           <path d="M12 3l8 3v5c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6l8-3z" />
           <path d="M9 12l2 2 4-4" />
         </svg>
       );
-    case "Wydajnosc":
+    case "Wydajność":
       return (
         <svg {...common}>
           <path d="M13 2L4 14h7l-1 8 9-12h-7l1-8z" />
@@ -86,37 +86,37 @@ function TileIcon({
 
 const SMALL_TILES = [
   {
-    kind: "Modularnosc",
+    kind: "Modularność",
     seedIdx: 0,
-    title: "Modularnosc",
-    desc: "Wielkosc i liczba skrytek dostosowana do potrzeb i specyfiki branzy klienta.",
+    title: "Modularność",
+    desc: "Wielkość i liczba skrytek dostosowana do potrzeb i specyfiki branży klienta.",
     accent: "#0086b0",
   },
   {
-    kind: "Skalowalnosc",
+    kind: "Skalowalność",
     seedIdx: 1,
-    title: "Skalowalnosc",
-    desc: "Mozliwosc instalowania dodatkowych modulow.",
+    title: "Skalowalność",
+    desc: "Możliwość instalowania dodatkowych modułów.",
     accent: "#34d399",
   },
   {
-    kind: "Bezpieczenstwo",
+    kind: "Bezpieczeństwo",
     seedIdx: 4,
-    title: "Bezpieczenstwo",
-    desc: "Bezdotykowa, bezkontaktowa obsluga zwieksza bezpieczenstwo klientow i sluzb sprzedazy.",
+    title: "Bezpieczeństwo",
+    desc: "Bezdotykowa, bezkontaktowa obsługa zwiększa bezpieczeństwo klientów i służb sprzedaży.",
     accent: "#f59e0b",
   },
   {
-    kind: "Uniwersalnosc",
+    kind: "Uniwersalność",
     seedIdx: 3,
-    title: "Uniwersalnosc",
-    desc: "Wymiary modulow w zgodzie ze standardami zabudow meblowych w retailu.",
+    title: "Uniwersalność",
+    desc: "Wymiary modułów w zgodzie ze standardami zabudów meblowych w retailu.",
     accent: "#a855f7",
   },
 ];
 
 const COLOR_SWATCHES = [
-  { color: "#0f0f0f", label: "Czern" },
+  { color: "#0f0f0f", label: "Czerń" },
   { color: "#f5f3ee", label: "Biel" },
   { color: "#0086b0", label: "Cyjan" },
   { color: "#d4c5a8", label: "Piasek" },
@@ -126,11 +126,11 @@ const BG_COLOR = "#fafaf8";
 
 export default function QASection({ data }: { data?: QAData } = {}) {
   const { t } = useLang();
-  const eyebrow = t(data?.qaEyebrow ?? null) || "Nasze rozwiazanie";
+  const eyebrow = t(data?.qaEyebrow ?? null) || "Nasze rozwiązanie";
   const headline = t(data?.qaHeadline ?? null) || "PickUpWall.";
   const subtitle =
     t(data?.qaSubtitle ?? null) ||
-    'PickUpWall to rozwiazanie do zamowien typu "pick up in store".';
+    'PickUpWall to rozwiązanie do zamówień typu "pick up in store".';
 
   const tileText = (seedIdx: number, fallbackTitle: string, fallbackDesc: string) => {
     const d = data?.qaTiles?.[seedIdx];
@@ -149,10 +149,10 @@ export default function QASection({ data }: { data?: QAData } = {}) {
     "Personalizacja",
     "Dedykowane grafiki i kolor obudowy. Opcjonalny ekran Digital Signage.",
   );
-  const wydajnosc = tileText(
+  const wydajność = tileText(
     5,
-    "Wydajnosc",
-    "Odbior ponizej 10 sekund, krotsze kolejki i zwolnienie przestrzeni magazynowej zaplecza.",
+    "Wydajność",
+    "Odbiór poniżej 10 sekund, krótsze kolejki i zwolnienie przestrzeni magazynowej zaplecza.",
   );
 
   const sectionRef = useRef<HTMLElement>(null);
@@ -199,9 +199,9 @@ export default function QASection({ data }: { data?: QAData } = {}) {
       accent: "#0086b0",
     },
     {
-      kind: "Wydajnosc",
-      title: wydajnosc.title,
-      desc: wydajnosc.desc,
+      kind: "Wydajność",
+      title: wydajność.title,
+      desc: wydajność.desc,
       accent: "#0f0f0f",
     },
   ];
@@ -363,7 +363,7 @@ export default function QASection({ data }: { data?: QAData } = {}) {
                   height: 44,
                   background: "rgba(15,15,15,0.05)",
                 }}>
-                <TileIcon kind="Wydajnosc" size={20} />
+                <TileIcon kind="Wydajność" size={20} />
               </div>
               <div className="flex items-baseline gap-2 mb-3">
                 <span
@@ -379,12 +379,12 @@ export default function QASection({ data }: { data?: QAData } = {}) {
                   lineHeight: 1.1,
                   letterSpacing: "-0.015em",
                 }}>
-                {wydajnosc.title}.
+                {wydajność.title}.
               </h3>
               <p
                 className="m-0 text-[#5a5a5a] leading-relaxed font-light"
                 style={{ fontSize: "0.88rem" }}>
-                {wydajnosc.desc}
+                {wydajność.desc}
               </p>
             </div>
           </article>
@@ -636,7 +636,7 @@ export default function QASection({ data }: { data?: QAData } = {}) {
                   height: 48,
                   background: "rgba(15,15,15,0.05)",
                 }}>
-                <TileIcon kind="Wydajnosc" size={22} />
+                <TileIcon kind="Wydajność" size={22} />
               </div>
               <div className="flex items-baseline gap-2 mb-4">
                 <span
@@ -655,12 +655,12 @@ export default function QASection({ data }: { data?: QAData } = {}) {
                   lineHeight: 1.1,
                   letterSpacing: "-0.015em",
                 }}>
-                {wydajnosc.title}.
+                {wydajność.title}.
               </h3>
               <p
                 className="m-0 text-[#5a5a5a] leading-relaxed font-light max-w-[360px]"
                 style={{ fontSize: "0.95rem" }}>
-                {wydajnosc.desc}
+                {wydajność.desc}
               </p>
             </div>
           </article>

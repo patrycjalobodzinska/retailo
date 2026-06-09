@@ -11,37 +11,37 @@ gsap.registerPlugin(ScrollTrigger);
 const STEPS_FALLBACK = [
   [
     "Integracja",
-    "Gwarantujemy elastycznosc w integracji - w sposobie komunikacji, jak i zakresie przesylanych danych.",
+    "Gwarantujemy elastyczność w integracji - w sposobie komunikacji, jak i zakresie przesyłanych danych.",
   ],
   [
     "RODO",
-    "Zagwarantujemy zgodnosc z zasadami przetwarzania danych osobowych.",
+    "Zagwarantujemy zgodność z zasadami przetwarzania danych osobowych.",
   ],
   [
     "Instalacja",
-    "Instalacja i konfiguracja systemu z klientem, upewnienie sie czy zakres jest adekwatny do oczekiwan.",
+    "Instalacja i konfiguracja systemu z klientem, upewnienie się czy zakres jest adekwatny do oczekiwań.",
   ],
   [
     "Wsparcie",
-    "Dedykowane pakiety serwisowe i rozwoj systemu zapewniajace trwalosc i stabilnosc rozwiazania.",
+    "Dedykowane pakiety serwisowe i rozwój systemu zapewniające trwałość i stabilność rozwiązania.",
   ],
 ] as const;
 
 const HARDWARE_FALLBACK = [
   ["Liczba skrytek", "od 3 do 320"],
   ["Ekran", 'od 10" do 21.5"'],
-  ["Kolory urzadzen", "dowolne z palety RAL"],
-  ["Rozwiazania", "indoor i outdoor"],
+  ["Kolory urządzeń", "dowolne z palety RAL"],
+  ["Rozwiązania", "indoor i outdoor"],
 ] as const;
 
 export default function ProductShowcase({
   data,
 }: { data?: HomePage } = {}) {
   const { t, lang } = useLang();
-  const eyebrow = t(data?.productEyebrow ?? null) || "Nasze rozwiazanie";
+  const eyebrow = t(data?.productEyebrow ?? null) || "Nasze rozwiązanie";
   const headline = t(data?.productHeadline ?? null) || "PickUpWall";
   const stepsLabel =
-    t(data?.productStepsLabel ?? null) || "Wdrozenie krok po kroku";
+    t(data?.productStepsLabel ?? null) || "Wdrożenie krok po kroku";
   const brandLabel = t(data?.productBrandLabel ?? null) || "retailo.";
   const specsHeadline =
     t(data?.productSpecsHeadline ?? null) || "Specyfikacja techniczna";

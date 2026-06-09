@@ -54,7 +54,7 @@ export default function EuropeGlobeSection({
   webGlobeOnMobile?: boolean;
 } = {}) {
   const { t } = useLang();
-  const eyebrow = t(data?.globalEyebrow ?? null) || "Wdrozenia w calej Europie";
+  const eyebrow = t(data?.globalEyebrow ?? null) || "Wdrożenia w całej Europie";
   const headline = t(data?.globalHeadline ?? null) || "GLOBAL";
   const intro = t(data?.globalIntro ?? null) || "";
   const ctaToggleLabel =
@@ -462,7 +462,7 @@ export default function EuropeGlobeSection({
                   disabled={ctaStatus === "sending"}
                   className="mt-0.5 self-end flex items-center justify-center gap-1.5 rounded-full bg-white px-5 py-2 text-sm font-semibold text-gray-900 transition hover:bg-white/95 disabled:opacity-60"
                 >
-                  {ctaStatus === "sending" ? "Wysylanie..." : ctaSubmit}
+                  {ctaStatus === "sending" ? "Wysyłanie..." : ctaSubmit}
                   <svg
                     width="12"
                     height="12"
@@ -481,12 +481,12 @@ export default function EuropeGlobeSection({
                 </button>
                 {ctaStatus === "ok" && (
                   <p role="status" className="m-0 text-sm font-medium text-[#59bfc8]">
-                    Dziekujemy! Wiadomosc zostala wyslana.
+                    Dziękujemy! Wiadomość została wysłana.
                   </p>
                 )}
                 {ctaStatus === "error" && (
                   <p role="alert" className="m-0 text-sm font-medium text-red-300">
-                    Cos poszlo nie tak. Sprobuj ponownie.
+                    Coś poszło nie tak. Spróbuj ponownie.
                   </p>
                 )}
               </form>

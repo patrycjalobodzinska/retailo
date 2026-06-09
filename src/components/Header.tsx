@@ -13,7 +13,7 @@ type NavItem = {
 };
 
 const NAV_ITEMS_FALLBACK: NavItem[] = [
-  { label: "Rozwiazanie", target: "rozwiazanie", vhOffset: 0.15 },
+  { label: "Rozwiązanie", target: "rozwiazanie", vhOffset: 0.15 },
   { label: "Realizacje", target: "realizacje", vhOffset: 0.05 },
   { label: "Kontakt", target: "kontakt" },
 ];
@@ -116,7 +116,7 @@ export default function Header({
           className={`inline-flex items-center no-underline transition-opacity duration-200 ${
             open ? "pointer-events-none opacity-0" : "opacity-100"
           }`}
-          aria-label="retailo. - strona glowna"
+          aria-label="retailo. - strona główna"
           style={{
             background: onDark
               ? "rgba(255,255,255,0.85)"
@@ -177,7 +177,7 @@ export default function Header({
 
         <button
           type="button"
-          aria-label={open ? "Zamknij menu" : "Otworz menu"}
+          aria-label={open ? "Zamknij menu" : "Otwórz menu"}
           onClick={() => setOpen((o) => !o)}
           className={`md:hidden flex flex-col gap-1.5 cursor-pointer w-12 h-12 justify-center items-center transition-opacity duration-200 ${
             open ? "pointer-events-none opacity-0" : "opacity-100"

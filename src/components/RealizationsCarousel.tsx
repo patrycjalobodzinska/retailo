@@ -30,10 +30,10 @@ export default function RealizationsCarousel({
   const eyebrow = t(data?.realizationsEyebrow ?? null) || "Realizacje";
   const headlinePrefix =
     t(data?.realizationsHeadline ?? null) ||
-    "Wspolpracujemy z najwiekszymi markami.";
+    "Współpracujemy z największymi markami.";
   const intro =
     t(data?.realizationsIntro ?? null) ||
-    "PickUpWall wdrazany w salonach kosmetycznych, fashion i elektroniki.";
+    "PickUpWall wdrażany w salonach kosmetycznych, fashion i elektroniki.";
   const ctaLabel =
     t(data?.realizationsCtaLabel ?? null) || "Zobacz wszystkie realizacje";
   const items = excludeSlug
@@ -460,7 +460,7 @@ export default function RealizationsCarousel({
             <button
               type="button"
               onClick={() => go(1)}
-              aria-label="Nastepna"
+              aria-label="Następna"
               className="grid h-12 w-12 md:h-14 md:w-14 cursor-pointer place-items-center rounded-full bg-[#0a2a2e] text-white transition hover:bg-[#16404a]"
             >
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none">

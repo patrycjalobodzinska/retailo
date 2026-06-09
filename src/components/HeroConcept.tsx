@@ -22,11 +22,11 @@ export default function HeroConcept({ data }: { data?: HeroData } = {}) {
   const subtitle = t(data?.heroSubtitle ?? null) || "PickUpWall";
   const description =
     t(data?.heroDescription ?? null) ||
-    "Automatyczne, modulowe systemy odbioru przesylek typu pick-up in store dla sieci retailu. Projektujemy, produkujemy i wdrazamy rozwiazania dopasowane do specyfiki marki - od jednostki glownej z dotykowym ekranem po skalowalna konfiguracje skrytek i bezdotykowy odbior ponizej 10 sekund.";
+    "Automatyczne, modułowe systemy odbioru przesyłek typu pick-up in store dla sieci retailu. Projektujemy, produkujemy i wdrażamy rozwiązania dopasowane do specyfiki marki - od jednostki głównej z dotykowym ekranem po skalowalną konfigurację skrytek i bezdotykowy odbiór poniżej 10 sekund.";
   const installEyebrow =
     t(data?.heroInstallEyebrow ?? null) || "Zaufali nam";
   const installTitle =
-    t(data?.heroInstallTitle ?? null) || "Wdrazamy dla najwiekszych marek.";
+    t(data?.heroInstallTitle ?? null) || "Wdrażamy dla największych marek.";
   const installSubtitle =
     t(data?.heroInstallSubtitle ?? null) ||
     "Sieci kosmetyczne, fashion, elektronika.";
@@ -39,7 +39,7 @@ export default function HeroConcept({ data }: { data?: HeroData } = {}) {
     },
     {
       cls: "top-[44vh] right-[4vw]",
-      fallbackValue: "Modulowy",
+      fallbackValue: "Modułowy",
       fallbackLabel: "System skrytek",
     },
     {
@@ -333,7 +333,7 @@ export default function HeroConcept({ data }: { data?: HeroData } = {}) {
           style={{ background: "rgba(240,239,235,0.7)" }}>
           <img
             src={data?.heroInstallImage || "/sephora-pickupwall.jpeg"}
-            alt="Wdrozenie PickUpWall"
+            alt="Wdrożenie PickUpWall"
             className="block h-full w-full object-cover"
           />
         </div>

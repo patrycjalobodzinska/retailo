@@ -68,7 +68,7 @@ export default async function RealizacjaDetailPage({ params }: PageProps) {
 
   const META_ROWS: Array<[string, string]> = [
     ["Lokalizacja", r.location],
-    ["Rok wdrozenia", r.year ? String(r.year) : "-"],
+    ["Rok wdrożenia", r.year ? String(r.year) : "-"],
     ["Liczba skrytek", config?.lockers ? String(config.lockers) : "-"],
     ...(r.specs ?? []).map((s) => [s.label, s.value] as [string, string]),
   ];
@@ -189,7 +189,7 @@ export default async function RealizacjaDetailPage({ params }: PageProps) {
                 <Link
                   href="/#kontakt"
                   className="inline-flex items-center gap-2 rounded-full bg-[#0a2a2e] px-5 py-2.5 text-sm font-semibold text-white no-underline transition hover:bg-[#0086b0]">
-                  Porozmawiajmy o podobnym wdrozeniu
+                  Porozmawiajmy o podobnym wdrożeniu
                   <span aria-hidden="true">&rarr;</span>
                 </Link>
                 <Link
@@ -224,7 +224,7 @@ export default async function RealizacjaDetailPage({ params }: PageProps) {
               <p
                 className="m-0 mb-3 uppercase tracking-[0.22em] font-semibold text-[#0086b0]"
                 style={{ fontSize: "0.85rem" }}>
-                Dane wdrozenia
+                Dane wdrożenia
               </p>
               <dl className="m-0 grid grid-cols-2 gap-x-8 gap-y-5 max-w-[560px]">
                 {META_ROWS.map(([label, value]) => (
@@ -299,7 +299,7 @@ export default async function RealizacjaDetailPage({ params }: PageProps) {
                   <p
                     className="m-0 mb-6 uppercase tracking-[0.18em] font-semibold text-[#0086b0]"
                     style={{ fontSize: "clamp(1rem, 1.5vw, 1.35rem)" }}>
-                    Konfiguracja wdrozenia
+                    Konfiguracja wdrożenia
                   </p>
                   <div className="flex flex-col lg:flex-row lg:items-start lg:justify-center gap-8 lg:gap-14">
                     <div className="flex flex-col gap-5 lg:w-fit lg:max-w-full lg:shrink-0">
@@ -322,7 +322,7 @@ export default async function RealizacjaDetailPage({ params }: PageProps) {
                         <p
                           className="m-0 mb-5 uppercase tracking-[0.22em] font-semibold text-[#0086b0]"
                           style={{ fontSize: "0.85rem" }}>
-                          Dane wdrozenia
+                          Dane wdrożenia
                         </p>
                         <dl className="m-0 grid grid-cols-2 gap-x-8 gap-y-4">
                           {META_ROWS.map(([label, value]) => (
@@ -355,7 +355,7 @@ export default async function RealizacjaDetailPage({ params }: PageProps) {
                   <p
                     className="m-0 mb-6 uppercase tracking-[0.18em] font-semibold text-[#0086b0]"
                     style={{ fontSize: "clamp(1rem, 1.5vw, 1.35rem)" }}>
-                    Konfiguracja wdrozenia
+                    Konfiguracja wdrożenia
                   </p>
                   <div className="flex flex-col lg:flex-row lg:items-start lg:justify-center gap-8 lg:gap-14">
                     <div className="rounded-2xl bg-white/70 backdrop-blur-sm p-6 md:p-8 border border-[#0a2a2e]/10 lg:w-fit lg:max-w-full lg:shrink-0 max-lg:-mx-[6vw] max-lg:rounded-none max-lg:border-x-0 max-lg:px-3 max-lg:py-5">
@@ -461,7 +461,7 @@ export default async function RealizacjaDetailPage({ params }: PageProps) {
                   lineHeight: 1.1,
                   letterSpacing: "-0.01em",
                 }}>
-                Zdjecia z wdrozenia.
+                Zdjęcia z wdrożenia.
               </h2>
             </div>
             <RealizationGallery images={r.gallery} title={r.title} />
@@ -473,7 +473,7 @@ export default async function RealizacjaDetailPage({ params }: PageProps) {
             <p
               className="m-0 mb-3 uppercase tracking-[0.22em] font-semibold text-[#0086b0]"
               style={{ fontSize: "0.72rem" }}>
-              Zobacz tez
+              Zobacz też
             </p>
             <h2
               className="m-0 font-bold tracking-tight text-[#0a2a2e]"

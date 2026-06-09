@@ -110,7 +110,7 @@ export const homeProduct = defineType({
     }),
     defineField({
       name: "productStepsLabel",
-      title: "Phase 1 - etykieta listy kroków (Wdrozenie krok po kroku)",
+      title: "Phase 1 - etykieta listy kroków (Wdrożenie krok po kroku)",
       type: "localizedString",
     }),
     defineField({

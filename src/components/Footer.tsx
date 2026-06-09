@@ -15,7 +15,7 @@ export default function Footer() {
               alt="retailo."
               style={{ height: 26, width: "auto", display: "block", marginBottom: 10 }}
             />
-            <p className="text-white/50 text-sm m-0">Automatyczne systemy odbioru przesylek</p>
+            <p className="text-white/50 text-sm m-0">Automatyczne systemy odbioru przesyłek</p>
           </div>
           <div className="flex flex-wrap gap-x-12 gap-y-6">
             <div>
@@ -39,9 +39,9 @@ export default function Footer() {
           </div>
         </div>
         <div className="flex items-center justify-between gap-x-6 gap-y-2 px-[5vw] py-4 border-t border-white/5 max-md:flex-col max-md:items-start">
-          <p className="text-white/60 text-xs m-0">&copy; 2026 retailo. Wszelkie prawa zastrzezone.</p>
+          <p className="text-white/60 text-xs m-0">&copy; 2026 retailo. Wszelkie prawa zastrzeżone.</p>
           <div className="flex flex-wrap gap-x-6 gap-y-2">
-            <Link href="/polityka-prywatnosci" className="text-white/60 text-xs no-underline hover:text-white/90 transition-colors">Polityka prywatnosci</Link>
+            <Link href="/polityka-prywatnosci" className="text-white/60 text-xs no-underline hover:text-white/90 transition-colors">Polityka prywatności</Link>
             <CookieSettingsLink className="cursor-pointer border-0 bg-transparent p-0 text-white/60 text-xs hover:text-white/90 transition-colors" />
           </div>
         </div>

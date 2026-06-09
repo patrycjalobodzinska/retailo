@@ -54,7 +54,7 @@ export default function ContactCtaForm() {
             className="m-0 mb-3 uppercase tracking-[0.22em] font-semibold text-[#0086b0]"
             style={{ fontSize: "0.72rem" }}
           >
-            Wlasny projekt
+            Własny projekt
           </p>
           <h2
             className="m-0 font-semibold tracking-tight text-[#0a2a2e]"
@@ -64,13 +64,13 @@ export default function ContactCtaForm() {
               letterSpacing: "-0.02em",
             }}
           >
-            Planujesz wdrozenie PickUpWall?
+            Planujesz wdrożenie PickUpWall?
           </h2>
           <p
             className="m-0 mt-4 text-[#3a5a60] leading-relaxed"
             style={{ fontSize: "1rem", maxWidth: "480px" }}
           >
-            Dostosujemy format urzadzen, liczbe skrytek, obudowe i grafike pod
+            Dostosujemy format urządzeń, liczbę skrytek, obudowę i grafikę pod
             potrzeby twojej marki i przestrzeni.
           </p>
           <ul className="m-0 mt-6 flex list-none flex-col gap-2 p-0 text-sm text-[#3a5a60]">
@@ -88,7 +88,7 @@ export default function ContactCtaForm() {
             </li>
             <li className="flex items-center gap-2">
               <span className="block h-1 w-4 bg-[#0086b0]" />
-              Odezwiemy sie w ciagu 24h
+              Odezwiemy się w ciągu 24h
             </li>
           </ul>
         </div>
@@ -111,8 +111,8 @@ export default function ContactCtaForm() {
                 name="name"
                 type="text"
                 autoComplete="name"
-                aria-label="Imie i nazwisko"
-                placeholder="Imie i nazwisko"
+                aria-label="Imię i nazwisko"
+                placeholder="Imię i nazwisko"
                 className="rounded-lg border border-[#0a2a2e]/15 bg-white px-3 py-2 text-sm text-[#0a2a2e] placeholder:text-[#0a2a2e]/40 outline-none ring-[#0086b0]/30 transition focus:border-[#0086b0]/60 focus:ring-2"
               />
               <input
@@ -136,8 +136,8 @@ export default function ContactCtaForm() {
             <textarea
               name="message"
               rows={3}
-              aria-label="Opisz krotko temat rozmowy..."
-              placeholder="Opisz krotko temat rozmowy..."
+              aria-label="Opisz krótko temat rozmowy..."
+              placeholder="Opisz krótko temat rozmowy..."
               className="resize-none rounded-lg border border-[#0a2a2e]/15 bg-white px-3 py-2 text-sm text-[#0a2a2e] placeholder:text-[#0a2a2e]/40 outline-none ring-[#0086b0]/30 transition focus:border-[#0086b0]/60 focus:ring-2"
             />
             <button
@@ -145,7 +145,7 @@ export default function ContactCtaForm() {
               disabled={status === "sending"}
               className="mt-1 inline-flex cursor-pointer items-center justify-center gap-2 rounded-full bg-[#0086b0] px-6 py-3 text-sm font-semibold uppercase tracking-[0.18em] text-white transition hover:opacity-90 disabled:cursor-default disabled:opacity-60"
             >
-              {status === "sending" ? "Wysylanie..." : "Porozmawiajmy"}
+              {status === "sending" ? "Wysyłanie..." : "Porozmawiajmy"}
               <svg
                 width="14"
                 height="14"
@@ -167,12 +167,12 @@ export default function ContactCtaForm() {
                 role="status"
                 className="m-0 text-sm font-medium text-[#0086b0]"
               >
-                Dziekujemy! Wiadomosc zostala wyslana.
+                Dziękujemy! Wiadomość została wysłana.
               </p>
             )}
             {status === "error" && (
               <p role="alert" className="m-0 text-sm font-medium text-red-600">
-                Cos poszlo nie tak. Sprobuj ponownie lub napisz na kontakt@retailo.pl.
+                Coś poszło nie tak. Spróbuj ponownie lub napisz na kontakt@retailo.pl.
               </p>
             )}
           </div>
