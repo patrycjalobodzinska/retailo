@@ -91,10 +91,6 @@ export const HOME_PAGE_QUERY = /* groq */ `{
     },
     productBrandLabel ${localized},
     productBrandName ${localized},
-    productSpecs[]{
-      label ${localized},
-      value ${localized}
-    },
     productBenefitsHeadline ${localized},
     productBenefits[]{
       title ${localized},
@@ -102,6 +98,9 @@ export const HOME_PAGE_QUERY = /* groq */ `{
     },
     productStepsLabel ${localized},
     productSpecsHeadline ${localized},
+    productPersonalizationKicker ${localized},
+    productPersonalizationHeadline ${localized},
+    productPersonalizationText ${localized},
     productHardwareLabel ${localized},
     productHardwareRows[]{
       label ${localized},

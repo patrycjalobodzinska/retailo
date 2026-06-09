@@ -71,39 +71,6 @@ export const homeProduct = defineType({
       type: "localizedString",
     }),
     defineField({
-      name: "productSpecs",
-      title: "Specyfikacja (Typ, Skrytki, Ekran, Odbiór, Integracja, Serwis)",
-      type: "array",
-      of: [
-        {
-          type: "object",
-          name: "spec",
-          fields: [
-            defineField({
-              name: "label",
-              type: "localizedString",
-              title: "Etykieta",
-              validation: (rule) => rule.required(),
-            }),
-            defineField({
-              name: "value",
-              type: "localizedString",
-              title: "Wartość",
-              validation: (rule) => rule.required(),
-            }),
-          ],
-          preview: {
-            select: { items: "label.translations" },
-            prepare: ({ items }) => {
-              const list = (items as { value?: string }[] | undefined) ?? [];
-              const first = list.find((i) => i?.value)?.value;
-              return { title: first ?? "(spec)" };
-            },
-          },
-        },
-      ],
-    }),
-    defineField({
       name: "productBenefitsHeadline",
       title: "Phase 2 - nagłówek prawej kolumny (Korzyści)",
       type: "localizedString",
@@ -150,6 +117,21 @@ export const homeProduct = defineType({
       name: "productSpecsHeadline",
       title: "Phase 2 - nagłówek (Specyfikacja techniczna)",
       type: "localizedString",
+    }),
+    defineField({
+      name: "productPersonalizationKicker",
+      title: "Personalizacja - etykieta (np. Personalizacja)",
+      type: "localizedString",
+    }),
+    defineField({
+      name: "productPersonalizationHeadline",
+      title: "Personalizacja - nagłówek (np. Każdy PickUpWall budujemy pod Ciebie.)",
+      type: "localizedString",
+    }),
+    defineField({
+      name: "productPersonalizationText",
+      title: "Personalizacja - opis pod nagłówkiem",
+      type: "localizedText",
     }),
     defineField({
       name: "productHardwareLabel",

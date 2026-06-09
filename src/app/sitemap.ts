@@ -3,7 +3,7 @@ import { getRealizationsList } from "@/lib/sanity/fetch";
 
 const BASE_URL = "https://retailo.pl";
 
-export const revalidate = 3600;
+export const dynamic = "force-static";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   let realizations: Awaited<ReturnType<typeof getRealizationsList>> = [];

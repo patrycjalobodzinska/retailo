@@ -128,11 +128,13 @@ export type HomePage = {
   productFeatures?: LocalizedItem[];
   productBrandLabel?: LocalizedField;
   productBrandName?: LocalizedField;
-  productSpecs?: Array<{ label: LocalizedField; value: LocalizedField }>;
   productBenefitsHeadline?: LocalizedField;
   productBenefits?: LocalizedItem[];
   productStepsLabel?: LocalizedField;
   productSpecsHeadline?: LocalizedField;
+  productPersonalizationKicker?: LocalizedField;
+  productPersonalizationHeadline?: LocalizedField;
+  productPersonalizationText?: LocalizedField;
   productHardwareLabel?: LocalizedField;
   productHardwareRows?: Array<{
     label: LocalizedField;

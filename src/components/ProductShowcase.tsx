@@ -27,13 +27,6 @@ const STEPS_FALLBACK = [
   ],
 ] as const;
 
-const SPECS_FALLBACK = [
-  ["Jednostka glowna", "39 skrytek + ekran"],
-  ["Jednostka rozszerzajaca", "40 skrytek"],
-  ["Ekran", '21.5" dotykowy'],
-  ["Integracja", "API / Middleware"],
-] as const;
-
 const HARDWARE_FALLBACK = [
   ["Liczba skrytek", "od 3 do 320"],
   ["Ekran", 'od 10" do 21.5"'],
@@ -44,7 +37,7 @@ const HARDWARE_FALLBACK = [
 export default function ProductShowcase({
   data,
 }: { data?: HomePage } = {}) {
-  const { t } = useLang();
+  const { t, lang } = useLang();
   const eyebrow = t(data?.productEyebrow ?? null) || "Nasze rozwiazanie";
   const headline = t(data?.productHeadline ?? null) || "PickUpWall";
   const stepsLabel =
@@ -53,6 +46,19 @@ export default function ProductShowcase({
   const specsHeadline =
     t(data?.productSpecsHeadline ?? null) || "Specyfikacja techniczna";
   const hardwareLabel = t(data?.productHardwareLabel ?? null) || "Hardware";
+  const personalizationKicker =
+    t(data?.productPersonalizationKicker ?? null) ||
+    (lang === "en" ? "Personalisation" : "Personalizacja");
+  const personalizationHeadline =
+    t(data?.productPersonalizationHeadline ?? null) ||
+    (lang === "en"
+      ? "Every PickUpWall is built **around you.**"
+      : "Każdy PickUpWall budujemy **pod Ciebie.**");
+  const personalizationText =
+    t(data?.productPersonalizationText ?? null) ||
+    (lang === "en"
+      ? "Format, locker count, screen, enclosure and graphics - all tailored to your brand and your space."
+      : "Format, liczba skrytek, ekran, obudowa i grafika - wszystko pod Twoją markę i przestrzeń.");
 
   const steps: Array<[string, string]> =
     data?.productFeatures && data.productFeatures.length > 0
@@ -61,10 +67,6 @@ export default function ProductShowcase({
           t(f.description) || "",
         ])
       : STEPS_FALLBACK.map((s) => [s[0], s[1]] as [string, string]);
-  const specs: Array<[string, string]> =
-    data?.productSpecs && data.productSpecs.length > 0
-      ? data.productSpecs.map((s) => [t(s.label) || "", t(s.value) || ""])
-      : SPECS_FALLBACK.map((s) => [s[0], s[1]] as [string, string]);
   const hardwareRows: Array<[string, string]> =
     data?.productHardwareRows && data.productHardwareRows.length > 0
       ? data.productHardwareRows.map((r) => [t(r.label) || "", t(r.value) || ""])
@@ -295,19 +297,45 @@ export default function ProductShowcase({
                   {specsHeadline}
                 </p>
 
-                <div className="grid grid-cols-2 gap-x-8 gap-y-4 mb-8 max-lg:mb-6">
-                  {specs.map(([label, value]) => (
-                    <div key={label} className="flex flex-col gap-1">
-                      <span
-                        className="text-[0.68rem] font-medium uppercase tracking-widest"
-                        style={{ color: "#0086b0" }}>
-                        {label}
-                      </span>
-                      <span className="text-[#2a2a2a] text-[0.92rem] font-semibold">
-                        {value}
-                      </span>
-                    </div>
-                  ))}
+                <div className="mb-8 max-lg:mb-6">
+                  <span
+                    className="inline-flex items-center gap-2 rounded-full border border-[#0086b0]/25 bg-[#0086b0]/10 px-4 py-1.5 font-semibold uppercase tracking-[0.18em] text-[#0086b0]"
+                    style={{ fontSize: "0.68rem" }}>
+                    <svg
+                      width="13"
+                      height="13"
+                      viewBox="0 0 24 24"
+                      fill="currentColor"
+                      aria-hidden>
+                      <path d="M12 2l2.2 5.8L20 10l-5.8 2.2L12 18l-2.2-5.8L4 10l5.8-2.2L12 2z" />
+                    </svg>
+                    {personalizationKicker}
+                  </span>
+                  <p
+                    className="m-0 mt-3 font-bold tracking-tight text-[#0a2a2e]"
+                    style={{
+                      fontSize: "clamp(1.25rem, 1.9vw, 1.7rem)",
+                      lineHeight: 1.15,
+                      letterSpacing: "-0.01em",
+                      maxWidth: "20ch",
+                    }}>
+                    {personalizationHeadline
+                      .split(/\*\*(.+?)\*\*/g)
+                      .map((part, i) =>
+                        i % 2 === 1 ? (
+                          <span key={i} style={{ color: "#0086b0" }}>
+                            {part}
+                          </span>
+                        ) : (
+                          part
+                        ),
+                      )}
+                  </p>
+                  <p
+                    className="m-0 mt-2.5 text-[#3a5a60] leading-relaxed"
+                    style={{ fontSize: "0.9rem", maxWidth: "34ch" }}>
+                    {personalizationText}
+                  </p>
                 </div>
 
                 <div
