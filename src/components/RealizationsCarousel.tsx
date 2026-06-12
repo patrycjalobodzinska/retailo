@@ -114,7 +114,7 @@ export default function RealizationsCarousel({
       {showHeader && (
         <div className="relative z-10 mx-auto max-w-[1100px] px-6 mb-4 md:mb-10 text-center">
           <p
-            className="m-0 mb-2 uppercase tracking-[0.3em] font-semibold text-[#7a7a7a]"
+            className="m-0 mb-2 uppercase tracking-[0.3em] font-semibold text-[#5f5f5f]"
             style={{ fontSize: "0.62rem" }}
           >
             {eyebrow}
@@ -207,7 +207,7 @@ export default function RealizationsCarousel({
 
               if (variant === "dark") {
                 return (
-                  <article
+                  <div
                     key={`${item.slug}-${i}`}
                     onClick={handleClick}
                     {...a11yProps}
@@ -322,12 +322,12 @@ export default function RealizationsCarousel({
                         </div>
                       )}
                     </div>
-                  </article>
+                  </div>
                 );
               }
 
               return (
-                <article
+                <div
                   key={`${item.slug}-${i}`}
                   onClick={handleClick}
                   {...a11yProps}
@@ -408,14 +408,14 @@ export default function RealizationsCarousel({
                       )}
                     </div>
                   </div>
-                </article>
+                </div>
               );
             })}
           </div>
         </div>
 
         <div className="relative mx-auto mt-8 md:mt-14 flex w-full max-w-[1100px] flex-col items-center gap-5 px-6">
-          <div className="flex items-center md:hidden">
+          <div className="flex items-center gap-1 md:hidden">
             {Array.from({ length: len }).map((_, i) => {
               const active = ((index % len) + len) % len === i;
               return (
@@ -425,7 +425,7 @@ export default function RealizationsCarousel({
                   onClick={() => goTo(i)}
                   aria-label={`Slajd ${i + 1}`}
                   aria-current={active}
-                  className="cursor-pointer border-0 bg-transparent p-1.5"
+                  className="flex h-11 w-9 items-center justify-center cursor-pointer border-0 bg-transparent p-0"
                 >
                   <span
                     className="block rounded-full transition-all duration-300"

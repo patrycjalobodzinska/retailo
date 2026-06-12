@@ -112,36 +112,18 @@ export default async function RootLayout({
       suppressHydrationWarning
     >
       <head>
-        {/* Szybsze ładowanie globusa: wczesne nawiązanie połączenia z CDN
-            kafelków/stylu MapLibre (Carto) - oszczędza DNS + TLS handshake. */}
-        <link
-          rel="preconnect"
-          href="https://basemaps.cartocdn.com"
-          crossOrigin="anonymous"
-        />
-        <link rel="dns-prefetch" href="https://basemaps.cartocdn.com" />
-        {/* Preload hero image - najważniejszy LCP element strony głównej */}
-        <link
-          rel="preload"
-          as="image"
-          href="/model3_retailo.png"
-          fetchPriority="high"
-        />
-        {/* Preload below-the-fold heavy images that cause first-pass lag
-            in the spec section. fetchPriority="low" pozwala przeglądarce
-            ściągnąć je w tle bez konkurowania z LCP. */}
-        <link
-          rel="preload"
-          as="image"
-          href="/pickupwall-photo.png"
-          fetchPriority="low"
-        />
-        <link
-          rel="preload"
-          as="image"
-          href="/pickupwall-sketch.png"
-          fetchPriority="low"
-        />
+        {/* Element LCP (obraz hero) jest w SSR-owym HTML z fetchPriority="high"
+            i loading="eager" - preload scanner znajduje go natychmiast, więc
+            osobny <link rel="preload"> nie jest potrzebny.
+
+            Świadomie NIE preloadujemy tu lokalnych /model3_retailo.png,
+            /pickupwall-photo.png ani /pickupwall-sketch.png: realnie
+            renderowane są wersje z Sanity CDN, więc te preloady tylko
+            marnowały ~1,5 MB transferu na obrazy, które nigdy się nie pokazują.
+
+            Połączenia do basemaps.cartocdn.com (kafelki globusa) nawiązujemy
+            dopiero gdy globus się montuje - sekcja jest głęboko pod foldem,
+            a wczesny preconnect był przez PageSpeed oznaczany jako nieużywany. */}
         {/* Runs before <body> is parsed so the browser never gets a chance
             to restore the previous scroll position. Without this, hard
             refreshes mid-page land the user at the old scrollY (often

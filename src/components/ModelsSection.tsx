@@ -216,7 +216,7 @@ export default function ModelsSection({ data }: { data?: HomePage } = {}) {
                 type="button"
                 aria-label={`Model ${i + 1}`}
                 onClick={() => scrollToCard(i)}
-                className="cursor-pointer p-0 m-0 border-0 bg-transparent">
+                className="flex h-11 w-9 items-center justify-center cursor-pointer p-0 m-0 border-0 bg-transparent">
                 <span
                   className="block transition-all duration-300 rounded-full"
                   style={{

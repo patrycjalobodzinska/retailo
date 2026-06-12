@@ -214,7 +214,7 @@ export default function QASection({ data }: { data?: QAData } = {}) {
       <div className="lg:hidden relative">
         <div className="relative z-[1] mb-7 max-w-[520px] px-[6vw]">
           <p
-            className="m-0 mb-3 uppercase tracking-[0.28em] font-semibold text-[#7a7a7a]"
+            className="m-0 mb-3 uppercase tracking-[0.28em] font-semibold text-[#5f5f5f]"
             style={{ fontSize: "0.68rem" }}>
             {eyebrow}
           </p>
@@ -305,7 +305,7 @@ export default function QASection({ data }: { data?: QAData } = {}) {
               {COLOR_SWATCHES.map((swatch) => (
                 <span
                   key={swatch.color}
-                  aria-label={swatch.label}
+                  aria-hidden="true"
                   title={swatch.label}
                   className="block rounded-full"
                   style={{
@@ -447,7 +447,7 @@ export default function QASection({ data }: { data?: QAData } = {}) {
               type="button"
               aria-label={`Karta ${i + 1}`}
               onClick={() => scrollToCard(i)}
-              className="cursor-pointer p-0 m-0 border-0 bg-transparent">
+              className="flex h-11 w-9 items-center justify-center cursor-pointer p-0 m-0 border-0 bg-transparent">
               <span
                 className="block transition-all duration-300 rounded-full"
                 style={{
@@ -487,7 +487,7 @@ export default function QASection({ data }: { data?: QAData } = {}) {
           className="mb-10 max-w-[680px]"
           style={{ transform: "translateY(40px)" }}>
           <span
-            className="block uppercase tracking-[0.3em] font-semibold text-[#7a7a7a] mb-4"
+            className="block uppercase tracking-[0.3em] font-semibold text-[#5f5f5f] mb-4"
             style={{ fontSize: "0.72rem" }}>
             {eyebrow}
           </span>
@@ -578,7 +578,7 @@ export default function QASection({ data }: { data?: QAData } = {}) {
               {COLOR_SWATCHES.map((swatch) => (
                 <span
                   key={swatch.color}
-                  aria-label={swatch.label}
+                  aria-hidden="true"
                   title={swatch.label}
                   className="block rounded-full"
                   style={{

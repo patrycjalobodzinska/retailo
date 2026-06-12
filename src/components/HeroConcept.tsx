@@ -67,8 +67,10 @@ export default function HeroConcept({ data }: { data?: HeroData } = {}) {
     const badges = statsWrapRef.current
       ? Array.from(statsWrapRef.current.children)
       : [];
+    // UWAGA: obraz hero (imageRef) celowo NIE jest tu animowany. Jest to
+    // element LCP - musi być widoczny od pierwszego paintu (opacity:1 w SSR).
+    // Gdyby GSAP odsłaniał go po hydracji, LCP rośnie do kilkunastu sekund.
     const targets = [
-      imageRef.current,
       contentRef.current,
       cardRef.current,
       ...badges,
@@ -188,10 +190,12 @@ export default function HeroConcept({ data }: { data?: HeroData } = {}) {
           ref={imageRef}
           src={data?.heroImage || "/model3_retailo.png"}
           alt="PickUpWall"
+          loading="eager"
+          fetchPriority="high"
+          decoding="async"
           className="relative block h-[78vh] w-auto object-contain max-lg:h-[36svh]"
           style={{
-            opacity: 0,
-            transform: "translateX(-40px)",
+            opacity: 1,
             filter:
               "drop-shadow(0 18px 30px rgba(15,15,15,0.18)) drop-shadow(0 6px 12px rgba(15,15,15,0.10))",
           }}
@@ -307,7 +311,7 @@ export default function HeroConcept({ data }: { data?: HeroData } = {}) {
               <span className="font-medium text-[#0f0f0f] tracking-tight text-[0.92rem] leading-[1.1] max-lg:text-[0.72rem]">
                 {b.value}
               </span>
-              <span className="mt-0.5 uppercase tracking-[0.18em] font-medium text-[#7a7a7a] text-[0.55rem] max-lg:text-[0.46rem] max-lg:mt-0">
+              <span className="mt-0.5 uppercase tracking-[0.18em] font-medium text-[#5f5f5f] text-[0.55rem] max-lg:text-[0.46rem] max-lg:mt-0">
                 {b.label}
               </span>
             </div>
@@ -340,7 +344,7 @@ export default function HeroConcept({ data }: { data?: HeroData } = {}) {
         <div className="flex flex-1 items-center justify-between gap-2.5 px-4 py-3 max-lg:px-3">
           <div className="flex-1 min-w-0">
             <span
-              className="block uppercase tracking-[0.24em] font-semibold text-[#7a7a7a] mb-1"
+              className="block uppercase tracking-[0.24em] font-semibold text-[#5f5f5f] mb-1"
               style={{ fontSize: "0.56rem" }}>
               {installEyebrow}
             </span>

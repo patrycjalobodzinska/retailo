@@ -57,8 +57,8 @@ export const LEGAL_PAGE_QUERY = /* groq */ `
 
 export const HOME_PAGE_QUERY = /* groq */ `{
   "hero": *[_type == "homeHero"][0]{
-    "heroImage": heroImage.asset->url,
-    "heroInstallImage": heroInstallImage.asset->url,
+    "heroImage": heroImage.asset->url + "?w=1200&auto=format&q=80&fit=max",
+    "heroInstallImage": heroInstallImage.asset->url + "?w=400&auto=format&q=75&fit=max",
     heroSubtitle ${localized},
     heroDescription ${localized},
     heroScrollLabel ${localized},
@@ -71,7 +71,7 @@ export const HOME_PAGE_QUERY = /* groq */ `{
     heroInstallSubtitle ${localized}
   },
   "qa": *[_type == "homeQa"][0]{
-    "qaClientLogo": qaClientLogo.asset->url,
+    "qaClientLogo": qaClientLogo.asset->url + "?w=320&auto=format&q=80&fit=max",
     qaEyebrow ${localized},
     qaHeadline ${localized},
     qaSubtitle ${localized},
@@ -81,8 +81,8 @@ export const HOME_PAGE_QUERY = /* groq */ `{
     }
   },
   "product": *[_type == "homeProduct"][0]{
-    "productPhoto": productPhoto.asset->url,
-    "productSketch": productSketch.asset->url,
+    "productPhoto": productPhoto.asset->url + "?w=1000&auto=format&q=80&fit=max",
+    "productSketch": productSketch.asset->url + "?w=900&auto=format&q=80&fit=max",
     productEyebrow ${localized},
     productHeadline ${localized},
     productFeatures[]{
@@ -136,7 +136,7 @@ export const HOME_PAGE_QUERY = /* groq */ `{
       name ${localized},
       description ${localized},
       featured,
-      "image": image.asset->url
+      "image": image.asset->url + "?w=800&auto=format&q=80&fit=max"
     }
   },
   "global": *[_type == "homeGlobal"][0]{
